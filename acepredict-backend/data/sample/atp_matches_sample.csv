@@ -1,0 +1,43 @@
+tourney_id,tourney_name,surface,draw_size,tourney_level,tourney_date,match_num,winner_id,winner_name,winner_hand,winner_ioc,winner_ht,loser_id,loser_name,loser_hand,loser_ioc,loser_ht,score,best_of,round,w_ace,w_df,l_ace,l_df,winner_rank,loser_rank
+2024-580,Australian Open,Hard,128,G,20240114,1,100001,Carlos Alcaraz,R,ESP,183,100004,Daniil Medvedev,R,RUS,198,6-4 7-0 6-0,5,R32,8,1,9,0,36,13
+2024-580,Australian Open,Hard,128,G,20240114,2,100005,Alexander Zverev,R,GER,198,100012,Grigor Dimitrov,R,BUL,191,7-1 7-4 6-0,5,R32,7,5,7,5,18,10
+2024-580,Australian Open,Hard,128,G,20240114,3,100016,Frances Tiafoe,R,USA,188,100014,Tommy Paul,R,USA,185,6-0 7-0,5,R32,13,6,6,4,3,47
+2024-580,Australian Open,Hard,128,G,20240114,4,100003,Novak Djokovic,R,SRB,188,100002,Jannik Sinner,R,ITA,191,7-0 6-4,5,R32,13,4,4,1,3,43
+2024-580,Australian Open,Hard,128,G,20240114,5,100001,Carlos Alcaraz,R,ESP,183,100005,Alexander Zverev,R,GER,198,6-1 6-3,5,R16,10,3,11,5,11,24
+2024-580,Australian Open,Hard,128,G,20240114,6,100016,Frances Tiafoe,R,USA,188,100003,Novak Djokovic,R,SRB,188,6-0 6-4 6-1,5,R16,16,3,5,3,21,54
+2024-580,Australian Open,Hard,128,G,20240114,7,100016,Frances Tiafoe,R,USA,188,100001,Carlos Alcaraz,R,ESP,183,6-0 6-3,5,QF,10,0,4,5,14,42
+2024-M001,Indian Wells Masters,Hard,96,M,20240306,29,100004,Daniil Medvedev,R,RUS,198,100012,Grigor Dimitrov,R,BUL,191,6-1 6-1,3,R32,15,0,3,5,27,52
+2024-M001,Indian Wells Masters,Hard,96,M,20240306,30,100015,Holger Rune,R,DEN,188,100011,Hubert Hurkacz,R,POL,196,6-2 6-0 7-0,3,R32,17,1,4,7,23,20
+2024-M001,Indian Wells Masters,Hard,96,M,20240306,31,100002,Jannik Sinner,R,ITA,191,100014,Tommy Paul,R,USA,185,6-0 6-3,3,R32,12,2,14,1,18,23
+2024-M001,Indian Wells Masters,Hard,96,M,20240306,32,100009,Casper Ruud,R,NOR,183,100006,Andrey Rublev,R,RUS,188,6-0 6-2,3,R32,7,4,5,0,7,39
+2024-M001,Indian Wells Masters,Hard,96,M,20240306,33,100004,Daniil Medvedev,R,RUS,198,100015,Holger Rune,R,DEN,188,6-3 6-3 6-2,3,R16,3,5,7,0,34,60
+2024-M001,Indian Wells Masters,Hard,96,M,20240306,34,100009,Casper Ruud,R,NOR,183,100002,Jannik Sinner,R,ITA,191,6-2 7-0 6-4,3,R16,12,5,14,1,20,33
+2024-M001,Indian Wells Masters,Hard,96,M,20240306,35,100004,Daniil Medvedev,R,RUS,198,100009,Casper Ruud,R,NOR,183,6-3 6-4,3,QF,6,1,7,6,12,40
+2024-M002,Rome Masters,Clay,96,M,20240508,36,100007,Stefanos Tsitsipas,R,GRE,193,100010,Taylor Fritz,R,USA,196,6-3 7-3 6-4,3,R32,17,6,13,2,6,19
+2024-M002,Rome Masters,Clay,96,M,20240508,37,100001,Carlos Alcaraz,R,ESP,183,100009,Casper Ruud,R,NOR,183,6-0 6-2 6-1,3,R32,6,0,1,3,31,40
+2024-M002,Rome Masters,Clay,96,M,20240508,38,100012,Grigor Dimitrov,R,BUL,191,100005,Alexander Zverev,R,GER,198,7-3 6-3,3,R32,17,3,4,2,1,58
+2024-M002,Rome Masters,Clay,96,M,20240508,39,100015,Holger Rune,R,DEN,188,100004,Daniil Medvedev,R,RUS,198,7-1 6-4,3,R32,16,0,9,3,8,30
+2024-M002,Rome Masters,Clay,96,M,20240508,40,100007,Stefanos Tsitsipas,R,GRE,193,100001,Carlos Alcaraz,R,ESP,183,6-3 7-4,3,R16,16,1,12,7,29,17
+2024-M002,Rome Masters,Clay,96,M,20240508,41,100015,Holger Rune,R,DEN,188,100012,Grigor Dimitrov,R,BUL,191,6-4 7-1 6-3,3,R16,4,5,5,3,18,22
+2024-M002,Rome Masters,Clay,96,M,20240508,42,100007,Stefanos Tsitsipas,R,GRE,193,100015,Holger Rune,R,DEN,188,6-1 6-1 7-1,3,QF,8,0,7,6,22,35
+2024-520,Roland Garros,Clay,128,G,20240526,8,100007,Stefanos Tsitsipas,R,GRE,193,100016,Frances Tiafoe,R,USA,188,6-4 7-4 7-2,5,R32,9,1,9,7,6,49
+2024-520,Roland Garros,Clay,128,G,20240526,9,100011,Hubert Hurkacz,R,POL,196,100008,Ben Shelton,L,USA,193,6-1 7-4,5,R32,4,3,7,7,34,17
+2024-520,Roland Garros,Clay,128,G,20240526,10,100005,Alexander Zverev,R,GER,198,100003,Novak Djokovic,R,SRB,188,6-4 6-2,5,R32,5,2,7,2,30,1
+2024-520,Roland Garros,Clay,128,G,20240526,11,100004,Daniil Medvedev,R,RUS,198,100012,Grigor Dimitrov,R,BUL,191,6-4 6-4 6-2,5,R32,18,4,4,2,24,49
+2024-520,Roland Garros,Clay,128,G,20240526,12,100007,Stefanos Tsitsipas,R,GRE,193,100011,Hubert Hurkacz,R,POL,196,6-4 6-3 6-0,5,R16,13,6,13,4,16,4
+2024-520,Roland Garros,Clay,128,G,20240526,13,100005,Alexander Zverev,R,GER,198,100004,Daniil Medvedev,R,RUS,198,6-0 7-0 6-1,5,R16,17,4,3,4,34,56
+2024-520,Roland Garros,Clay,128,G,20240526,14,100005,Alexander Zverev,R,GER,198,100007,Stefanos Tsitsipas,R,GRE,193,6-2 7-2,5,QF,16,4,8,1,16,15
+2024-540,Wimbledon,Grass,128,G,20240701,15,100003,Novak Djokovic,R,SRB,188,100006,Andrey Rublev,R,RUS,188,6-1 6-0 6-0,5,R32,18,1,5,7,14,35
+2024-540,Wimbledon,Grass,128,G,20240701,16,100001,Carlos Alcaraz,R,ESP,183,100010,Taylor Fritz,R,USA,196,7-1 7-3 6-0,5,R32,5,5,7,5,28,27
+2024-540,Wimbledon,Grass,128,G,20240701,17,100009,Casper Ruud,R,NOR,183,100004,Daniil Medvedev,R,RUS,198,6-0 6-3 6-0,5,R32,9,1,4,7,9,28
+2024-540,Wimbledon,Grass,128,G,20240701,18,100013,Alex de Minaur,R,AUS,183,100011,Hubert Hurkacz,R,POL,196,6-0 7-4,5,R32,5,0,11,0,6,60
+2024-540,Wimbledon,Grass,128,G,20240701,19,100001,Carlos Alcaraz,R,ESP,183,100003,Novak Djokovic,R,SRB,188,6-3 7-3,5,R16,8,6,7,0,11,25
+2024-540,Wimbledon,Grass,128,G,20240701,20,100009,Casper Ruud,R,NOR,183,100013,Alex de Minaur,R,AUS,183,6-3 6-3,5,R16,17,1,4,4,14,4
+2024-540,Wimbledon,Grass,128,G,20240701,21,100009,Casper Ruud,R,NOR,183,100001,Carlos Alcaraz,R,ESP,183,6-2 6-0 7-4,5,QF,18,1,1,1,12,5
+2024-560,US Open,Hard,128,G,20240826,22,100011,Hubert Hurkacz,R,POL,196,100003,Novak Djokovic,R,SRB,188,6-3 6-2,5,R32,8,5,12,5,16,17
+2024-560,US Open,Hard,128,G,20240826,23,100014,Tommy Paul,R,USA,185,100004,Daniil Medvedev,R,RUS,198,6-3 6-0 6-3,5,R32,5,0,9,3,33,17
+2024-560,US Open,Hard,128,G,20240826,24,100007,Stefanos Tsitsipas,R,GRE,193,100002,Jannik Sinner,R,ITA,191,6-1 6-2,5,R32,7,3,14,4,40,52
+2024-560,US Open,Hard,128,G,20240826,25,100013,Alex de Minaur,R,AUS,183,100010,Taylor Fritz,R,USA,196,6-0 6-2,5,R32,5,0,12,2,18,19
+2024-560,US Open,Hard,128,G,20240826,26,100014,Tommy Paul,R,USA,185,100011,Hubert Hurkacz,R,POL,196,6-1 6-4 7-2,5,R16,3,0,11,6,18,3
+2024-560,US Open,Hard,128,G,20240826,27,100007,Stefanos Tsitsipas,R,GRE,193,100013,Alex de Minaur,R,AUS,183,6-1 7-4,5,R16,15,4,1,1,5,57
+2024-560,US Open,Hard,128,G,20240826,28,100007,Stefanos Tsitsipas,R,GRE,193,100014,Tommy Paul,R,USA,185,6-2 6-3,5,QF,6,0,5,5,3,58

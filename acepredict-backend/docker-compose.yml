@@ -1,0 +1,38 @@
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: acepredict
+      POSTGRES_PASSWORD: acepredict
+      POSTGRES_DB: acepredict
+    ports:
+      - "5432:5432"
+    volumes:
+      - acepredict_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U acepredict"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    # seed_demo applique les migrations puis peuple la base avec les données
+    # de démo (idempotent : ne duplique rien si déjà peuplée) avant de lancer
+    # l'API — un simple `docker compose up` donne donc un backend déjà
+    # fonctionnel avec de vraies données, sans étape manuelle.
+    command: sh -c "python -m scripts.seed_demo && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+volumes:
+  acepredict_db_data:
