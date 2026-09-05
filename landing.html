@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AcePredict</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -190,19 +191,20 @@
     padding-bottom: 40px;
   }
   .float-badge{
-    position:absolute;
-    width: 76px; height:76px; border-radius:999px;
+    position:absolute; z-index:3;
+    width: 86px; height:86px; border-radius:999px;
     background: radial-gradient(circle at 35% 30%, #1c2b1e, #0c110e);
-    border: 1px solid var(--line-strong);
+    border: 2px solid var(--line-strong);
     display:flex; align-items:center; justify-content:center;
-    font-size: 30px;
-    box-shadow: 0 0 40px rgba(215,242,44,0.18);
+    overflow:hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 40px rgba(215,242,44,0.18);
     animation: bob 5s ease-in-out infinite;
   }
-  .float-badge.b1{ top: 6%; left: -8%; animation-delay: 0s; }
-  .float-badge.b2{ top: 2%; right: -10%; animation-delay: .6s; }
-  .float-badge.b3{ bottom: 30%; left: -12%; animation-delay: 1.2s; width:66px; height:66px; font-size:26px; }
-  .float-badge.b4{ bottom: 26%; right: -9%; animation-delay: 1.8s; }
+  .float-badge img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .float-badge.b1{ top: 4%; left: -11%; animation-delay: 0s; }
+  .float-badge.b2{ top: 0%; right: -13%; animation-delay: .6s; }
+  .float-badge.b3{ bottom: 28%; left: -15%; animation-delay: 1.2s; width:72px; height:72px; }
+  .float-badge.b4{ bottom: 24%; right: -12%; animation-delay: 1.8s; }
   @keyframes bob{ 0%,100%{ transform: translateY(0px); } 50%{ transform: translateY(-14px); } }
 
   .phone{
@@ -258,6 +260,8 @@
   }
   .wordmark{ font-family: var(--font-h); font-weight:700; font-size: clamp(18px,2.4vw,26px); color: var(--text); opacity:.85; letter-spacing:.02em; }
   .wordmark.dim{ opacity:.35; }
+  .wordmark{ transition: transform .35s cubic-bezier(.2,.8,.2,1), color .35s ease, opacity .35s ease; will-change: transform; display:inline-block; }
+  .wordmark.col-active{ transform: translateY(-8px); color: #ff8fb0 !important; opacity:1 !important; }
 
   /* ---------- SCORE / COURT SECTION ---------- */
   .court-section{
@@ -286,6 +290,8 @@
     border-radius: 999px; padding: 8px; padding-right:26px;
   }
   .ready-ball{ width:44px; height:44px; border-radius:999px; background:#e9ecec; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .live-dot{ width:10px; height:10px; border-radius:999px; background:#4ADE80; margin-left:14px; flex-shrink:0; animation: pulse-dot 1.8s infinite; }
+  @keyframes pulse-dot{ 0%{ box-shadow:0 0 0 0 rgba(74,222,128,.6); } 70%{ box-shadow:0 0 0 10px rgba(74,222,128,0); } 100%{ box-shadow:0 0 0 0 rgba(74,222,128,0); } }
   .ready-text{ font-family: var(--font-h); font-weight:700; font-size:14px; background: linear-gradient(90deg,#3a5c3d,var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .dl-line{ margin-top: 18px; color: var(--accent); opacity:.75; font-size:13.5px; line-height:1.6; }
 
@@ -358,14 +364,25 @@
   .faq-head{ text-align:center; margin-bottom: 50px; }
   .faq-head h2{ font-size: clamp(26px,3.8vw,42px); font-weight:800; text-transform:uppercase; }
   .faq-head p{ color: var(--text-sec); font-size:15px; margin-top:14px; }
-  .faq-list{ max-width: 760px; margin:0 auto; }
-  .faq-item{ border-top: 1px solid var(--line); padding: 26px 0; }
-  .faq-item:last-child{ border-bottom: 1px solid var(--line); }
-  .faq-q{ display:flex; align-items:center; gap:18px; cursor:pointer; font-size: 17px; font-weight:700; }
-  .faq-q .plus{ font-size:22px; color: var(--text-sec); flex-shrink:0; width:22px; transition: transform .25s ease; font-weight:400; }
+  .faq-list{ max-width: 760px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+  .faq-item{
+    background: linear-gradient(160deg, var(--card-top), var(--card-bottom));
+    border: 1px solid var(--line); border-radius:18px; padding: 22px 24px;
+    transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease;
+  }
+  .faq-item:hover{ border-color: var(--line-strong); transform: translateY(-2px); }
+  .faq-item.open{ border-color: var(--accent); box-shadow: 0 12px 34px -18px rgba(215,242,44,0.35); }
+  .faq-q{ display:flex; align-items:center; gap:16px; cursor:pointer; font-size: 16.5px; font-weight:700; }
+  .faq-q .num{
+    width:34px; height:34px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-h); font-weight:800; font-size:14px; color:#14180a;
+  }
+  .faq-q .q-text{ flex:1; }
+  .faq-q .plus{ font-size:22px; color: var(--text-sec); flex-shrink:0; width:22px; text-align:right; transition: transform .25s ease; font-weight:400; }
   .faq-item.open .faq-q .plus{ transform: rotate(45deg); color: var(--accent); }
   .faq-a{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
-  .faq-a p{ padding: 16px 0 0 40px; color: var(--text-sec); font-size:14.5px; line-height:1.6; max-width:600px; }
+  .faq-a p{ padding: 16px 0 0 50px; color: var(--text-sec); font-size:14.5px; line-height:1.6; max-width:600px; }
 
   /* ---------- FOOTER ---------- */
   footer{ border-top:1px solid var(--line); padding: 44px 32px; }
@@ -463,11 +480,13 @@
         <button type="button" class="lang-option active" data-lang="fr">Français</button>
         <button type="button" class="lang-option" data-lang="en">English</button>
         <button type="button" class="lang-option" data-lang="es">Español</button>
+        <button type="button" class="lang-option" data-lang="de">Deutsch</button>
+        <button type="button" class="lang-option" data-lang="it">Italiano</button>
       </div>
     </div>
     <a href="#" class="nav-login" id="navLoginBtn">
       <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 8-6 8"/><path d="M13 4l6 8-6 8"/></svg></span>
-      Connexion
+      <span data-i18n="nav_login">Connexion</span>
     </a>
     <div class="burger"><span></span><span></span></div>
   </div>
@@ -476,21 +495,21 @@
 <section class="hero">
   <div class="court-bg"></div>
   <div class="badge"><span class="star">★★★★★</span> +100K utilisateurs satisfaits</div>
-  <h1 class="reveal">Prédit chaque match avant qu'il ne<br><span class="lime">commence.</span></h1>
-  <p class="sub reveal">Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.</p>
+  <h1 class="reveal" data-i18n-html="hero_title">Prédit chaque match avant qu'il ne<br><span class="lime">commence.</span></h1>
+  <p class="sub reveal" data-i18n="hero_sub">Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.</p>
 
   <div class="search-hero reveal">
-    <input type="text" placeholder="Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)">
-    <button>Analyser</button>
+    <input type="text" placeholder="Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)" data-i18n-placeholder="hero_search_ph">
+    <button data-i18n="btn_analyser">Analyser</button>
   </div>
 
-  <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b> de précision sur les <b class="n2 counter" data-target="612">0</b> matchs analysés la semaine dernière</div>
+  <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs analysés la semaine dernière</span></div>
 
   <div class="phone-stage reveal">
-    <div class="float-badge b1">🇪🇸</div>
-    <div class="float-badge b2">🇮🇹</div>
-    <div class="float-badge b3">🇷🇸</div>
-    <div class="float-badge b4">🇬🇷</div>
+    <div class="float-badge b1"><img src="assets/players/alcaraz.jpg" alt="Carlos Alcaraz" loading="lazy"></div>
+    <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
+    <div class="float-badge b3"><img src="assets/players/player-w.jpg" alt="Joueuse WTA" loading="lazy"></div>
+    <div class="float-badge b4"><img src="assets/players/djokovic.jpg" alt="Novak Djokovic" loading="lazy"></div>
     <div class="phone">
       <div class="phone-notch"></div>
       <div class="phone-screen">
@@ -498,19 +517,19 @@
           <span class="brand-name" style="font-size:14px;">AcePredict</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA69A" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </div>
-        <div class="p-h1">Analyse de match</div>
-        <div class="p-sub">Entre les joueurs que tu veux analyser</div>
-        <div class="p-sub accent">Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.</div>
+        <div class="p-h1" data-i18n="p_h1_analyse">Analyse de match</div>
+        <div class="p-sub" data-i18n="p_sub1">Entre les joueurs que tu veux analyser</div>
+        <div class="p-sub accent" data-i18n="p_sub_accent1">Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.</div>
         <div class="p-card">
-          <div class="p-label">MATCH À ANALYSER</div>
+          <div class="p-label" data-i18n="p_label_match">MATCH À ANALYSER</div>
           <div class="p-vs-badge">🇪🇸</div>
           <input class="p-input ok" value="Carlos Alcaraz" readonly>
           <div class="p-vs">VS</div>
-          <input class="p-input" placeholder="Cherche un joueur (ex: Sinner, Zverev...)">
-          <button class="p-btn">Analyser le match avec l'IA</button>
+          <input class="p-input" placeholder="Cherche un joueur (ex: Sinner, Zverev...)" data-i18n-placeholder="p_search_ph">
+          <button class="p-btn" onclick="window.location.href='visitennis_1.html'" data-i18n="p_analyse_btn">Analyser le match avec l'IA</button>
         </div>
         <div class="p-card p-next">
-          <div class="p-next-title">Prochains matchs</div>
+          <div class="p-next-title" data-i18n="p_next_title">Prochains matchs</div>
           <div class="p-match"><span class="p-date">03/04<br>20:45</span><b>Alcaraz</b> 🇪🇸 <span class="vs-mini">vs</span> 🇮🇹 Sinner</div>
           <div class="p-match"><span class="p-date">08/04<br>21:00</span><b>Alcaraz</b> 🇪🇸 <span class="vs-mini">vs</span> 🇬🇷 Tsitsipas</div>
           <div class="p-match"><span class="p-date">11/04<br>17:00</span>Zverev 🇩🇪 <span class="vs-mini">vs</span> 🇪🇸 <b>Alcaraz</b></div>
@@ -523,7 +542,7 @@
 
 <section class="logos-section">
   <div class="wrap">
-    <h2 class="reveal">Plus de 60 tournois <span class="lime">couverts</span></h2>
+    <h2 class="reveal" data-i18n-html="logos_h2">Plus de 60 tournois <span class="lime">couverts</span></h2>
     <div class="logos-row reveal">
       <span class="wordmark">ATP TOUR</span>
       <span class="wordmark dim">WTA TOUR</span>
@@ -547,22 +566,22 @@
   </svg>
   <div class="wrap">
     <h2 class="court-h2 reveal"><span class="lime">Alcaraz</span> 3 - 1 Sinner</h2>
-    <p class="court-p reveal">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</p>
+    <p class="court-p reveal" data-i18n="court_p">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</p>
     <div class="score-stats">
       <div class="score-stat reveal">
         <div class="score-num"><span class="counter" data-target="68" data-suffix="%">0%</span></div>
-        <div class="score-cap">Victoire Alcaraz</div>
+        <div class="score-cap" data-i18n="score_cap1">Victoire Alcaraz</div>
       </div>
       <div class="score-stat reveal">
         <div class="score-num"><span class="counter" data-target="32" data-suffix="%">0%</span></div>
-        <div class="score-cap">Victoire Sinner</div>
+        <div class="score-cap" data-i18n="score_cap2">Victoire Sinner</div>
       </div>
     </div>
-    <div class="ready-pill reveal">
-      <span class="ready-ball">🎾</span>
-      <span class="ready-text">ANALYSE PRÊTE</span>
+    <div class="ready-pill reveal" style="padding-left:20px;">
+      <span class="ready-text" data-i18n="live_update">Données mises à jour toutes les 15 minutes</span>
+      <span class="live-dot"></span>
     </div>
-    <div class="dl-line reveal">Télécharger l'app pour obtenir toutes les<br>analyses du match</div>
+    <div class="dl-line reveal" data-i18n-html="dl_line">Télécharger l'app pour obtenir toutes les<br>analyses du match</div>
   </div>
 </section>
 
@@ -575,30 +594,25 @@
       <span class="avatar" style="background:#A78BFA;">DP</span>
       <span class="avatar" style="background:#D7F22C;">LK</span>
     </div>
-    <h2 class="reveal">Ce que pensent les utilisateurs de <span class="lime">AcePredict</span></h2>
-    <p class="reveal">Des milliers de passionnés utilisent AcePredict pour analyser les matchs avec précision.</p>
+    <h2 class="reveal" data-i18n-html="testi_h2">Ce que pensent les utilisateurs de <span class="lime">AcePredict</span></h2>
+    <p class="reveal" data-i18n="testi_p">Des milliers de passionnés utilisent AcePredict pour analyser les matchs avec précision.</p>
 
     <div class="video-strip reveal">
       <div class="video-card">
-        <div class="vtag">Analyse IA prête</div>
+        <div class="vtag" data-i18n="vtag1">Analyse IA prête</div>
         <div class="vplay">▶</div>
         <div class="vbars"><div class="vbar"><span style="width:70%"></span></div><div class="vbar"><span style="width:45%"></span></div></div>
       </div>
       <div class="video-card">
-        <div class="vtag">L'IA avait prédit tout ✅</div>
+        <div class="vtag" data-i18n="vtag2">L'IA avait prédit tout ✅</div>
         <div class="vplay">▶</div>
         <div class="vbars"><div class="vbar"><span style="width:90%"></span></div><div class="vbar"><span style="width:30%"></span></div></div>
       </div>
       <div class="video-card">
-        <div class="vtag">Confiance de l'IA</div>
+        <div class="vtag" data-i18n="vtag3">Confiance de l'IA</div>
         <div class="vplay">▶</div>
         <div class="vbars"><div class="vbar"><span style="width:60%"></span></div><div class="vbar"><span style="width:80%"></span></div></div>
       </div>
-    </div>
-
-    <div class="ready-pill reveal" style="margin-top:36px;">
-      <span class="ready-ball">🎾</span>
-      <span class="ready-text">ANALYSE PRÊTE</span>
     </div>
 
     <div class="testi-cards reveal">
@@ -607,7 +621,7 @@
         <div class="testi-who">
           <span class="testi-avatar" style="background:#F7B267;">MZ</span>
           <div><div class="testi-name">Maya Zong</div><div class="testi-role">Passionnée de tennis</div></div>
-          <span class="testi-x">×</span>
+          <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
       </div>
       <div class="testi-card hidden-extra">
@@ -615,7 +629,7 @@
         <div class="testi-who">
           <span class="testi-avatar" style="background:#E8604C;">EM</span>
           <div><div class="testi-name">Ethan Miller</div><div class="testi-role">Analyste amateur</div></div>
-          <span class="testi-x">×</span>
+          <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
       </div>
       <div class="testi-card hidden-extra">
@@ -623,7 +637,7 @@
         <div class="testi-who">
           <span class="testi-avatar" style="background:#8CC0DE;">HL</span>
           <div><div class="testi-name">Hannah Lee</div><div class="testi-role">Utilisatrice régulière</div></div>
-          <span class="testi-x">×</span>
+          <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
       </div>
       <div class="testi-card hidden-extra">
@@ -631,7 +645,7 @@
         <div class="testi-who">
           <span class="testi-avatar" style="background:#A78BFA;">DP</span>
           <div><div class="testi-name">Daniel Perez</div><div class="testi-role">Fan de tennis</div></div>
-          <span class="testi-x">×</span>
+          <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
       </div>
       <div class="testi-card hidden-extra">
@@ -639,23 +653,18 @@
         <div class="testi-who">
           <span class="testi-avatar" style="background:#D7F22C; color:#14180a;">LK</span>
           <div><div class="testi-name">Laura Kim</div><div class="testi-role">Amatrice de data</div></div>
-          <span class="testi-x">×</span>
+          <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
       </div>
     </div>
-    <button class="voir-tous reveal" id="voirTous">Voir tous</button>
+    <button class="voir-tous reveal" id="voirTous" data-i18n="voir_tous">Voir tous</button>
   </div>
 </section>
 
 <section class="feature-section">
   <div class="wrap">
-    <h2 class="reveal">Des analyses IA pour anticiper <span class="lime">chaque match.</span></h2>
-    <p class="reveal">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
-
-    <div class="ready-pill reveal" style="margin-top:34px;">
-      <span class="ready-ball">🎾</span>
-      <span class="ready-text">ANALYSE PRÊTE</span>
-    </div>
+    <h2 class="reveal" data-i18n-html="feature_h2">Des analyses IA pour anticiper <span class="lime">chaque match.</span></h2>
+    <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
 
     <div class="phone-stage reveal" style="margin-top:50px;">
       <div class="phone">
@@ -665,14 +674,14 @@
             <span class="brand-name" style="font-size:14px;">AcePredict</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA69A" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
           </div>
-          <div class="p-h1">Compétitions</div>
-          <div class="p-sub">Découvre les compétitions en cours</div>
-          <div class="p-sub accent">Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.</div>
-          <div class="p-search">🔍&nbsp; Rechercher une compétition...</div>
-          <div class="p-comp-label">GRAND CHELEM</div>
+          <div class="p-h1" data-i18n="p_h1_comp">Compétitions</div>
+          <div class="p-sub" data-i18n="p_sub2">Découvre les compétitions en cours</div>
+          <div class="p-sub accent" data-i18n="p_sub_accent2">Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.</div>
+          <div class="p-search"><span data-i18n="p_search_comp">🔍&nbsp; Rechercher une compétition...</span></div>
+          <div class="p-comp-label" data-i18n="p_label_slam">GRAND CHELEM</div>
           <div class="p-comp-row"><span class="p-comp-icon">🇦🇺</span><div><div class="p-comp-name">Australian Open</div><div class="p-comp-meta">Melbourne • 2026</div></div><span class="p-comp-chev">›</span></div>
           <div class="p-comp-row"><span class="p-comp-icon">🇫🇷</span><div><div class="p-comp-name">Roland-Garros</div><div class="p-comp-meta">Paris • 2026</div></div><span class="p-comp-chev">›</span></div>
-          <div class="p-comp-label">CIRCUITS</div>
+          <div class="p-comp-label" data-i18n="p_label_circuits">CIRCUITS</div>
           <div class="p-comp-row"><span class="p-comp-icon">🎾</span><div><div class="p-comp-name">ATP Tour</div><div class="p-comp-meta">Monde • 2026</div></div><span class="p-comp-chev">›</span></div>
           <div class="p-comp-row"><span class="p-comp-icon">🏆</span><div><div class="p-comp-name">Masters 1000</div><div class="p-comp-meta">Monde • 2026</div></div><span class="p-comp-chev">›</span></div>
         </div>
@@ -684,9 +693,9 @@
 <section class="sources-section">
   <div class="court-visual"></div>
   <div class="wrap">
-    <span class="sources-pill reveal">+1M de sources de données</span>
-    <h2 class="reveal">Nous analysons +220 <span class="lime">sources</span></h2>
-    <p class="reveal">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
+    <span class="sources-pill reveal" data-i18n="sources_pill">+1M de sources de données</span>
+    <h2 class="reveal" data-i18n-html="sources_h2">Nous analysons +220 <span class="lime">sources</span></h2>
+    <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
     <div class="logos-row reveal" style="margin-top:46px;">
       <span class="wordmark">ATP TOUR</span>
       <span class="wordmark dim">ROLAND-GARROS</span>
@@ -699,25 +708,25 @@
 <section class="faq-section">
   <div class="wrap">
     <div class="faq-head">
-      <h2 class="reveal">Question fréquente</h2>
-      <p class="reveal">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
+      <h2 class="reveal" data-i18n="faq_h2">Question fréquente</h2>
+      <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
     </div>
     <div class="faq-list reveal">
       <div class="faq-item">
-        <div class="faq-q"><span class="plus">+</span>1. AcePredict est-il gratuit ?</div>
-        <div class="faq-a"><p>AcePredict propose une version gratuite avec un accès limité à certaines analyses. L'abonnement à 19€/mois permet de débloquer l'ensemble des fonctionnalités.</p></div>
+        <div class="faq-q"><span class="num" style="background:#D7F22C;">1</span><span class="q-text" data-i18n="faq_q1">AcePredict est-il gratuit ?</span><span class="plus">+</span></div>
+        <div class="faq-a"><p data-i18n="faq_a1">AcePredict propose une version gratuite avec un accès limité à certaines analyses. L'abonnement à 19€/mois permet de débloquer l'ensemble des fonctionnalités.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><span class="plus">+</span>2. Comment fonctionnent les analyses IA ?</div>
-        <div class="faq-a"><p>Nos modèles analysent des milliers de données (statistiques, forme des joueurs, historiques...) pour générer des probabilités et des scénarios de match clairs et compréhensibles.</p></div>
+        <div class="faq-q"><span class="num" style="background:#7DD3FC;">2</span><span class="q-text" data-i18n="faq_q2">Comment fonctionnent les analyses IA ?</span><span class="plus">+</span></div>
+        <div class="faq-a"><p data-i18n="faq_a2">Nos modèles analysent des milliers de données (statistiques, forme des joueurs, historiques...) pour générer des probabilités et des scénarios de match clairs et compréhensibles.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><span class="plus">+</span>3. Est-ce que AcePredict permet de parier ?</div>
-        <div class="faq-a"><p>Non. AcePredict est un outil d'analyse et d'aide à la compréhension du jeu. Nous ne proposons aucun service de pari.</p></div>
+        <div class="faq-q"><span class="num" style="background:#FDA4AF;">3</span><span class="q-text" data-i18n="faq_q3">Est-ce que AcePredict permet de parier ?</span><span class="plus">+</span></div>
+        <div class="faq-a"><p data-i18n="faq_a3">Non. AcePredict est un outil d'analyse et d'aide à la compréhension du jeu. Nous ne proposons aucun service de pari.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><span class="plus">+</span>Les données sont-elles fiables ?</div>
-        <div class="faq-a"><p>Oui. Les analyses s'appuient sur des données réelles et mises à jour en continu pour garantir la meilleure précision possible.</p></div>
+        <div class="faq-q"><span class="num" style="background:#C4B5FD;">4</span><span class="q-text" data-i18n="faq_q4">Les données sont-elles fiables ?</span><span class="plus">+</span></div>
+        <div class="faq-a"><p data-i18n="faq_a4">Oui. Les analyses s'appuient sur des données réelles et mises à jour en continu pour garantir la meilleure précision possible.</p></div>
       </div>
     </div>
   </div>
@@ -726,8 +735,8 @@
 <footer>
   <div class="wrap foot-wrap">
     <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M 11.07,1.11 L 11.14,1.32 L 11.25,1.54 L 11.50,1.75 L 11.78,1.97 L 12.04,2.19 L 12.29,2.40 L 12.47,2.62 L 12.65,2.83 L 12.83,3.05 L 12.97,3.26 L 13.11,3.48 L 13.22,3.70 L 13.29,3.91 L 13.37,4.13 L 13.44,4.34 L 13.47,4.56 L 13.51,4.77 L 13.55,4.99 L 13.55,5.21 L 13.55,5.42 L 13.55,5.64 L 13.51,5.85 L 13.47,6.07 L 13.44,6.28 L 13.40,6.50 L 13.37,6.72 L 13.29,6.93 L 13.22,7.15 L 13.15,7.36 L 13.08,7.58 L 13.01,7.79 L 12.93,8.01 L 12.83,8.23 L 12.75,8.44 L 12.65,8.66 L 12.54,8.87 L 12.43,9.09 L 12.32,9.30 L 12.22,9.52 L 12.11,9.74 L 12.00,9.95 L 11.89,10.17 L 11.78,10.38 L 11.68,10.60 L 11.53,10.81 L 11.42,11.03 L 11.32,11.25 L 11.17,11.46 L 11.07,11.68 L 10.96,11.89 L 10.85,12.11 L 10.71,12.32 L 10.60,12.54 L 10.49,12.75 L 10.38,12.97 L 10.24,13.19 L 10.13,13.40 L 10.02,13.62 L 9.92,13.83 L 9.81,14.05 L 9.74,14.26 L 9.63,14.48 L 9.52,14.70 L 9.41,14.91 L 9.34,15.13 L 9.23,15.34 L 9.16,15.56 L 9.09,15.77 L 9.02,15.99 L 8.94,16.21 L 8.87,16.42 L 8.80,16.64 L 8.76,16.85 L 8.69,17.07 L 8.66,17.28 L 8.62,17.50 L 8.58,17.72 L 8.55,17.93 L 8.55,18.15 L 8.51,18.36 L 8.51,18.58 L 8.51,18.79 L 8.51,19.01 L 8.55,19.23 L 8.55,19.44 L 8.58,19.66 L 8.62,19.87 L 8.69,20.09 L 8.73,20.30 L 8.80,20.52 L 8.87,20.74 L 8.98,20.95 L 9.09,21.17 L 9.20,21.38 L 9.30,21.60 L 9.45,21.81 L 9.59,22.03 L 9.77,22.25 L 9.95,22.46 L 10.13,22.68 L 10.31,22.86 L 12.90,22.86 L 12.86,22.68 L 12.72,22.46 L 12.50,22.25 L 12.22,22.03 L 11.96,21.81 L 11.71,21.60 L 11.53,21.38 L 11.32,21.17 L 11.17,20.95 L 10.99,20.74 L 10.89,20.52 L 10.78,20.30 L 10.67,20.09 L 10.60,19.87 L 10.53,19.66 L 10.49,19.44 L 10.45,19.23 L 10.42,19.01 L 10.42,18.79 L 10.42,18.58 L 10.42,18.36 L 10.45,18.15 L 10.45,17.93 L 10.53,17.72 L 10.56,17.50 L 10.60,17.28 L 10.67,17.07 L 10.71,16.85 L 10.78,16.64 L 10.85,16.42 L 10.96,16.21 L 11.03,15.99 L 11.10,15.77 L 11.21,15.56 L 11.32,15.34 L 11.39,15.13 L 11.50,14.91 L 11.60,14.70 L 11.71,14.48 L 11.82,14.26 L 11.93,14.05 L 12.04,13.83 L 12.18,13.62 L 12.29,13.40 L 12.40,13.19 L 12.50,12.97 L 12.65,12.75 L 12.75,12.54 L 12.86,12.32 L 13.01,12.11 L 13.11,11.89 L 13.22,11.68 L 13.33,11.46 L 13.47,11.25 L 13.58,11.03 L 13.69,10.81 L 13.80,10.60 L 13.91,10.38 L 14.01,10.17 L 14.12,9.95 L 14.23,9.74 L 14.34,9.52 L 14.44,9.30 L 14.52,9.09 L 14.62,8.87 L 14.70,8.66 L 14.80,8.44 L 14.88,8.23 L 14.95,8.01 L 15.02,7.79 L 15.09,7.58 L 15.16,7.36 L 15.20,7.15 L 15.27,6.93 L 15.31,6.72 L 15.34,6.50 L 15.38,6.28 L 15.42,6.07 L 15.42,5.85 L 15.45,5.64 L 15.45,5.42 L 15.45,5.21 L 15.45,4.99 L 15.45,4.77 L 15.42,4.56 L 15.38,4.34 L 15.34,4.13 L 15.31,3.91 L 15.24,3.70 L 15.16,3.48 L 15.09,3.26 L 15.02,3.05 L 14.91,2.83 L 14.80,2.62 L 14.66,2.40 L 14.55,2.19 L 14.41,1.97 L 14.23,1.75 L 14.05,1.54 L 13.87,1.32 L 13.65,1.11 Z" fill="var(--bg)"/></svg></span><span class="brand-name">AcePredict</span></div>
-    <div class="foot-links"><a href="#">Pricing</a><a href="#">Support</a><a href="#">Confidentialité</a></div>
-    <div class="foot-copy">© 2026 AcePredict. Toutes les analyses sont fournies à titre informatif uniquement.</div>
+    <div class="foot-links"><a href="#" data-i18n="foot_pricing">Pricing</a><a href="#" data-i18n="foot_support">Support</a><a href="#" data-i18n="foot_privacy">Confidentialité</a></div>
+    <div class="foot-copy" data-i18n="foot_copy">© 2026 AcePredict. Toutes les analyses sont fournies à titre informatif uniquement.</div>
   </div>
 </footer>
 
@@ -737,53 +746,406 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
     <div class="auth-tabs">
-      <button type="button" class="auth-tab active" data-auth-tab="login">Connexion</button>
-      <button type="button" class="auth-tab" data-auth-tab="register">Inscription</button>
+      <button type="button" class="auth-tab active" data-auth-tab="login" data-i18n="nav_login">Connexion</button>
+      <button type="button" class="auth-tab" data-auth-tab="register" data-i18n="auth_tab_register">Inscription</button>
     </div>
 
     <div class="auth-panel active" id="authPanelLogin">
-      <div class="auth-title">Content de te revoir</div>
-      <div class="auth-sub">Connecte-toi pour accéder à tes analyses et à ton historique.</div>
+      <div class="auth-title" data-i18n="auth_title_login">Content de te revoir</div>
+      <div class="auth-sub" data-i18n="auth_sub_login">Connecte-toi pour accéder à tes analyses et à ton historique.</div>
       <form class="auth-form" id="loginForm">
         <div class="auth-field">
-          <label for="loginEmail">E-mail</label>
+          <label for="loginEmail" data-i18n="auth_label_email">E-mail</label>
           <input type="email" id="loginEmail" required autocomplete="email">
         </div>
         <div class="auth-field">
-          <label for="loginPassword">Mot de passe</label>
+          <label for="loginPassword" data-i18n="auth_label_password">Mot de passe</label>
           <input type="password" id="loginPassword" required autocomplete="current-password">
         </div>
         <div class="auth-msg" id="loginMsg"></div>
-        <button class="auth-submit" type="submit" id="loginSubmit">Se connecter</button>
+        <button class="auth-submit" type="submit" id="loginSubmit" data-i18n="auth_btn_login">Se connecter</button>
       </form>
-      <div class="auth-switch">Pas encore de compte ? <a data-auth-tab="register">Inscris-toi</a></div>
+      <div class="auth-switch"><span data-i18n="auth_switch_to_register">Pas encore de compte ?</span> <a data-auth-tab="register" data-i18n="link_signup">Inscris-toi</a></div>
     </div>
 
     <div class="auth-panel" id="authPanelRegister">
-      <div class="auth-title">Créer un compte</div>
-      <div class="auth-sub">Rejoins AcePredict et commence à analyser tes premiers matchs.</div>
+      <div class="auth-title" data-i18n="auth_title_register">Créer un compte</div>
+      <div class="auth-sub" data-i18n="auth_sub_register">Rejoins AcePredict et commence à analyser tes premiers matchs.</div>
       <form class="auth-form" id="registerForm">
         <div class="auth-field">
-          <label for="registerName">Nom complet</label>
+          <label for="registerName" data-i18n="auth_label_name">Nom complet</label>
           <input type="text" id="registerName" autocomplete="name">
         </div>
         <div class="auth-field">
-          <label for="registerEmail">E-mail</label>
+          <label for="registerEmail" data-i18n="auth_label_email">E-mail</label>
           <input type="email" id="registerEmail" required autocomplete="email">
         </div>
         <div class="auth-field">
-          <label for="registerPassword">Mot de passe</label>
+          <label for="registerPassword" data-i18n="auth_label_password">Mot de passe</label>
           <input type="password" id="registerPassword" required minlength="8" autocomplete="new-password">
         </div>
         <div class="auth-msg" id="registerMsg"></div>
-        <button class="auth-submit" type="submit" id="registerSubmit">Créer mon compte</button>
+        <button class="auth-submit" type="submit" id="registerSubmit" data-i18n="auth_btn_register">Créer mon compte</button>
       </form>
-      <div class="auth-switch">Déjà inscrit ? <a data-auth-tab="login">Connecte-toi</a></div>
+      <div class="auth-switch"><span data-i18n="auth_switch_to_login">Déjà inscrit ?</span> <a data-auth-tab="login" data-i18n="link_login">Connecte-toi</a></div>
     </div>
   </div>
 </div>
 
 <script>
+  // ---------- i18n ----------
+  const TR = {
+  "fr": {
+    "nav_login": "Connexion",
+    "hero_title": "Prédit chaque match avant qu'il ne<br><span class=\"lime\">commence.</span>",
+    "hero_sub": "Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.",
+    "hero_search_ph": "Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)",
+    "btn_analyser": "Analyser",
+    "stat_mid1": " de précision sur les ",
+    "stat_mid2": " matchs analysés la semaine dernière",
+    "p_h1_analyse": "Analyse de match",
+    "p_sub1": "Entre les joueurs que tu veux analyser",
+    "p_sub_accent1": "Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.",
+    "p_label_match": "MATCH À ANALYSER",
+    "p_search_ph": "Cherche un joueur (ex: Sinner, Zverev...)",
+    "p_analyse_btn": "Analyser le match avec l'IA",
+    "p_next_title": "Prochains matchs",
+    "logos_h2": "Plus de 60 tournois <span class=\"lime\">couverts</span>",
+    "court_p": "Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.",
+    "score_cap1": "Victoire Alcaraz",
+    "score_cap2": "Victoire Sinner",
+    "live_update": "Données mises à jour toutes les 15 minutes",
+    "dl_line": "Télécharger l'app pour obtenir toutes les<br>analyses du match",
+    "testi_h2": "Ce que pensent les utilisateurs de <span class=\"lime\">AcePredict</span>",
+    "testi_p": "Des milliers de passionnés utilisent AcePredict pour analyser les matchs avec précision.",
+    "vtag1": "Analyse IA prête",
+    "vtag2": "L'IA avait prédit tout ✅",
+    "vtag3": "Confiance de l'IA",
+    "voir_tous": "Voir tous",
+    "feature_h2": "Des analyses IA pour anticiper <span class=\"lime\">chaque match.</span>",
+    "feature_p": "Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.",
+    "p_h1_comp": "Compétitions",
+    "p_sub2": "Découvre les compétitions en cours",
+    "p_sub_accent2": "Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.",
+    "p_search_comp": "🔍&nbsp; Rechercher une compétition...",
+    "p_label_slam": "GRAND CHELEM",
+    "p_label_circuits": "CIRCUITS",
+    "sources_pill": "+1M de sources de données",
+    "sources_h2": "Nous analysons +220 <span class=\"lime\">sources</span>",
+    "process_line": "Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.",
+    "faq_h2": "Question fréquente",
+    "faq_q1": "AcePredict est-il gratuit ?",
+    "faq_a1": "AcePredict propose une version gratuite avec un accès limité à certaines analyses. L'abonnement à 19€/mois permet de débloquer l'ensemble des fonctionnalités.",
+    "faq_q2": "Comment fonctionnent les analyses IA ?",
+    "faq_a2": "Nos modèles analysent des milliers de données (statistiques, forme des joueurs, historiques...) pour générer des probabilités et des scénarios de match clairs et compréhensibles.",
+    "faq_q3": "Est-ce que AcePredict permet de parier ?",
+    "faq_a3": "Non. AcePredict est un outil d'analyse et d'aide à la compréhension du jeu. Nous ne proposons aucun service de pari.",
+    "faq_q4": "Les données sont-elles fiables ?",
+    "faq_a4": "Oui. Les analyses s'appuient sur des données réelles et mises à jour en continu pour garantir la meilleure précision possible.",
+    "foot_pricing": "Pricing",
+    "foot_support": "Support",
+    "foot_privacy": "Confidentialité",
+    "foot_copy": "© 2026 AcePredict. Toutes les analyses sont fournies à titre informatif uniquement.",
+    "auth_tab_register": "Inscription",
+    "auth_title_login": "Content de te revoir",
+    "auth_sub_login": "Connecte-toi pour accéder à tes analyses et à ton historique.",
+    "auth_label_email": "E-mail",
+    "auth_label_password": "Mot de passe",
+    "auth_btn_login": "Se connecter",
+    "auth_switch_to_register": "Pas encore de compte ?",
+    "link_signup": "Inscris-toi",
+    "auth_title_register": "Créer un compte",
+    "auth_sub_register": "Rejoins AcePredict et commence à analyser tes premiers matchs.",
+    "auth_label_name": "Nom complet",
+    "auth_btn_register": "Créer mon compte",
+    "auth_switch_to_login": "Déjà inscrit ?",
+    "link_login": "Connecte-toi"
+  },
+  "en": {
+    "nav_login": "Log in",
+    "hero_title": "Predicts every match before it<br><span class=\"lime\">even begins.</span>",
+    "hero_sub": "AI analysis, advanced stats and match scenarios to anticipate results and better understand the game.",
+    "hero_search_ph": "Search for a player (e.g. Alcaraz, Sinner...)",
+    "btn_analyser": "Analyze",
+    "stat_mid1": " accuracy on the ",
+    "stat_mid2": " matches analyzed last week",
+    "p_h1_analyse": "Match analysis",
+    "p_sub1": "Enter the players you want to analyze",
+    "p_sub_accent1": "Our AI is connected to tennis news and crosses millions of data points for every prediction.",
+    "p_label_match": "MATCH TO ANALYZE",
+    "p_search_ph": "Search a player (e.g. Sinner, Zverev...)",
+    "p_analyse_btn": "Analyze the match with AI",
+    "p_next_title": "Upcoming matches",
+    "logos_h2": "Over 60 tournaments <span class=\"lime\">covered</span>",
+    "court_p": "Millions of tennis data points analyzed from over 220 sources to predict every match.",
+    "score_cap1": "Alcaraz win",
+    "score_cap2": "Sinner win",
+    "live_update": "Data updated every 15 minutes",
+    "dl_line": "Download the app to get all the<br>match analyses",
+    "testi_h2": "What <span class=\"lime\">AcePredict</span> users think",
+    "testi_p": "Thousands of fans use AcePredict to analyze matches with precision.",
+    "vtag1": "AI analysis ready",
+    "vtag2": "The AI predicted it all ✅",
+    "vtag3": "AI confidence",
+    "voir_tous": "See all",
+    "feature_h2": "AI analysis to anticipate <span class=\"lime\">every match.</span>",
+    "feature_p": "Probabilities, scenarios and key data to understand how a match will unfold before the first point.",
+    "p_h1_comp": "Competitions",
+    "p_sub2": "Discover ongoing competitions",
+    "p_sub_accent2": "Our AI analyzes tournaments and gives you insights on players, rankings and upcoming matches.",
+    "p_search_comp": "🔍&nbsp; Search a competition...",
+    "p_label_slam": "GRAND SLAM",
+    "p_label_circuits": "TOURS",
+    "sources_pill": "+1M data sources",
+    "sources_h2": "We analyze +220 <span class=\"lime\">sources</span>",
+    "process_line": "One team, one process, to launch an app built for conversion and profitability.",
+    "faq_h2": "Frequently asked questions",
+    "faq_q1": "Is AcePredict free?",
+    "faq_a1": "AcePredict offers a free version with limited access to some analyses. The €19/month subscription unlocks all features.",
+    "faq_q2": "How do the AI analyses work?",
+    "faq_a2": "Our models analyze thousands of data points (stats, player form, history...) to generate clear, understandable probabilities and match scenarios.",
+    "faq_q3": "Does AcePredict let you bet?",
+    "faq_a3": "No. AcePredict is an analysis and understanding tool. We offer no betting service whatsoever.",
+    "faq_q4": "Is the data reliable?",
+    "faq_a4": "Yes. Analyses rely on real data updated continuously to guarantee the best possible accuracy.",
+    "foot_pricing": "Pricing",
+    "foot_support": "Support",
+    "foot_privacy": "Privacy",
+    "foot_copy": "© 2026 AcePredict. All analyses are provided for informational purposes only.",
+    "auth_tab_register": "Sign up",
+    "auth_title_login": "Welcome back",
+    "auth_sub_login": "Log in to access your analyses and history.",
+    "auth_label_email": "Email",
+    "auth_label_password": "Password",
+    "auth_btn_login": "Log in",
+    "auth_switch_to_register": "Don't have an account yet?",
+    "link_signup": "Sign up",
+    "auth_title_register": "Create an account",
+    "auth_sub_register": "Join AcePredict and start analyzing your first matches.",
+    "auth_label_name": "Full name",
+    "auth_btn_register": "Create my account",
+    "auth_switch_to_login": "Already registered?",
+    "link_login": "Log in"
+  },
+  "es": {
+    "nav_login": "Iniciar sesión",
+    "hero_title": "Predice cada partido antes de que<br><span class=\"lime\">empiece.</span>",
+    "hero_sub": "Análisis con IA, estadísticas avanzadas y escenarios de partido para anticipar resultados y entender mejor el juego.",
+    "hero_search_ph": "Busca un jugador (ej: Alcaraz, Sinner...)",
+    "btn_analyser": "Analizar",
+    "stat_mid1": " de precisión en los ",
+    "stat_mid2": " partidos analizados la semana pasada",
+    "p_h1_analyse": "Análisis de partido",
+    "p_sub1": "Introduce los jugadores que quieres analizar",
+    "p_sub_accent1": "Nuestra IA está conectada a la actualidad del tenis y cruza millones de datos para cada pronóstico.",
+    "p_label_match": "PARTIDO A ANALIZAR",
+    "p_search_ph": "Busca un jugador (ej: Sinner, Zverev...)",
+    "p_analyse_btn": "Analizar el partido con IA",
+    "p_next_title": "Próximos partidos",
+    "logos_h2": "Más de 60 torneos <span class=\"lime\">cubiertos</span>",
+    "court_p": "Millones de datos de tenis analizados a partir de más de 220 fuentes para predecir cada partido.",
+    "score_cap1": "Victoria de Alcaraz",
+    "score_cap2": "Victoria de Sinner",
+    "live_update": "Datos actualizados cada 15 minutos",
+    "dl_line": "Descarga la app para obtener todos los<br>análisis del partido",
+    "testi_h2": "Lo que opinan los usuarios de <span class=\"lime\">AcePredict</span>",
+    "testi_p": "Miles de aficionados usan AcePredict para analizar partidos con precisión.",
+    "vtag1": "Análisis de IA listo",
+    "vtag2": "La IA lo predijo todo ✅",
+    "vtag3": "Confianza de la IA",
+    "voir_tous": "Ver todos",
+    "feature_h2": "Análisis de IA para anticipar <span class=\"lime\">cada partido.</span>",
+    "feature_p": "Probabilidades, escenarios y datos clave para entender el desarrollo de un partido antes del primer punto.",
+    "p_h1_comp": "Competiciones",
+    "p_sub2": "Descubre las competiciones en curso",
+    "p_sub_accent2": "Nuestra IA analiza los torneos y te da información sobre jugadores, clasificaciones y próximos partidos.",
+    "p_search_comp": "🔍&nbsp; Buscar una competición...",
+    "p_label_slam": "GRAND SLAM",
+    "p_label_circuits": "CIRCUITOS",
+    "sources_pill": "+1M de fuentes de datos",
+    "sources_h2": "Analizamos +220 <span class=\"lime\">fuentes</span>",
+    "process_line": "Un solo equipo, un solo proceso, para lanzar una app pensada para la conversión y la rentabilidad.",
+    "faq_h2": "Preguntas frecuentes",
+    "faq_q1": "¿AcePredict es gratis?",
+    "faq_a1": "AcePredict ofrece una versión gratuita con acceso limitado a algunos análisis. La suscripción de 19€/mes desbloquea todas las funciones.",
+    "faq_q2": "¿Cómo funcionan los análisis de IA?",
+    "faq_a2": "Nuestros modelos analizan miles de datos (estadísticas, forma de los jugadores, historial...) para generar probabilidades y escenarios de partido claros y comprensibles.",
+    "faq_q3": "¿AcePredict permite apostar?",
+    "faq_a3": "No. AcePredict es una herramienta de análisis y comprensión del juego. No ofrecemos ningún servicio de apuestas.",
+    "faq_q4": "¿Son fiables los datos?",
+    "faq_a4": "Sí. Los análisis se basan en datos reales actualizados continuamente para garantizar la mejor precisión posible.",
+    "foot_pricing": "Precios",
+    "foot_support": "Soporte",
+    "foot_privacy": "Privacidad",
+    "foot_copy": "© 2026 AcePredict. Todos los análisis se ofrecen únicamente con fines informativos.",
+    "auth_tab_register": "Registrarse",
+    "auth_title_login": "Bienvenido de nuevo",
+    "auth_sub_login": "Inicia sesión para acceder a tus análisis y a tu historial.",
+    "auth_label_email": "Correo electrónico",
+    "auth_label_password": "Contraseña",
+    "auth_btn_login": "Iniciar sesión",
+    "auth_switch_to_register": "¿Aún no tienes cuenta?",
+    "link_signup": "Regístrate",
+    "auth_title_register": "Crear una cuenta",
+    "auth_sub_register": "Únete a AcePredict y empieza a analizar tus primeros partidos.",
+    "auth_label_name": "Nombre completo",
+    "auth_btn_register": "Crear mi cuenta",
+    "auth_switch_to_login": "¿Ya tienes cuenta?",
+    "link_login": "Inicia sesión"
+  },
+  "de": {
+    "nav_login": "Anmelden",
+    "hero_title": "Sagt jedes Match voraus, bevor es<br><span class=\"lime\">überhaupt beginnt.</span>",
+    "hero_sub": "KI-Analysen, fortschrittliche Statistiken und Spielszenarien, um Ergebnisse vorherzusehen und das Spiel besser zu verstehen.",
+    "hero_search_ph": "Spieler suchen (z. B. Alcaraz, Sinner...)",
+    "btn_analyser": "Analysieren",
+    "stat_mid1": " Genauigkeit bei den ",
+    "stat_mid2": " Matches, die letzte Woche analysiert wurden",
+    "p_h1_analyse": "Match-Analyse",
+    "p_sub1": "Gib die Spieler ein, die du analysieren möchtest",
+    "p_sub_accent1": "Unsere KI ist mit aktuellen Tennisnachrichten verbunden und wertet Millionen von Daten für jede Prognose aus.",
+    "p_label_match": "ZU ANALYSIERENDES MATCH",
+    "p_search_ph": "Spieler suchen (z. B. Sinner, Zverev...)",
+    "p_analyse_btn": "Match mit KI analysieren",
+    "p_next_title": "Nächste Matches",
+    "logos_h2": "Über 60 abgedeckte <span class=\"lime\">Turniere</span>",
+    "court_p": "Millionen von Tennisdaten aus über 220 Quellen analysiert, um jedes Match vorherzusagen.",
+    "score_cap1": "Sieg Alcaraz",
+    "score_cap2": "Sieg Sinner",
+    "live_update": "Daten alle 15 Minuten aktualisiert",
+    "dl_line": "Lade die App herunter, um alle<br>Match-Analysen zu erhalten",
+    "testi_h2": "Was Nutzer von <span class=\"lime\">AcePredict</span> sagen",
+    "testi_p": "Tausende von Fans nutzen AcePredict, um Matches präzise zu analysieren.",
+    "vtag1": "KI-Analyse bereit",
+    "vtag2": "Die KI hatte alles vorhergesagt ✅",
+    "vtag3": "Vertrauen der KI",
+    "voir_tous": "Alle anzeigen",
+    "feature_h2": "KI-Analysen, um <span class=\"lime\">jedes Match</span> vorherzusehen.",
+    "feature_p": "Wahrscheinlichkeiten, Szenarien und Schlüsseldaten, um den Verlauf eines Matches schon vor dem ersten Punkt zu verstehen.",
+    "p_h1_comp": "Wettbewerbe",
+    "p_sub2": "Entdecke laufende Wettbewerbe",
+    "p_sub_accent2": "Unsere KI analysiert Turniere und liefert dir Einblicke zu Spielern, Ranglisten und kommenden Matches.",
+    "p_search_comp": "🔍&nbsp; Wettbewerb suchen...",
+    "p_label_slam": "GRAND SLAM",
+    "p_label_circuits": "TOUREN",
+    "sources_pill": "+1 Mio. Datenquellen",
+    "sources_h2": "Wir analysieren +220 <span class=\"lime\">Quellen</span>",
+    "process_line": "Ein Team, ein Prozess, um eine App zu starten, die auf Conversion und Rentabilität ausgelegt ist.",
+    "faq_h2": "Häufige Fragen",
+    "faq_q1": "Ist AcePredict kostenlos?",
+    "faq_a1": "AcePredict bietet eine kostenlose Version mit begrenztem Zugriff auf bestimmte Analysen. Das Abo für 19€/Monat schaltet alle Funktionen frei.",
+    "faq_q2": "Wie funktionieren die KI-Analysen?",
+    "faq_a2": "Unsere Modelle analysieren Tausende von Daten (Statistiken, Spielerform, Historie...), um klare und verständliche Wahrscheinlichkeiten und Matchszenarien zu erstellen.",
+    "faq_q3": "Kann man mit AcePredict wetten?",
+    "faq_a3": "Nein. AcePredict ist ein Analyse- und Verständnistool. Wir bieten keinerlei Wettservice an.",
+    "faq_q4": "Sind die Daten zuverlässig?",
+    "faq_a4": "Ja. Die Analysen basieren auf realen, kontinuierlich aktualisierten Daten, um bestmögliche Genauigkeit zu gewährleisten.",
+    "foot_pricing": "Preise",
+    "foot_support": "Support",
+    "foot_privacy": "Datenschutz",
+    "foot_copy": "© 2026 AcePredict. Alle Analysen dienen ausschließlich zu Informationszwecken.",
+    "auth_tab_register": "Registrieren",
+    "auth_title_login": "Schön, dich wiederzusehen",
+    "auth_sub_login": "Melde dich an, um auf deine Analysen und deinen Verlauf zuzugreifen.",
+    "auth_label_email": "E-Mail",
+    "auth_label_password": "Passwort",
+    "auth_btn_login": "Anmelden",
+    "auth_switch_to_register": "Noch kein Konto?",
+    "link_signup": "Registrieren",
+    "auth_title_register": "Konto erstellen",
+    "auth_sub_register": "Tritt AcePredict bei und beginne, deine ersten Matches zu analysieren.",
+    "auth_label_name": "Vollständiger Name",
+    "auth_btn_register": "Konto erstellen",
+    "auth_switch_to_login": "Schon registriert?",
+    "link_login": "Anmelden"
+  },
+  "it": {
+    "nav_login": "Accedi",
+    "hero_title": "Prevede ogni partita prima ancora<br><span class=\"lime\">che inizi.</span>",
+    "hero_sub": "Analisi IA, statistiche avanzate e scenari di partita per anticipare i risultati e capire meglio il gioco.",
+    "hero_search_ph": "Cerca un giocatore (es: Alcaraz, Sinner...)",
+    "btn_analyser": "Analizza",
+    "stat_mid1": " di precisione sulle ",
+    "stat_mid2": " partite analizzate la settimana scorsa",
+    "p_h1_analyse": "Analisi della partita",
+    "p_sub1": "Inserisci i giocatori che vuoi analizzare",
+    "p_sub_accent1": "La nostra IA è connessa alle notizie sul tennis e incrocia milioni di dati per ogni pronostico.",
+    "p_label_match": "PARTITA DA ANALIZZARE",
+    "p_search_ph": "Cerca un giocatore (es: Sinner, Zverev...)",
+    "p_analyse_btn": "Analizza la partita con l'IA",
+    "p_next_title": "Prossime partite",
+    "logos_h2": "Oltre 60 tornei <span class=\"lime\">coperti</span>",
+    "court_p": "Milioni di dati sul tennis analizzati da oltre 220 fonti per prevedere ogni partita.",
+    "score_cap1": "Vittoria Alcaraz",
+    "score_cap2": "Vittoria Sinner",
+    "live_update": "Dati aggiornati ogni 15 minuti",
+    "dl_line": "Scarica l'app per ottenere tutte le<br>analisi della partita",
+    "testi_p": "Migliaia di appassionati usano AcePredict per analizzare le partite con precisione.",
+    "vtag1": "Analisi IA pronta",
+    "vtag2": "L'IA aveva previsto tutto ✅",
+    "vtag3": "Fiducia dell'IA",
+    "voir_tous": "Vedi tutti",
+    "feature_h2": "Analisi IA per anticipare <span class=\"lime\">ogni partita.</span>",
+    "feature_p": "Probabilità, scenari e dati chiave per capire lo svolgimento di una partita ancora prima del primo punto.",
+    "p_h1_comp": "Competizioni",
+    "p_sub2": "Scopri le competizioni in corso",
+    "p_sub_accent2": "La nostra IA analizza i tornei e ti offre approfondimenti su giocatori, classifiche e prossime partite.",
+    "p_search_comp": "🔍&nbsp; Cerca una competizione...",
+    "p_label_slam": "GRAND SLAM",
+    "p_label_circuits": "CIRCUITI",
+    "sources_pill": "+1M di fonti di dati",
+    "sources_h2": "Analizziamo +220 <span class=\"lime\">fonti</span>",
+    "process_line": "Un solo team, un solo processo, per lanciare un'app pensata per conversione e redditività.",
+    "faq_h2": "Domande frequenti",
+    "faq_q1": "AcePredict è gratuito?",
+    "faq_a1": "AcePredict offre una versione gratuita con accesso limitato ad alcune analisi. L'abbonamento a 19€/mese sblocca tutte le funzionalità.",
+    "faq_q2": "Come funzionano le analisi IA?",
+    "faq_a2": "I nostri modelli analizzano migliaia di dati (statistiche, forma dei giocatori, storico...) per generare probabilità e scenari di partita chiari e comprensibili.",
+    "faq_q3": "AcePredict permette di scommettere?",
+    "faq_a3": "No. AcePredict è uno strumento di analisi e comprensione del gioco. Non offriamo alcun servizio di scommesse.",
+    "faq_q4": "I dati sono affidabili?",
+    "faq_a4": "Sì. Le analisi si basano su dati reali aggiornati continuamente per garantire la migliore precisione possibile.",
+    "foot_pricing": "Prezzi",
+    "foot_support": "Supporto",
+    "foot_privacy": "Privacy",
+    "foot_copy": "© 2026 AcePredict. Tutte le analisi sono fornite esclusivamente a scopo informativo.",
+    "auth_tab_register": "Registrati",
+    "auth_title_login": "Bentornato",
+    "auth_sub_login": "Accedi per consultare le tue analisi e la cronologia.",
+    "auth_label_email": "E-mail",
+    "auth_label_password": "Password",
+    "auth_btn_login": "Accedi",
+    "auth_switch_to_register": "Non hai ancora un account?",
+    "link_signup": "Registrati",
+    "auth_title_register": "Crea un account",
+    "auth_sub_register": "Unisciti ad AcePredict e inizia ad analizzare le tue prime partite.",
+    "auth_label_name": "Nome completo",
+    "auth_btn_register": "Crea il mio account",
+    "auth_switch_to_login": "Hai già un account?",
+    "link_login": "Accedi",
+    "testi_h2": "Cosa pensano gli utenti di <span class=\"lime\">AcePredict</span>"
+  }
+};
+  const LANG_NAMES = { fr:'Français', en:'English', es:'Español', de:'Deutsch', it:'Italiano' };
+
+  function applyLang(lang){
+    const dict = TR[lang] || TR.fr;
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.dataset.i18n;
+      if(dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el=>{
+      const key = el.dataset.i18nHtml;
+      if(dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
+      const key = el.dataset.i18nPlaceholder;
+      if(dict[key] !== undefined) el.placeholder = dict[key];
+    });
+    document.documentElement.lang = lang;
+    try{ localStorage.setItem('acepredict_lang', lang); }catch(e){}
+  }
+
   // language dropdown
   const langDropdown = document.querySelector('.lang-dropdown');
   const langBtn = document.getElementById('langBtn');
@@ -796,11 +1158,27 @@
     opt.addEventListener('click', ()=>{
       langDropdown.querySelectorAll('.lang-option').forEach(o=> o.classList.remove('active'));
       opt.classList.add('active');
-      langLabel.textContent = opt.textContent.trim();
+      langLabel.textContent = LANG_NAMES[opt.dataset.lang] || opt.textContent.trim();
       langDropdown.classList.remove('open');
+      applyLang(opt.dataset.lang);
     });
   });
   document.addEventListener('click', ()=> langDropdown.classList.remove('open'));
+
+  // restore saved language on load
+  (function(){
+    let saved = null;
+    try{ saved = localStorage.getItem('acepredict_lang'); }catch(e){}
+    if(saved && TR[saved]){
+      const opt = langDropdown.querySelector('.lang-option[data-lang="'+saved+'"]');
+      if(opt){
+        langDropdown.querySelectorAll('.lang-option').forEach(o=> o.classList.remove('active'));
+        opt.classList.add('active');
+        langLabel.textContent = LANG_NAMES[saved] || opt.textContent.trim();
+      }
+      applyLang(saved);
+    }
+  })();
 
   // ---------- Auth modal ----------
   const API_BASE = 'http://localhost:8000'; // adapte cette URL si ton backend tourne ailleurs
@@ -966,6 +1344,25 @@
       setTimeout(()=> card.remove(), 300);
     });
   });
+
+  // Grand Chelem wordmarks: lift + turn pink whenever the mouse crosses their
+  // horizontal column, anywhere on the page (no matter the vertical position).
+  (function(){
+    const marks = Array.from(document.querySelectorAll('.wordmark'));
+    if(!marks.length) return;
+    let raf = null;
+    function update(x){
+      marks.forEach(m=>{
+        const r = m.getBoundingClientRect();
+        m.classList.toggle('col-active', x >= r.left && x <= r.right);
+      });
+    }
+    document.addEventListener('mousemove', (e)=>{
+      if(raf) return;
+      raf = requestAnimationFrame(()=>{ update(e.clientX); raf = null; });
+    });
+    document.addEventListener('mouseleave', ()=> marks.forEach(m=> m.classList.remove('col-active')));
+  })();
 </script>
 </body>
 </html>
