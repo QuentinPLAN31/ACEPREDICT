@@ -198,6 +198,12 @@ class Player(Base):
     # pas encore couvert (rang trop bas / joueur trop récent) : le frontend
     # masque simplement le bloc, jamais de contenu inventé pour combler.
     playing_style = Column(Text, nullable=True)
+    # "haute" = note rédigée à la main sur une vraie connaissance du joueur ;
+    # "faible" = joueur hors de notre couverture éditoriale (rang trop bas /
+    # trop peu médiatisé) -- fallback honnête basé uniquement sur une donnée
+    # sûre (main), jamais une invention de style narratif. Le frontend
+    # affiche un avertissement quand faible (cf. scripts/seed_playing_styles.py).
+    playing_style_confidence = Column(String, nullable=True)
     playing_style_updated_at = Column(DateTime, nullable=True)
 
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -109,7 +109,9 @@ def _build_prompt(ctx: dict) -> str:
         "Base-toi STRICTEMENT sur les données fournies ci-dessous : "
         "n'invente aucune statistique, blessure, actualité, classement ou "
         "style de jeu non fourni — si une donnée manque, dis-le plutôt que "
-        "de l'inventer.",
+        "de l'inventer. Si une information de style de jeu est explicitement "
+        "marquée [INFORMATION INCERTAINE], ne t'appuie pas dessus pour un "
+        "argument important — mentionne-la au mieux avec la réserve qui va avec.",
         "",
         f"Match : {p1} vs {p2}" + (f" (surface : {ctx['surface_used']})" if ctx.get("surface_used") and ctx["surface_used"] != "overall" else ""),
         f"Elo : {p1} {ctx['elo_player1']} — {p2} {ctx['elo_player2']} (écart {ctx['elo_diff']})",
@@ -148,9 +150,11 @@ def _build_prompt(ctx: dict) -> str:
 
     style1, style2 = ctx.get("style_player1"), ctx.get("style_player2")
     if style1:
-        lines.append(f"Style de jeu de {p1} : {style1}")
+        tag = " [INFORMATION INCERTAINE, à traiter avec prudence]" if ctx.get("style_player1_confidence") == "faible" else ""
+        lines.append(f"Style de jeu de {p1}{tag} : {style1}")
     if style2:
-        lines.append(f"Style de jeu de {p2} : {style2}")
+        tag = " [INFORMATION INCERTAINE, à traiter avec prudence]" if ctx.get("style_player2_confidence") == "faible" else ""
+        lines.append(f"Style de jeu de {p2}{tag} : {style2}")
 
     tournament = ctx.get("tournament_context")
     if tournament:

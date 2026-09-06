@@ -3826,7 +3826,11 @@
 
     let styleHtml = '';
     if(info.local && info.local.playing_style){
+      const lowConfidence = info.local.playing_style_confidence === 'faible';
       styleHtml = '<div class="pj-section-label">STYLE DE JEU</div>' +
+        (lowConfidence
+          ? '<div class="pj-empty-note" style="margin-bottom:6px;">⚠ Information incertaine — couverture éditoriale limitée à ce niveau de classement.</div>'
+          : '') +
         '<div class="pj-bio">' + info.local.playing_style + '</div>';
     }
 

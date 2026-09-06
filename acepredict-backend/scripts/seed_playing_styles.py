@@ -1,31 +1,42 @@
 """
-Seed unique : notes de style de jeu écrites à la main pour les joueurs
-suffisamment établis/médiatisés pour qu'on soit vraiment sûr de ne pas
-inventer (cf. models.py::Player.playing_style). Volontairement PAS
-exhaustif : on couvre le haut du classement ATP/WTA et quelques vétérans
-bien connus plus bas, et on s'arrête net dès que la confiance retombe (joueurs
-trop récents/jeunes ou trop peu médiatisés pour qu'on ait une vraie
-certitude sur leur style) -- mieux vaut une fiche absente qu'une fiche
-inventée.
+Seed des notes de style de jeu (cf. models.py::Player.playing_style /
+playing_style_confidence). Deux niveaux, jamais mélangés :
+
+  1. HAUTE CONFIANCE : notes rédigées à la main pour les joueurs qu'on
+     connaît vraiment bien (essentiellement le top ~30-40 de chaque tour,
+     plus quelques vétérans très médiatisés situés plus bas au classement).
+     Texte descriptif réel (coup dominant, main, tendance de jeu...).
+
+  2. FAIBLE CONFIANCE : pour tout joueur en base avec un classement
+     (Player.current_rank) <= STYLE_COVERAGE_RANK_LIMIT qui n'a PAS de note
+     manuscrite ci-dessus -- on ne invente PAS un style qu'on ne connaît
+     pas. On pose à la place une note honnête basée UNIQUEMENT sur une
+     donnée sûre déjà en base (la main, si connue), explicitement marquée
+     "faible" -- le frontend affiche alors un avertissement "information
+     incertaine / couverture éditoriale limitée" plutôt que de faire
+     passer ce texte pour une vraie analyse de style.
 
 Usage :
     python -m scripts.seed_playing_styles
 
-Idempotent : cherche chaque joueur par nom (insensible à la casse) + tour,
-et écrase playing_style à chaque exécution (donnée de référence qu'on
-contrôle nous-mêmes, pas une donnée synchronisée depuis une API externe).
-Un nom non trouvé en base est juste ignoré (log), jamais bloquant -- le
-joueur sera couvert dès qu'il existera en base (import Sackmann ou
-auto-discovery LiveTennisAPI).
+Idempotent, à relancer après chaque mise à jour des classements (le
+fallback "faible" dépend de Player.current_rank, rempli par le job horaire
+scripts/sync_hourly.py -- tant qu'aucun classement n'est encore synchronisé,
+current_rank est NULL partout et seule la liste manuscrite ci-dessous est
+appliquée).
 """
 from datetime import datetime
 
 from app import models
 from app.database import SessionLocal
 
-# (nom exact tel qu'en base, tour, note de style)
-STYLES = [
-    # ---- ATP ----
+# Rang officiel (Player.current_rank) en-deçà duquel on pose au moins un
+# fallback "faible" pour un joueur non couvert par la liste manuscrite.
+STYLE_COVERAGE_RANK_LIMIT = 150
+
+# (nom exact tel qu'en base, tour, note de style) -- toutes en confiance "haute".
+STYLES_HAUTE = [
+    # ================= ATP =================
     ("Jannik Sinner", "atp",
      "Jeu extrêmement plat et puissant des deux côtés, frappe la balle très tôt "
      "après le rebond, redoutable en échange de fond de court, peu d'amorties. "
@@ -101,8 +112,44 @@ STYLES = [
     ("Karen Khachanov", "atp",
      "Jeu de puissance classique depuis le fond du court, gros coup droit, "
      "profil plus solide que créatif."),
+    ("Stefanos Tsitsipas", "atp",
+     "Revers à une main, jeu offensif construit autour d'un coup droit "
+     "inside-out puissant, historiquement à l'aise sur terre battue."),
+    ("Grigor Dimitrov", "atp",
+     "Jeu élégant et complet, revers à une main, excellent toucher de balle. "
+     "Carrière freinée par des blessures récurrentes."),
+    ("Holger Rune", "atp",
+     "Jeu très agressif et physique, gros coup droit, prise de risque élevée, "
+     "tempérament parfois instable sur le court."),
+    ("Sebastian Baez", "atp",
+     "Spécialiste de la terre battue, petit gabarit, jeu de grinder avec "
+     "énormément de topspin depuis le fond du court."),
+    ("Jack Draper", "atp",
+     "Gaucher, gros coup gauche et jeu physique, longtemps freiné par les "
+     "blessures avant de percer durablement."),
+    ("Adrian Mannarino", "atp",
+     "Gaucher, jeu très à plat et très varié, style atypique et difficile à "
+     "lire, prend la balle tôt sans forcer."),
+    ("Gael Monfils", "atp",
+     "Athlète explosif, jeu spectaculaire et créatif, couverture de terrain "
+     "exceptionnelle, mentalement irrégulier, en fin de carrière."),
+    ("Stan Wawrinka", "atp",
+     "Revers à une main parmi les plus puissants de l'histoire du jeu, coup "
+     "gagnant redoutable en fin d'échange, en fin de carrière."),
+    ("Nick Kyrgios", "atp",
+     "Jeu extrêmement talentueux et créatif, gros service, énormément "
+     "d'amorties. Très irrégulier, activité réduite ces dernières saisons "
+     "(blessures)."),
+    ("Borna Coric", "atp",
+     "Jeu solide et régulier sans coup extrême, profil de grinder plus que d'attaquant."),
+    ("Sebastian Korda", "atp",
+     "Jeu élégant avec un bon toucher de balle, revers à une main, service efficace."),
+    ("Alexei Popyrin", "atp",
+     "Grand gabarit, gros service et coup droit puissant, jeu plus direct que varié."),
+    ("Yoshihito Nishioka", "atp",
+     "Petit gabarit, jeu de contre très rapide et régulier, spécialiste du retour de service."),
 
-    # ---- WTA ----
+    # ================= WTA =================
     ("Aryna Sabalenka", "wta",
      "Service et coup droit parmi les plus puissants du circuit féminin, jeu "
      "très agressif joué proche de la ligne de fond, cherche à dicter l'échange "
@@ -165,14 +212,62 @@ STYLES = [
      "moyenne du top 30, excellente tacticienne (également très forte en double)."),
     ("Donna Vekic", "wta",
      "Jeu solide et complet sans particularité extrême, profil plus régulier que spectaculaire."),
+    ("Emma Navarro", "wta",
+     "Jeu solide et régulier, bonne tacticienne, moins de puissance brute que "
+     "la moyenne du top 30."),
+    ("Daria Kasatkina", "wta",
+     "Jeu tout en variation (slices, amorties, changements de rythme), moins de "
+     "puissance que la moyenne, très bonne défenseuse."),
+    ("Victoria Azarenka", "wta",
+     "Jeu de puissance avec prise de balle très tôt, expérience de très haut "
+     "niveau, carrière en fin de parcours."),
+    ("Caroline Garcia", "wta",
+     "Jeu offensif et agressif, gros coup droit et service puissant, résultats "
+     "historiquement irréguliers d'un tournoi à l'autre."),
+    ("Leylah Fernandez", "wta",
+     "Gauchère, jeu créatif avec beaucoup de variation, grande combativité "
+     "mentale dans les matchs serrés."),
+    ("Petra Kvitova", "wta",
+     "Gauchère, jeu extrêmement plat et puissant, frappe la balle très tôt, "
+     "activité réduite en fin de carrière."),
+    ("Marketa Vondrousova", "wta",
+     "Gauchère, jeu tout en variation et en toucher, peu de puissance brute, "
+     "beaucoup de slices et de changements de rythme."),
+    ("Ons Jabeur", "wta",
+     "Jeu extrêmement créatif avec énormément d'amorties et de slices, l'un des "
+     "styles les plus atypiques du circuit féminin."),
+    ("Beatriz Haddad Maia", "wta",
+     "Gauchère, jeu physique et puissant, beaucoup de topspin, profil de terrienne."),
+    ("Magda Linette", "wta",
+     "Jeu régulier et discret, profil plus tacticien que puissance brute."),
+    ("Sloane Stephens", "wta",
+     "Jeu de contre-attaque et de défense, très bonne vitesse de déplacement."),
+    ("Katie Boulter", "wta",
+     "Gros service et coup droit, jeu plus direct que varié."),
 ]
+
+# Fallback honnête pour un joueur classé (current_rank <= STYLE_COVERAGE_RANK_LIMIT)
+# mais absent de STYLES_HAUTE ci-dessus : on ne connaît pas assez ce joueur pour
+# décrire un vrai style, donc on ne décrit RIEN d'inventé -- seule la main
+# (donnée sûre déjà en base) est mentionnée si connue.
+def _fallback_note(player) -> str:
+    if player.hand and player.hand.upper() in ("R", "L"):
+        main = "gaucher" if player.hand.upper() == "L" else "droitier"
+        return (
+            f"Peu d'informations de style disponibles pour ce joueur à ce niveau de "
+            f"classement (couverture éditoriale limitée) -- seule donnée fiable connue : {main}."
+        )
+    return (
+        "Peu d'informations de style disponibles pour ce joueur à ce niveau de "
+        "classement (couverture éditoriale limitée)."
+    )
 
 
 def run():
     db = SessionLocal()
-    updated, missing = 0, []
+    updated_haute, missing = 0, []
     try:
-        for name, tour, note in STYLES:
+        for name, tour, note in STYLES_HAUTE:
             player = (
                 db.query(models.Player)
                 .filter(models.Player.name.ilike(name), models.Player.tour == tour)
@@ -182,17 +277,40 @@ def run():
                 missing.append(f"{name} ({tour})")
                 continue
             player.playing_style = note
+            player.playing_style_confidence = "haute"
             player.playing_style_updated_at = datetime.utcnow()
-            updated += 1
+            updated_haute += 1
         db.commit()
+
+        # Fallback "faible" : tout joueur classé dans la limite, sans note haute.
+        candidates = (
+            db.query(models.Player)
+            .filter(
+                models.Player.current_rank.isnot(None),
+                models.Player.current_rank <= STYLE_COVERAGE_RANK_LIMIT,
+                models.Player.playing_style.is_(None),
+            )
+            .all()
+        )
+        for player in candidates:
+            player.playing_style = _fallback_note(player)
+            player.playing_style_confidence = "faible"
+            player.playing_style_updated_at = datetime.utcnow()
+        db.commit()
+        updated_faible = len(candidates)
     finally:
         db.close()
 
-    print(f"Style de jeu renseigné pour {updated}/{len(STYLES)} joueur(s).")
+    print(f"Style haute confiance renseigné pour {updated_haute}/{len(STYLES_HAUTE)} joueur(s).")
+    print(f"Style faible confiance (fallback) posé pour {updated_faible} joueur(s) classé(s) <= {STYLE_COVERAGE_RANK_LIMIT}.")
     if missing:
-        print("Introuvables en base (pas encore importés, ou nom différent) :")
+        print("Introuvables en base parmi la liste haute confiance (pas encore importés, ou nom différent) :")
         for m in missing:
             print(f"  - {m}")
+    if updated_faible == 0:
+        print("Aucun fallback posé : Player.current_rank est probablement encore vide partout "
+              "(classements pas encore synchronisés, cf. scripts/sync_hourly.py) -- relance ce "
+              "script après le premier sync horaire réussi.")
 
 
 if __name__ == "__main__":

@@ -20,9 +20,11 @@ depends_on = None
 
 def upgrade() -> None:
     op.add_column("players", sa.Column("playing_style", sa.Text, nullable=True))
+    op.add_column("players", sa.Column("playing_style_confidence", sa.String, nullable=True))
     op.add_column("players", sa.Column("playing_style_updated_at", sa.DateTime, nullable=True))
 
 
 def downgrade() -> None:
     op.drop_column("players", "playing_style_updated_at")
+    op.drop_column("players", "playing_style_confidence")
     op.drop_column("players", "playing_style")

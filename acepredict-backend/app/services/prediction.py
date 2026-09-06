@@ -401,8 +401,10 @@ def build_prediction(
     # calibre rien sur du texte qualitatif).
     if getattr(player1, "playing_style", None):
         detail["style_player1"] = player1.playing_style
+        detail["style_player1_confidence"] = getattr(player1, "playing_style_confidence", None)
     if getattr(player2, "playing_style", None):
         detail["style_player2"] = player2.playing_style
+        detail["style_player2_confidence"] = getattr(player2, "playing_style_confidence", None)
 
     # Head-to-head : bilan des confrontations directes, ajustement seulement
     # si l'échantillon est assez grand (H2H_MIN_SAMPLE) pour être significatif.
