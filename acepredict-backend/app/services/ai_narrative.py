@@ -56,7 +56,6 @@ def generate_narrative(context: dict) -> Optional[str]:
             json={
                 "model": settings.anthropic_model,
                 "max_tokens": MAX_TOKENS,
-                "temperature": TEMPERATURE,
                 "messages": [{"role": "user", "content": _build_prompt(context)}],
             },
             timeout=TIMEOUT_SECONDS,
