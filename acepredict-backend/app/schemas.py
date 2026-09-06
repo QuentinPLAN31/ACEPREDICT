@@ -65,6 +65,12 @@ class PlayerOut(BaseModel):
     elo_hard: float
     elo_clay: float
     elo_grass: float
+    hand: Optional[str] = None  # R / L
+    current_rank: Optional[int] = None
+    # Note de style de jeu rédigée à la main (cf. scripts/seed_playing_styles.py) --
+    # None si ce joueur n'est pas encore couvert (rang trop bas / trop récent),
+    # jamais de contenu généré à la volée pour combler.
+    playing_style: Optional[str] = None
     # Libellé FR (cf. services/data_confidence.py::label) -- converti depuis
     # Player.data_confidence par le validator ci-dessous, pour que le
     # frontend affiche directement le même texte partout (recherche,

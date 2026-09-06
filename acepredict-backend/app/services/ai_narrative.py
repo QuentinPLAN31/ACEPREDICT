@@ -146,6 +146,12 @@ def _build_prompt(ctx: dict) -> str:
     if style_matchup:
         lines.append(f"Particularité du match : {style_matchup['note']}")
 
+    style1, style2 = ctx.get("style_player1"), ctx.get("style_player2")
+    if style1:
+        lines.append(f"Style de jeu de {p1} : {style1}")
+    if style2:
+        lines.append(f"Style de jeu de {p2} : {style2}")
+
     tournament = ctx.get("tournament_context")
     if tournament:
         lines.append(

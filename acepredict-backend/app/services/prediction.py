@@ -395,6 +395,15 @@ def build_prediction(
                     "entre deux droitiers, sans que ça favorise mécaniquement l'un ou l'autre.",
         }
 
+    # Style de jeu (cf. scripts/seed_playing_styles.py) : note rédigée à la main,
+    # présente seulement pour les joueurs suffisamment établis -- purement
+    # informatif pour Claude (jamais d'ajustement de probabilité dessus, on ne
+    # calibre rien sur du texte qualitatif).
+    if getattr(player1, "playing_style", None):
+        detail["style_player1"] = player1.playing_style
+    if getattr(player2, "playing_style", None):
+        detail["style_player2"] = player2.playing_style
+
     # Head-to-head : bilan des confrontations directes, ajustement seulement
     # si l'échantillon est assez grand (H2H_MIN_SAMPLE) pour être significatif.
     h2h = _head_to_head(db, player1.id, player2.id)

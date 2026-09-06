@@ -190,6 +190,16 @@ class Player(Base):
     current_rank = Column(Integer, nullable=True)
     current_rank_synced_at = Column(DateTime, nullable=True)
 
+    # Note de style de jeu (cf. scripts/seed_playing_styles.py) : texte court,
+    # factuel et qualitatif (coup dominant, main, tendance de jeu...), rédigé
+    # à la main pour les joueurs suffisamment établis/médiatisés pour être
+    # fiable -- PAS généré à la volée par un modèle sur des joueurs inconnus,
+    # pour ne jamais inventer un style qu'on ne connaît pas vraiment. NULL =
+    # pas encore couvert (rang trop bas / joueur trop récent) : le frontend
+    # masque simplement le bloc, jamais de contenu inventé pour combler.
+    playing_style = Column(Text, nullable=True)
+    playing_style_updated_at = Column(DateTime, nullable=True)
+
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     __table_args__ = (Index("ix_players_name_tour", "name", "tour"),)

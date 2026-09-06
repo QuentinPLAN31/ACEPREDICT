@@ -2738,6 +2738,7 @@
     if(detail.weather_adjustment) tags.push('Conditions météo');
     if(detail.tournament_adjustment) tags.push('Format du tournoi');
     if(detail.market_adjustment) tags.push('Marché des paris');
+    if(detail.style_matchup) tags.push('Gaucher vs droitier');
     return tags;
   }
 
@@ -3823,6 +3824,12 @@
 
     const perfHtml = renderPerformanceBlock(info.stats);
 
+    let styleHtml = '';
+    if(info.local && info.local.playing_style){
+      styleHtml = '<div class="pj-section-label">STYLE DE JEU</div>' +
+        '<div class="pj-bio">' + info.local.playing_style + '</div>';
+    }
+
     let bioHtml = '<div class="pj-section-label">EN BREF</div>';
     if(info.wiki && info.wiki.extract){
       bioHtml += '<div class="pj-bio">' + info.wiki.extract +
@@ -3846,6 +3853,7 @@
       '</div>' +
       statsHtml +
       perfHtml +
+      styleHtml +
       bioHtml;
   }
 
