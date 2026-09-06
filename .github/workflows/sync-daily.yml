@@ -1,0 +1,29 @@
+name: Sync Daily (résultats historiques)
+
+on:
+  schedule:
+    - cron: "15 4 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  sync-daily:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: acepredict-backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run sync_daily
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m scripts.sync_daily
