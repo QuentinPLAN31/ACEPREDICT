@@ -375,6 +375,26 @@ def build_prediction(
     if form2:
         detail["form_player2"] = form2
 
+    # Matchup droitier/gaucher : fait purement informatif (donnée réelle en
+    # base, Player.hand), pas d'ajustement de probabilité -- on ne dispose
+    # d'aucune donnée de performance par joueur en fonction de la main
+    # adverse pour justifier de diriger le pronostic. Sert surtout de
+    # matière première pour le commentaire de Claude (cf. ai_narrative.py),
+    # qui peut légitimement noter qu'un droitier au revers à une main
+    # affronte un gaucher, sans avoir à l'inventer.
+    hand1, hand2 = getattr(player1, "hand", None), getattr(player2, "hand", None)
+    if hand1 and hand2 and hand1.upper() != hand2.upper():
+        left_name = player1.name if hand1.upper() == "L" else player2.name
+        right_name = player2.name if hand1.upper() == "L" else player1.name
+        detail["style_matchup"] = {
+            "type": "droitier_vs_gaucher",
+            "left_handed_player": left_name,
+            "right_handed_player": right_name,
+            "note": f"{left_name} (gaucher) affronte {right_name} (droitier) -- "
+                    "les effets et angles de balle changent par rapport à un match "
+                    "entre deux droitiers, sans que ça favorise mécaniquement l'un ou l'autre.",
+        }
+
     # Head-to-head : bilan des confrontations directes, ajustement seulement
     # si l'échantillon est assez grand (H2H_MIN_SAMPLE) pour être significatif.
     h2h = _head_to_head(db, player1.id, player2.id)

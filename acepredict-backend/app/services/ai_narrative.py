@@ -111,7 +111,7 @@ def _build_prompt(ctx: dict) -> str:
         "style de jeu non fourni — si une donnée manque, dis-le plutôt que "
         "de l'inventer.",
         "",
-        f"Match : {p1} vs {p2}" + (f" (surface : {ctx['surface']})" if ctx.get("surface") and ctx["surface"] != "overall" else ""),
+        f"Match : {p1} vs {p2}" + (f" (surface : {ctx['surface_used']})" if ctx.get("surface_used") and ctx["surface_used"] != "overall" else ""),
         f"Elo : {p1} {ctx['elo_player1']} — {p2} {ctx['elo_player2']} (écart {ctx['elo_diff']})",
     ]
 
@@ -141,6 +141,10 @@ def _build_prompt(ctx: dict) -> str:
             f"Météo prévue : {weather.get('description', 'inconnue')}, "
             f"{weather.get('temp_c', '?')}°C, vent {weather.get('wind_kmh', '?')} km/h"
         )
+
+    style_matchup = ctx.get("style_matchup")
+    if style_matchup:
+        lines.append(f"Particularité du match : {style_matchup['note']}")
 
     tournament = ctx.get("tournament_context")
     if tournament:
