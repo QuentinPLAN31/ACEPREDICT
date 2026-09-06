@@ -33,7 +33,7 @@ from app import models
 from app.services.elo import expected_score
 from app.services import ai_narrative
 
-MODEL_VERSION = "elo-h2h-fatigue-tournament-weather-market-v4"
+MODEL_VERSION = "elo-h2h-fatigue-tournament-weather-market-v5"
 
 # Probabilité de marché (services/polymarket_service.py) : fusion pondérée
 # avec la probabilité issue de l'Elo + ajustements ci-dessus. Poids
@@ -54,6 +54,14 @@ WIND_STRONG_KMH = 30
 WIND_MODERATE_KMH = 15
 TEMP_EXTREME_HIGH_C = 32
 TEMP_EXTREME_LOW_C = 5
+# Mots-clés (description renvoyée par OpenWeatherMap/Open-Meteo, en anglais)
+# identifiant une pluie ou un orage en cours/prévu — cf. _weather_dampening.
+# Volontairement générique (même dégradation pour les deux joueurs) : on ne
+# dispose d'aucune donnée historique par joueur (style de jeu, statistiques
+# par temps de pluie) qui justifierait de diriger l'ajustement vers l'un des
+# deux plutôt que l'autre — cf. weather_service.py.
+RAIN_KEYWORDS = ("rain", "drizzle", "shower", "thunderstorm")
+RAIN_DAMPENING_FACTOR = 0.90
 
 FORM_MATCHES_COUNT = 5
 
@@ -310,6 +318,11 @@ def _weather_dampening(weather: dict) -> tuple[float, list[str]]:
     if temp is not None and (temp >= TEMP_EXTREME_HIGH_C or temp <= TEMP_EXTREME_LOW_C):
         factor *= 0.95
         notes.append(f"température extrême ({temp}°C)")
+
+    description = (weather.get("description") or "").lower()
+    if any(kw in description for kw in RAIN_KEYWORDS):
+        factor *= RAIN_DAMPENING_FACTOR
+        notes.append(f"pluie ({description})")
 
     return factor, notes
 
