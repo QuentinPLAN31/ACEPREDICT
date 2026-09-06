@@ -3,13 +3,11 @@ Analyse approfondie en langage naturel, générée par l'API Anthropic (Claude)
 à partir des facteurs déjà calculés par prediction.py (Elo, forme récente,
 head-to-head, fatigue, météo). C'est la partie "un vrai travail de fond" de
 l'analyse : le modèle Elo donne un chiffre, ce service explique le chiffre.
-
 Optionnel et à dégradation gracieuse, comme Stripe/météo/LiveTennisAPI
 ailleurs dans ce backend : sans ANTHROPIC_API_KEY configurée (ou en cas
 d'erreur réseau/API), generate_narrative() retourne None et l'analyse
 continue de fonctionner avec les chiffres bruts uniquement — jamais
 d'exception qui remonterait jusqu'à /analyses.
-
 Le prompt interdit explicitement au modèle d'inventer des informations
 (blessures, actualités, stats non fournies) : il ne doit raisonner QUE sur
 les chiffres transmis dans le contexte, pour rester honnête sur ce que
@@ -26,15 +24,25 @@ logger = logging.getLogger(__name__)
 
 API_URL = "https://api.anthropic.com/v1/messages"
 TIMEOUT_SECONDS = 45.0
+
 # Le format de sortie voulu est volontairement COURT (une phrase de synthèse +
 # quelques puces, cf. _build_prompt) : le lecteur a déjà les chiffres bruts
 # sous forme de barres visuelles ailleurs dans l'UI, ce texte n'a plus à les
 # répéter. max_tokens reste généreux uniquement pour ne jamais tronquer une
 # réponse si le modèle déborde légèrement du format demandé.
-MAX_TOKENS = 1300
-# Température basse : on veut un raisonnement factuel et reproductible sur des
-# chiffres (fiabilité), pas une prose créative — jamais deux analyses très
-# différentes pour les mêmes chiffres d'entrée.
+#
+# claude-sonnet-5 fait de l'extended thinking par défaut sur les prompts
+# complexes (le nôtre en fait partie) : sans budget explicite, il peut
+# consommer TOUT max_tokens en "thinking" et ne jamais produire de texte
+# (stop_reason=max_tokens, output vide). On active donc `thinking` avec un
+# budget plafonné et strictement inférieur à max_tokens, pour garantir qu'il
+# reste toujours de la place pour le texte final.
+MAX_TOKENS = 2000
+THINKING_BUDGET = 700
+
+# NB: avec `thinking` activé, l'API Anthropic n'accepte plus le paramètre
+# `temperature` (400 "temperature is deprecated for this model") -- on ne
+# l'envoie donc jamais dans le payload.
 TEMPERATURE = 0.3
 
 
@@ -45,6 +53,7 @@ def is_configured() -> bool:
 def generate_narrative(context: dict) -> Optional[str]:
     if not is_configured():
         return None
+
     try:
         resp = httpx.post(
             API_URL,
@@ -56,6 +65,7 @@ def generate_narrative(context: dict) -> Optional[str]:
             json={
                 "model": settings.anthropic_model,
                 "max_tokens": MAX_TOKENS,
+                "thinking": {"type": "enabled", "budget_tokens": THINKING_BUDGET},
                 "messages": [{"role": "user", "content": _build_prompt(context)}],
             },
             timeout=TIMEOUT_SECONDS,
@@ -71,6 +81,7 @@ def generate_narrative(context: dict) -> Optional[str]:
                 resp.status_code, settings.anthropic_model, resp.text[:500],
             )
             return None
+
         blocks = resp.json().get("content", [])
         text = "".join(b.get("text", "") for b in blocks if b.get("type") == "text").strip()
         return text or None
@@ -81,6 +92,7 @@ def generate_narrative(context: dict) -> Optional[str]:
 
 def _build_prompt(ctx: dict) -> str:
     p1, p2 = ctx["player1_name"], ctx["player2_name"]
+
     lines = [
         "Tu es un analyste tennis professionnel senior qui rédige pour une "
         "application de pronostics payante. Le lecteur voit déjà, ailleurs à "
@@ -191,4 +203,5 @@ def _build_prompt(ctx: dict) -> str:
         "remplissage. Ne donne jamais de conseil de pari, de cote, ni de "
         "garantie de résultat.",
     ]
+
     return "\n".join(lines)
