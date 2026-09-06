@@ -49,11 +49,10 @@ class Settings(BaseSettings):
     # ou "open-meteo" (sans clé, mais licence non-commercial only — ne jamais
     # l'activer en prod tant que le site est monétisé, cf. README).
     weather_api_key: str = ""
-    # open-meteo : gratuit à 100%, sans clé, sans limite de requêtes connue —
-    # seule restriction : licence non-commercial only (OK tant que le site
-    # n'est pas monétisé ; repasser sur "openweathermap" + weather_api_key
-    # le jour où Stripe est activé en prod, cf. README).
-    weather_provider: str = "open-meteo"
+    # openweathermap : site à but commercial (Stripe actif) -> open-meteo est
+    # exclu (licence non-commercial only). Free tier OpenWeatherMap = 1000
+    # appels/jour, gratuit, pas de CB, licence compatible usage commercial.
+    weather_provider: str = "openweathermap"
 
     # Analyse approfondie générée par IA (commentaire en langage naturel à partir
     # des facteurs calculés — Elo, forme, head-to-head, fatigue, météo — cf.

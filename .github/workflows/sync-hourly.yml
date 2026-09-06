@@ -1,10 +1,11 @@
 name: Sync Hourly (fixtures, classements, cotes, météo)
 
-# Toutes les 3h pour rester sous le quota gratuit de LiveTennisAPI
-# (plan free : 100 requêtes/jour, pas de carte requise, pas d'expiration —
-# cf. https://livetennisapi.com/subscribe/free). 8 exécutions/jour x
-# ~4 requêtes de base (rankings+fixtures pour ATP et WTA) = 32/jour,
-# large marge pour les lookups de ville/joueur mis en cache.
+# Cron réglé sur le quota du plan FREE de LiveTennisAPI (100 req/jour, cf.
+# https://livetennisapi.com/subscribe/free) : toutes les 3h = ~32
+# requêtes/jour de base, marge pour les lookups ville/joueur mis en cache.
+# Site commercial -> passer au plan Basic ($9.99/mo, 1000/j + historique/H2H)
+# ou Pro ($29.99/mo, 10000/j + cotes marché) dès que le trafic réel le
+# justifie, puis remettre ce cron sur toutes les heures ("5 * * * *").
 on:
   schedule:
     - cron: "5 */3 * * *"
@@ -32,4 +33,5 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           LIVETENNISAPI_KEY: ${{ secrets.LIVETENNISAPI_KEY }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
         run: python -m scripts.sync_hourly
