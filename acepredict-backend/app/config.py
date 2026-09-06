@@ -60,7 +60,9 @@ class Settings(BaseSettings):
     # Sans clé : l'analyse fonctionne normalement, juste sans ce commentaire.
     anthropic_api_key: str = ""
     # Vérifier le modèle le plus récent sur https://docs.claude.com/en/docs/about-claude/models
-    anthropic_model: str = "claude-sonnet-4-6"
+    # (l'ancien défaut "claude-sonnet-4-6" n'existe plus -- l'API le rejetait
+    # silencieusement, ce qui désactivait l'analyse sans jamais avertir personne).
+    anthropic_model: str = "claude-sonnet-5"
 
     # E-mail transactionnel (réinitialisation de mot de passe, cf.
     # services/email_service.py). SMTP générique — Gmail (mot de passe

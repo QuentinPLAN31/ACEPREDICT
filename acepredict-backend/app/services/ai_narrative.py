@@ -15,11 +15,14 @@ Le prompt interdit explicitement au modèle d'inventer des informations
 les chiffres transmis dans le contexte, pour rester honnête sur ce que
 l'app sait réellement.
 """
+import logging
 from typing import Optional
 
 import httpx
 
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 API_URL = "https://api.anthropic.com/v1/messages"
 TIMEOUT_SECONDS = 45.0
@@ -59,11 +62,21 @@ def generate_narrative(context: dict) -> Optional[str]:
             timeout=TIMEOUT_SECONDS,
         )
         if resp.status_code != 200:
+            # Dégradation gracieuse (l'analyse continue sans commentaire), mais on
+            # log quand même -- sans ça, une clé invalide ou un nom de modèle
+            # obsolète désactive l'analyse Claude en silence, sans jamais rien
+            # remonter nulle part (c'est ce qui s'est passé avec l'ancien défaut
+            # "claude-sonnet-4-6", qui n'existait plus).
+            logger.warning(
+                "ai_narrative: réponse Anthropic non-200 (status=%s, model=%s) : %s",
+                resp.status_code, settings.anthropic_model, resp.text[:500],
+            )
             return None
         blocks = resp.json().get("content", [])
         text = "".join(b.get("text", "") for b in blocks if b.get("type") == "text").strip()
         return text or None
     except Exception:
+        logger.exception("ai_narrative: exception lors de l'appel à l'API Anthropic")
         return None
 
 
