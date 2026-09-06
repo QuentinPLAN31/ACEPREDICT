@@ -2,6 +2,8 @@
 Endpoints compétitions : liste (page "Compétitions"), détail avec tabs
 Classement / Matchs / Joueurs / Nations (page comp-detail du frontend).
 """
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -12,8 +14,20 @@ router = APIRouter(prefix="/competitions", tags=["competitions"])
 
 
 @router.get("", response_model=list[schemas.CompetitionOut])
-def list_competitions(db: Session = Depends(get_db)):
-    return db.query(models.Competition).all()
+def list_competitions(include_past: bool = False, db: Session = Depends(get_db)):
+    """Par défaut, ne montre que les compétitions de l'année en cours (season
+    == année courante) ou sans saison connue -- les éditions passées d'années
+    antérieures (import historique Sackmann, cf. scripts/ingest_sackmann.py)
+    sont masquées pour ne pas polluer la page avec des tournois déjà clos
+    depuis longtemps. include_past=true les réaffiche toutes (ex : usage
+    interne/debug)."""
+    query = db.query(models.Competition)
+    if not include_past:
+        current_year = datetime.utcnow().year
+        query = query.filter(
+            (models.Competition.season == None) | (models.Competition.season >= current_year)  # noqa: E711
+        )
+    return query.all()
 
 
 @router.get("/{competition_id}", response_model=schemas.CompetitionOut)

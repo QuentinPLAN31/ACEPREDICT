@@ -3432,6 +3432,7 @@
     upcomingGenderSwitchEl.addEventListener('click', ()=>{
       upcomingGenderFilter = (upcomingGenderFilter === 'atp') ? 'wta' : 'atp';
       updateGenderSwitchUI();
+      renderUpcomingFilters();
       renderUpcomingPageList();
     });
   }
@@ -3459,13 +3460,19 @@
 
   function renderUpcomingFilters(){
     const filtersEl = document.getElementById('upcomingFilters');
+    // Comptage fait sur le sous-ensemble déjà filtré par genre (Hommes/Femmes) --
+    // sinon le chiffre affiché sur un chip ("US Open (16)") ne correspond pas
+    // au nombre de lignes réellement affichées une fois le filtre genre appliqué.
+    const genderScoped = upcomingGenderFilter
+      ? upcomingPageMatches.filter(m => (m.tour || '').toLowerCase() === upcomingGenderFilter)
+      : upcomingPageMatches;
     const counts = {};
-    upcomingPageMatches.forEach(m=>{
+    genderScoped.forEach(m=>{
       const t = m.tournament || 'Autre';
       counts[t] = (counts[t] || 0) + 1;
     });
     const tournaments = Object.keys(counts).sort((a,b)=> counts[b] - counts[a]).slice(0, 10);
-    const chips = ['<button class="upcoming-chip' + (!upcomingPageFilter ? ' active' : '') + '" data-filter="">Tous (' + upcomingPageMatches.length + ')</button>']
+    const chips = ['<button class="upcoming-chip' + (!upcomingPageFilter ? ' active' : '') + '" data-filter="">Tous (' + genderScoped.length + ')</button>']
       .concat(tournaments.map(t =>
         '<button class="upcoming-chip' + (upcomingPageFilter === t ? ' active' : '') + '" data-filter="' + t.replace(/"/g,'&quot;') + '">' + t + ' (' + counts[t] + ')</button>'
       ));
