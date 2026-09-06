@@ -49,7 +49,7 @@ STYLES_HAUTE = [
      "Service et coup droit/revers à deux mains très puissants depuis le fond du "
      "court. Jeu de puissance pure, peu porté sur le filet. Peut être fragile "
      "mentalement dans les moments serrés."),
-    ("Felix Auger-Aliassime", "atp",
+    ("Felix Auger Aliassime", "atp",
      "Gros service et coup droit puissant, jeu plus direct et agressif. Revers à "
      "deux mains parfois moins fiable sous pression que le reste de son jeu."),
     ("Novak Djokovic", "atp",
