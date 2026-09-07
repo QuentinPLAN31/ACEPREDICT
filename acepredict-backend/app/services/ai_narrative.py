@@ -40,7 +40,7 @@ TIMEOUT_SECONDS = 45.0
 # modèle décider lui-même s'il réfléchit, et output_config.effort=low limite
 # l'ampleur de cette réflexion pour garantir qu'il reste de la place pour le
 # texte final dans max_tokens.
-MAX_TOKENS = 3600
+MAX_TOKENS = 4400
 
 # NB: avec `thinking` activé, l'API Anthropic n'accepte plus le paramètre
 # `temperature` (400 "temperature is deprecated for this model") -- on ne
@@ -118,11 +118,13 @@ def _build_prompt(ctx: dict) -> str:
         "Ligne 1 = une seule phrase de synthèse percutante (max 25 mots, "
         "pas de préfixe, pas de puce) donnant le facteur le plus décisif "
         "du pronostic. "
-        f"Puis, séparé par une ligne vide, EXACTEMENT ces 7 sections dans "
+        f"Puis, séparé par une ligne vide, EXACTEMENT ces 9 sections dans "
         "cet ordre, chacune introduite par une ligne '### ' suivie du nom "
         "de la section en majuscules et RIEN d'autre sur cette ligne, "
-        "puis ses puces (chacune sur sa propre ligne, commençant par "
-        "\"• \", aucune numérotation) : "
+        "puis son contenu -- pour les sections à puces, chaque puce sur sa "
+        "propre ligne, commençant par \"• \", aucune numérotation ; pour "
+        "MOMENT_CLE et VERDICT_EXPERT, jamais de puce, un texte fluide "
+        "directement (cf. consignes de chacune ci-dessous) : "
         f"### FORCES_J1 -- exactement 3 puces (max 16 mots chacune) sur les "
         f"points forts concrets de {p1} DANS CE MATCH précis face à ce style "
         f"d'adversaire (pas des généralités de carrière). "
@@ -140,6 +142,11 @@ def _build_prompt(ctx: dict) -> str:
         "comment le format du tournoi amplifie ou atténue tel autre "
         "facteur) -- jamais une puce qui ne fait que répéter un chiffre "
         "déjà affiché ailleurs à l'écran. "
+        "### MOMENT_CLE -- AUCUNE puce : une seule phrase percutante (max "
+        "30 mots) identifiant LE moment ou point de bascule tactique le "
+        "plus décisif à surveiller pendant le match (ex: un jeu précis, un "
+        "enchaînement, une situation de pression) -- concret et visuel, "
+        "jamais une généralité déjà dite ailleurs. "
         "### SCENARIOS -- exactement 2 puces, chacune un scénario tactique "
         "concret et distinct pour CE match précis (max 30 mots chacune) : "
         "comment le match pourrait se dérouler compte tenu des styles, de "
@@ -153,6 +160,12 @@ def _build_prompt(ctx: dict) -> str:
         "faire basculer le match, et le niveau de confiance global assumé "
         "-- jamais une puce qui redit ce qui est déjà dans la ligne 1 ou "
         "les autres sections. "
+        "### VERDICT_EXPERT -- AUCUNE puce : 2 à 3 phrases fluides, ton "
+        "éditorial et personnel (comme la conclusion signée d'un chroniqueur "
+        "tennis), qui résument ta lecture experte du match sans répéter un "
+        "chiffre ou une idée déjà donnée dans les sections précédentes -- la "
+        "vraie valeur ajoutée de fin, ce qui donnerait envie au lecteur de "
+        "faire confiance à l'analyse. "
         "Aucun titre en gras, aucun texte hors de ce format, aucune phrase "
         "de liaison creuse -- chaque puce doit apporter une information "
         "nouvelle, jamais de redite entre sections. "
@@ -227,12 +240,12 @@ def _build_prompt(ctx: dict) -> str:
         "Rappel du format : 1 phrase de synthèse SANS puce, puis dans cet "
         "ordre exact -- ### FORCES_J1 (3 puces), ### FAIBLESSES_J1 (2-3 "
         "puces), ### FORCES_J2 (3 puces), ### FAIBLESSES_J2 (2-3 puces), "
-        "### CROISEMENT (3 puces), ### SCENARIOS (2 puces), ### VIGILANCE "
-        "(3 à 4 puces) -- uniquement des puces, jamais de paragraphe ni de "
-        "bloc de texte continu, rien de redondant avec les chiffres déjà "
-        "donnés ci-dessus ni entre les sections elles-mêmes, aucun "
-        "remplissage. Ne donne jamais de conseil de pari, de cote, ni de "
-        "garantie de résultat.",
+        "### CROISEMENT (3 puces), ### MOMENT_CLE (1 phrase SANS puce), "
+        "### SCENARIOS (2 puces), ### VIGILANCE (3 à 4 puces), "
+        "### VERDICT_EXPERT (2-3 phrases SANS puce) -- rien de redondant "
+        "avec les chiffres déjà donnés ci-dessus ni entre les sections "
+        "elles-mêmes, aucun remplissage. Ne donne jamais de conseil de "
+        "pari, de cote, ni de garantie de résultat.",
     ]
 
     return "\n".join(lines)
