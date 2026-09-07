@@ -1119,17 +1119,20 @@
     background: rgba(20,24,10,0.4); border-radius:50%; filter: blur(.5px);
     animation: tb-shadow .85s cubic-bezier(.5,0,.5,1) infinite;
   }
-  .tennis-loader .tb-ball{
+    .tennis-loader .tb-ball{
     position:absolute; left:50%; bottom:7px; width:15px; height:15px; margin-left:-7.5px;
     border-radius:50%;
-    background: radial-gradient(circle at 32% 28%, #f4ffb0, var(--accent) 58%, #9db81b 100%);
+    /* Balle dans la couleur du fond sombre (pas l'accent) pour bien ressortir
+       sur le bouton vert clair pendant "Analyse en cours...". */
+    background: radial-gradient(circle at 32% 28%, #3a4730, var(--bg) 55%, #0a0d08 100%);
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
     animation: tb-jump .85s cubic-bezier(.5,0,.5,1) infinite;
   }
   .tennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     content:''; position:absolute; top:-12%; left:-12%; width:124%; height:124%;
-    border-radius:50%; border:1.1px solid rgba(20,24,10,0.28); border-left-color:transparent; border-right-color:transparent;
+    border-radius:50%; border:1.1px solid rgba(255,255,255,0.4); border-left-color:transparent; border-right-color:transparent;
   }
-  .tennis-loader .tb-ball::before{ transform: rotate(28deg) scale(0.82,1.4); }
+.tennis-loader .tb-ball::before{ transform: rotate(28deg) scale(0.82,1.4); }
   .tennis-loader .tb-ball::after{ transform: rotate(-28deg) scale(0.82,1.4); }
   @keyframes tb-jump{
     0%{ bottom:7px; transform: scaleX(1) scaleY(1); }
@@ -2784,43 +2787,58 @@
     return html;
   }
 
-  function renderNarrativeBlock(detail){
+    function renderNarrativeBlock(detail){
     const text = detail.ai_narrative;
     if(!text) return '';
-    // Format attendu : bloc 1 = phrase de synthèse, bloc(s) suivant(s) = 1 à 2
-    // paragraphes d'analyse, dernier bloc = puces "• " (séparés par une ligne
-    // vide entre chaque bloc, cf. prompt dans ai_narrative.py).
+    // Format attendu (cf. prompt dans ai_narrative.py) : bloc 1 = phrase de
+    // synthèse, puis des sections "### NOM" chacune suivie de puces "• "
+    // (séparées par une ligne vide entre chaque bloc). Sections attendues :
+    // CROISEMENT, LECTURE TACTIQUE, VIGILANCE -- mais le parsing reste
+    // générique (n'importe quel nom de section / bloc sans puces retombe
+    // proprement en paragraphe) pour rester robuste si le modèle dévie.
     const blocks = text.split(/\n{2,}/).map(b => b.trim()).filter(Boolean);
     if(!blocks.length) return '';
 
     const lead = blocks[0];
-    let rest = blocks.slice(1);
-    let bullets = [];
-    if(rest.length){
-      const lastLines = rest[rest.length - 1].split(/\n/).map(l => l.trim()).filter(Boolean);
-      const isBulletBlock = lastLines.length > 0 && lastLines.every(l => /^[•\-–]\s*/.test(l));
+    const LABELS = {
+      'CROISEMENT': 'Croisement des facteurs',
+      'LECTURE TACTIQUE': 'Lecture tactique',
+      'VIGILANCE': 'Points de vigilance',
+      'POINTS DE VIGILANCE': 'Points de vigilance'
+    };
+
+    const sections = [];
+    for(let i = 1; i < blocks.length; i++){
+      const rawLines = blocks[i].split(/\n/).map(l => l.trim()).filter(Boolean);
+      if(!rawLines.length) continue;
+      const headerMatch = rawLines[0].match(/^#{1,3}\s*(.+)$/);
+      let labelKey = '', lines = rawLines;
+      if(headerMatch){
+        labelKey = headerMatch[1].trim().toUpperCase();
+        lines = rawLines.slice(1);
+      }
+      if(!lines.length) continue;
+      const label = LABELS[labelKey] || (labelKey ? labelKey.charAt(0) + labelKey.slice(1).toLowerCase() : 'Analyse');
+      const isBulletBlock = lines.every(l => /^[•\-–]\s*/.test(l));
       if(isBulletBlock){
-        bullets = lastLines.map(l => l.replace(/^[•\-–]\s*/, ''));
-        rest = rest.slice(0, -1);
+        sections.push({ label: label, bullets: lines.map(l => l.replace(/^[•\-–]\s*/, '')) });
+      } else {
+        sections.push({ label: label, paragraph: lines.join(' ') });
       }
     }
-    const paragraphs = rest;
 
     const leadHtml = '<p class="result-narrative-lead">' + lead + '</p>';
-    const paragraphsHtml = paragraphs.length
-      ? '<div class="result-narrative-section">' +
-          '<div class="result-narrative-section-label">Analyse</div>' +
-          paragraphs.map(p => '<p>' + p + '</p>').join('') +
-        '</div>'
-      : '';
-    const listHtml = bullets.length
-      ? '<div class="result-narrative-section">' +
-          '<div class="result-narrative-section-label">Points de vigilance</div>' +
-          '<ul class="result-narrative-list">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>' +
-        '</div>'
-      : '';
+    const sectionsHtml = sections.map(function(s){
+      const body = s.bullets
+        ? '<ul class="result-narrative-list">' + s.bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>'
+        : '<p>' + s.paragraph + '</p>';
+      return '<div class="result-narrative-section">' +
+        '<div class="result-narrative-section-label">' + s.label + '</div>' + body +
+      '</div>';
+    }).join('');
+
     return '<div class="field-label" style="margin-top:18px;">ANALYSE APPROFONDIE</div>' +
-      '<div class="result-narrative">' + leadHtml + paragraphsHtml + listHtml + '</div>';
+      '<div class="result-narrative">' + leadHtml + sectionsHtml + '</div>';
   }
 
   function renderTournamentBlock(detail){
