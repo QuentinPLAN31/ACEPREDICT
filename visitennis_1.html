@@ -289,7 +289,11 @@
     padding:10px 14px; cursor:default; transition: background 0.15s ease, border-color 0.15s ease;
   }
   .upr-pbox:hover{ background: var(--accent-dim); border-color: var(--accent); }
-  .upr-flag{ font-size:28px; line-height:1; }
+        .upr-flag{
+    width:30px; height:22px; border-radius:4px; overflow:hidden; flex-shrink:0;
+    display:inline-flex; align-items:center; justify-content:center; background: var(--accent-dim);
+    font-size:16px; line-height:1;
+  }
   .upr-pname{ font-size:16px; font-weight:800; flex:1; color: var(--text); cursor:pointer; }
   .upr-pname:hover{ color: var(--accent); text-decoration:underline; }
   .upr-rank{ color: var(--accent); font-weight:700; font-size:11.5px; white-space:nowrap; min-width:34px; text-align:right; }
@@ -334,7 +338,11 @@
   }
   .player-hover-popover.visible{ opacity:1; transform:translateY(0); }
   .php-header{ display:flex; align-items:center; gap:8px; margin-bottom:11px; }
-  .php-flag{ font-size:24px; line-height:1; }
+    .php-flag{
+    width:26px; height:19px; border-radius:3px; overflow:hidden; flex-shrink:0;
+    display:inline-flex; align-items:center; justify-content:center; background: var(--accent-dim);
+    font-size:13px; line-height:1;
+  }
   .php-name{ font-size:14px; font-weight:800; color: var(--text); flex:1; line-height:1.25; }
   .php-tour{
     font-size:10px; font-weight:800; color: var(--accent); background: var(--accent-dim);
@@ -368,7 +376,11 @@
   }
   .pj-identity{ min-width:200px; }
   .pj-name-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .pj-flag{ font-size:26px; }
+    .pj-flag{
+    width:32px; height:23px; border-radius:4px; overflow:hidden; flex-shrink:0;
+    display:inline-flex; align-items:center; justify-content:center; background: var(--accent-dim);
+    font-size:15px; line-height:1;
+  }
   .pj-name{ font-size:24px; font-weight:800; color: var(--text); }
   .pj-tour{
     font-size:11px; font-weight:800; color: var(--accent); background: var(--accent-dim);
@@ -474,8 +486,9 @@
     width: 34px; height: 34px; border-radius: 9px;
     background: var(--accent-dim);
     display:flex; align-items:center; justify-content:center;
-    font-size: 15px; flex-shrink:0;
+        font-size: 15px; flex-shrink:0; overflow:hidden;
   }
+  .logo-img{ width:100%; height:100%; object-fit:contain; padding:6px; box-sizing:border-box; display:block; }
   .comp-name{ font-size: 14.5px; font-weight: 600; }
   .comp-meta{ font-size: 12px; color: var(--text-sec); margin-top:1px; }
   .comp-chevron{ margin-left:auto; color: var(--text-dim); }
@@ -942,7 +955,7 @@
     width:56px; height:56px; border-radius:12px;
     background: var(--accent-dim);
     display:flex; align-items:center; justify-content:center;
-    font-size:26px; flex-shrink:0;
+        font-size:26px; flex-shrink:0; overflow:hidden;
   }
   .comp-hero-title{ font-size:22px; font-weight:700; margin:0 0 4px; }
   .comp-hero-meta{ font-size:13px; color: var(--text-sec); }
@@ -999,7 +1012,7 @@
   .rank-table td{ padding:13px 16px; font-size:13.5px; border-bottom:1px solid var(--line); white-space:nowrap; }
   .rank-table tr:last-child td{ border-bottom:none; }
   .rank-table .rk-player{ display:flex; align-items:center; gap:10px; font-weight:600; }
-  .rank-table .rk-flag{ width:24px; height:24px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; }
+    .rank-table .rk-flag{ width:24px; height:24px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:12px; flex-shrink:0; overflow:hidden; }
   .rank-table .rk-pts{ font-weight:700; color: var(--accent); }
   .rank-table .rk-num{ color: var(--text-dim); font-weight:700; width:28px; }
   .rank-table-wrap{ overflow-x:auto; }
@@ -1016,11 +1029,30 @@
   .bracket-p.winner .score{ color: var(--accent); }
 
   .match-row{ display:flex; align-items:center; gap:14px; background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:15px 18px; margin-bottom:8px; }
-  .match-row .m-flag{ width:30px; height:30px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .match-row .m-flag{ width:30px; height:30px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; overflow:hidden; }
   .match-row .m-player{ font-size:14px; font-weight:600; flex:1; display:flex; align-items:center; gap:10px; }
   .match-row .m-player.right{ flex-direction:row-reverse; text-align:right; }
   .match-row .m-score{ font-size:15px; font-weight:800; padding:0 16px; font-variant-numeric:tabular-nums; white-space:nowrap; }
   .match-row .m-date{ font-size:11px; color: var(--text-dim); text-align:right; min-width:78px; flex-shrink:0; }
+
+  /* Ligne d'historique : "Nom VS Nom" + pourcentage, avec le gagnant prédit
+     clairement mis en valeur (gras + couleur accent) plutôt qu'un simple
+     pourcentage flottant sans repère visuel. */
+  .hist-row{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line);
+    border-radius:12px; padding:15px 18px; margin-bottom:8px; cursor:pointer; transition: border-color 0.15s ease;
+  }
+  .hist-row:hover{ border-color: var(--line-strong); }
+  .hist-matchup{ display:flex; align-items:baseline; gap:10px; flex:1; min-width:0; flex-wrap:wrap; }
+  .hist-player{
+    font-size:14.5px; font-weight:600; color: var(--text-sec); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .hist-player.winner{ color: var(--accent); font-weight:800; }
+  .hist-vs{ font-size:11px; font-weight:800; color: var(--text-dim); letter-spacing:0.05em; flex-shrink:0; }
+  .hist-result{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0; }
+  .hist-pct{ font-size:19px; font-weight:800; color: var(--accent); font-variant-numeric:tabular-nums; }
+  .hist-winner-label{ font-size:10.5px; color: var(--text-dim); white-space:nowrap; }
 
   .player-row{ display:flex; align-items:center; gap:14px; background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:13px 16px; margin-bottom:8px; }
   .player-rank{ width:28px; height:28px; border-radius:999px; background: rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; color: var(--text-sec); flex-shrink:0; }
@@ -1036,7 +1068,11 @@
 
   .nations-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
   .nation-card{ background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:20px 14px; text-align:center; }
-  .nation-flag{ font-size:30px; margin-bottom:10px; }
+    .nation-flag{
+    width:56px; height:40px; border-radius:6px; overflow:hidden; margin:0 auto 10px;
+    display:flex; align-items:center; justify-content:center; background: var(--accent-dim); font-size:26px;
+  }
+  .flag-img{ width:100%; height:100%; object-fit:cover; display:block; }
   .nation-name{ font-size:13.5px; font-weight:600; }
   .nation-count{ font-size:11.5px; color: var(--text-sec); margin-top:2px; }
 
@@ -1871,7 +1907,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </button>
 
       <div class="comp-hero-card">
-        <span class="comp-hero-icon" id="cd-icon">🇫🇷</span>
+                                <span class="comp-hero-icon" id="cd-icon"></span>
         <div>
           <h1 class="comp-hero-title" id="cd-title">Roland-Garros</h1>
           <div class="comp-hero-meta" id="cd-meta">France · Grand Chelem · 2026</div>
@@ -3330,14 +3366,25 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       empty.style.display = 'none';
       list.style.display = '';
       lastHistoriqueItems = items;
-      list.innerHTML = items.map((a, i) =>
-        '<div class="match-row" style="cursor:pointer;" onclick="viewHistoryAnalysis(' + i + ')">' +
-          '<span class="m-player">' + a.player1_name + '</span>' +
-          '<span class="m-score">' + Math.round(a.win_probability * 100) + '%</span>' +
-          '<span class="m-player right">' + a.player2_name + '</span>' +
-          '<span class="m-date">Gagnant prédit<br>' + a.predicted_winner_name + '</span>' +
-        '</div>'
-      ).join('');
+            list.innerHTML = items.map((a, i) => {
+        // win_probability est TOUJOURS P(predicted_winner), jamais P(player1)
+        // (même convention que prediction.py::build_prediction, cf.
+        // renderAnalysisResult) -- on ne peut donc pas juste l'afficher entre
+        // les deux noms sans dire à qui il appartient.
+        const p1IsWinner = a.predicted_winner_id === a.player1_id;
+        const pct = Math.round(a.win_probability * 100);
+        return '<div class="hist-row" onclick="viewHistoryAnalysis(' + i + ')">' +
+          '<div class="hist-matchup">' +
+            '<span class="hist-player' + (p1IsWinner ? ' winner' : '') + '">' + a.player1_name + '</span>' +
+            '<span class="hist-vs">VS</span>' +
+            '<span class="hist-player' + (!p1IsWinner ? ' winner' : '') + '">' + a.player2_name + '</span>' +
+          '</div>' +
+          '<div class="hist-result">' +
+            '<span class="hist-pct">' + pct + '%</span>' +
+            '<span class="hist-winner-label">Gagnant prédit : ' + a.predicted_winner_name + '</span>' +
+          '</div>' +
+        '</div>';
+            }).join('');
     } catch(err){
       // backend injoignable : état vide par défaut déjà affiché
     }
@@ -3440,9 +3487,34 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     atp_tour: 'CIRCUIT ATP', wta_tour: 'CIRCUIT WTA', davis_cup: 'COMPÉTITIONS PAR ÉQUIPE',
   };
   const COMP_CATEGORY_ORDER = ['grand_slam', 'masters_1000', 'finals', 'atp_tour', 'wta_tour', 'davis_cup'];
-  const GRAND_SLAM_FLAG = { 'Australian Open':'🇦🇺', 'Roland Garros':'🇫🇷', 'Roland-Garros':'🇫🇷', 'Wimbledon':'🇬🇧', 'US Open':'🇺🇸' };
-  function compIcon(comp){ return GRAND_SLAM_FLAG[comp.name] || (comp.category === 'grand_slam' ? '🏆' : '🎾'); }
-
+    // Logos officiels des tournois (au lieu d'un emoji générique) : on va
+  // chercher le favicon du site officiel de chaque tournoi via le service
+  // favicon de Google -- ça marche sans jamais avoir à héberger ou deviner
+  // une URL d'image exacte, et ça retombe sur une icône neutre plutôt qu'une
+  // image cassée si un domaine est introuvable. Pour les tournois dont on ne
+  // connaît pas le site officiel précis, on retombe sur atptour.com (vrai
+  // logo du circuit ATP, pas un emoji).
+  const TOURNAMENT_DOMAINS = {
+    'Australian Open': 'ausopen.com', 'Roland Garros': 'rolandgarros.com', 'Roland-Garros': 'rolandgarros.com',
+    'Wimbledon': 'wimbledon.com', 'US Open': 'usopen.org',
+    'Indian Wells Masters': 'bnpparibasopen.com', 'Madrid Masters': 'madrid-open.com',
+    'Miami Masters': 'miamiopen.com', 'Monte Carlo Masters': 'rolexmontecarlomasters.mc',
+    'Rome Masters': 'internazionalibnlditalia.com', 'Canada Masters': 'nationalbankopen.com',
+    'Cincinnati Masters': 'cincinnatiopen.com', 'Shanghai Masters': 'atptour.com',
+    'Paris Masters': 'rolexparismasters.com',
+    'Rotterdam': 'abnamrowtt.com', 'United Cup': 'unitedcup.com', 'Acapulco': 'abiertomexicanotenis.com',
+    'Adelaide': 'adelaideinternational.com.au', 'Auckland': 'asbclassic.co.nz',
+    'Barcelona': 'barcelonaopenbancsabadell.com', 'Delray Beach': 'delraybeachopen.com',
+    'Dubai': 'dubaidutyfreetennischampionships.com', 'Geneva': 'genevaopen.com',
+    'Hamburg': 'hamburg-open.de', 'Montpellier': 'opensud-tennis.fr', 'Munich': 'bmw-open.de',
+  };
+  function tournamentDomain(comp){
+    return TOURNAMENT_DOMAINS[comp.name] || 'atptour.com';
+  }
+  function tournamentLogo(comp){
+    const domain = tournamentDomain(comp);
+    return '<img class="logo-img" src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" alt="" loading="lazy">';
+  }
   let competitionsCache = [];
   async function loadCompetitionsList(){
     const container = document.getElementById('compListContainer');
@@ -3462,7 +3534,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         const list = groups[cat].slice().sort((a,b)=> (b.season||0) - (a.season||0) || a.name.localeCompare(b.name));
         const rows = list.map(c=>
           '<div class="comp-row" onclick="openComp(\'' + c.id + '\')">' +
-            '<span class="comp-icon">' + compIcon(c) + '</span>' +
+                        '<span class="comp-icon">' + tournamentLogo(c) + '</span>' +
             '<div><div class="comp-name">' + c.name + '</div><div class="comp-meta">' + (c.tour||'').toUpperCase() + ' • ' + (c.season||'?') + '</div></div>' +
             '<span class="comp-chevron">›</span>' +
           '</div>'
@@ -3571,7 +3643,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   function openComp(compId){
     const comp = competitionsCache.find(c => c.id === compId);
-    document.getElementById('cd-icon').textContent = comp ? compIcon(comp) : '🎾';
+        document.getElementById('cd-icon').innerHTML = comp ? tournamentLogo(comp) : '';
     document.getElementById('cd-title').textContent = comp ? comp.name : 'Compétition';
     document.getElementById('cd-meta').textContent = comp
       ? [comp.location, (comp.tour||'').toUpperCase(), comp.season].filter(Boolean).join(' · ')
@@ -3631,8 +3703,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const c = String(code).trim().toUpperCase();
     const iso2 = COUNTRY_IOC_TO_ISO2[c] || (c.length === 2 ? c : null);
     if(!iso2 || iso2.length !== 2) return '';
-    const A = 0x1F1E6;
-    return String.fromCodePoint(A + (iso2.charCodeAt(0) - 65), A + (iso2.charCodeAt(1) - 65));
+    const lc = iso2.toLowerCase();
+    return '<img class="flag-img" src="https://flagcdn.com/w80/' + lc + '.png" ' +
+      'srcset="https://flagcdn.com/w40/' + lc + '.png 40w, https://flagcdn.com/w80/' + lc + '.png 80w" ' +
+      'alt="' + iso2 + '" loading="lazy">';
   }
 
   // ---------- Page "Matchs à venir" ----------
