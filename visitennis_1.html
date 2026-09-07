@@ -2803,14 +2803,20 @@
       '<div class="result-factors">' + tags.map(function(t){ return '<span class="result-factor-pill">' + t + '</span>'; }).join('') + '</div>';
   }
 
-  function renderStatCompareBars(detail, p1Name, p2Name, pct){
+    function renderStatCompareBars(detail, p1Name, p2Name, pct, p1IsWinner){
     let html = '<div class="stat-bars">' +
       '<div class="stat-bars-legend">' +
         '<span class="stat-bars-legend-item"><span class="stat-bars-dot stat-bars-dot-left"></span>' + p1Name + '</span>' +
         '<span class="stat-bars-legend-item"><span class="stat-bars-dot stat-bars-dot-right"></span>' + p2Name + '</span>' +
       '</div>';
 
-    html += statBarRow('Probabilité de victoire', pct, Math.round((100 - pct) * 10) / 10, { suffix: '%', decimals: 1 });
+    // `pct` est TOUJOURS la probabilité du vainqueur prédit -- il faut donc
+    // l'attribuer à p1 ou p2 selon qui est réellement favori (p1IsWinner),
+    // jamais toujours à p1 (cf. commentaire dans renderAnalysisResult).
+    const otherPct = Math.round((100 - pct) * 10) / 10;
+    const p1Pct = p1IsWinner ? pct : otherPct;
+    const p2Pct = p1IsWinner ? otherPct : pct;
+    html += statBarRow('Probabilité de victoire', p1Pct, p2Pct, { suffix: '%', decimals: 1 });
 
     const surfaceTag = (detail.surface_used && detail.surface_used !== 'overall') ? ' (' + detail.surface_used + ')' : '';
     html += statBarRow('Rating Elo' + surfaceTag, detail.elo_player1, detail.elo_player2);
@@ -2838,27 +2844,31 @@
     return html;
   }
 
-    function renderNarrativeBlock(detail){
-    const text = detail.ai_narrative;
-    if(!text) return '';
-    // Format attendu (cf. prompt dans ai_narrative.py) : bloc 1 = phrase de
-    // synthèse, puis des sections "### NOM" chacune suivie de puces "• "
-    // (séparées par une ligne vide entre chaque bloc). Sections attendues :
-    // CROISEMENT, LECTURE TACTIQUE, VIGILANCE -- mais le parsing reste
-    // générique (n'importe quel nom de section / bloc sans puces retombe
-    // proprement en paragraphe) pour rester robuste si le modèle dévie.
+  // Parse le texte brut renvoyé par ai_narrative.py en un objet structuré.
+  // Format attendu (cf. prompt dans ai_narrative.py) : bloc 1 = phrase de
+  // synthèse, puis des sections "### NOM" chacune suivie de puces "• "
+  // (séparées par une ligne vide entre chaque bloc) : FORCES_J1,
+  // FAIBLESSES_J1, FORCES_J2, FAIBLESSES_J2, CROISEMENT, SCENARIOS,
+  // VIGILANCE -- le parsing reste générique (toute section inconnue ou tout
+  // bloc sans puces retombe proprement dans "sections", en paragraphe) pour
+  // rester robuste si le modèle dévie légèrement du format demandé.
+  const NARRATIVE_LABELS = {
+    'CROISEMENT': 'Croisement des facteurs',
+    'LECTURE TACTIQUE': 'Lecture tactique',
+    'VIGILANCE': 'Points de vigilance',
+    'POINTS DE VIGILANCE': 'Points de vigilance'
+  };
+  function parseNarrative(text){
+    if(!text) return null;
     const blocks = text.split(/\n{2,}/).map(b => b.trim()).filter(Boolean);
-    if(!blocks.length) return '';
+    if(!blocks.length) return null;
 
     const lead = blocks[0];
-    const LABELS = {
-      'CROISEMENT': 'Croisement des facteurs',
-      'LECTURE TACTIQUE': 'Lecture tactique',
-      'VIGILANCE': 'Points de vigilance',
-      'POINTS DE VIGILANCE': 'Points de vigilance'
-    };
-
+    const fiches = { j1: { forces: [], faiblesses: [] }, j2: { forces: [], faiblesses: [] } };
+    let hasFiches = false;
+    const scenarios = [];
     const sections = [];
+
     for(let i = 1; i < blocks.length; i++){
       const rawLines = blocks[i].split(/\n/).map(l => l.trim()).filter(Boolean);
       if(!rawLines.length) continue;
@@ -2869,17 +2879,56 @@
         lines = rawLines.slice(1);
       }
       if(!lines.length) continue;
-      const label = LABELS[labelKey] || (labelKey ? labelKey.charAt(0) + labelKey.slice(1).toLowerCase() : 'Analyse');
+      const bullets = lines.map(l => l.replace(/^[•\-–]\s*/, ''));
       const isBulletBlock = lines.every(l => /^[•\-–]\s*/.test(l));
+
+      if(labelKey === 'FORCES_J1'){ fiches.j1.forces = bullets; hasFiches = true; continue; }
+      if(labelKey === 'FAIBLESSES_J1'){ fiches.j1.faiblesses = bullets; hasFiches = true; continue; }
+      if(labelKey === 'FORCES_J2'){ fiches.j2.forces = bullets; hasFiches = true; continue; }
+      if(labelKey === 'FAIBLESSES_J2'){ fiches.j2.faiblesses = bullets; hasFiches = true; continue; }
+      if(labelKey === 'SCENARIOS'){ scenarios.push(...bullets); continue; }
+
+      const label = NARRATIVE_LABELS[labelKey] || (labelKey ? labelKey.charAt(0) + labelKey.slice(1).toLowerCase() : 'Analyse');
       if(isBulletBlock){
-        sections.push({ label: label, bullets: lines.map(l => l.replace(/^[•\-–]\s*/, '')) });
+        sections.push({ label: label, bullets: bullets });
       } else {
         sections.push({ label: label, paragraph: lines.join(' ') });
       }
     }
 
-    const leadHtml = '<p class="result-narrative-lead">' + lead + '</p>';
-    const sectionsHtml = sections.map(function(s){
+    return { lead: lead, fiches: hasFiches ? fiches : null, scenarios: scenarios, sections: sections };
+  }
+
+  function renderFichesBlock(fiches, p1Name, p2Name){
+    const card = function(name, f){
+      if(!f.forces.length && !f.faiblesses.length) return '';
+      const list = function(items, cls){
+        if(!items.length) return '';
+        return '<ul class="fiche-list ' + cls + '">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>';
+      };
+      return '<div class="fiche-card">' +
+        '<div class="fiche-card-name">' + name + '</div>' +
+        '<div class="fiche-card-sub fiche-sub-pos">Points forts</div>' + list(f.forces, 'fiche-pos') +
+        '<div class="fiche-card-sub fiche-sub-neg">À surveiller</div>' + list(f.faiblesses, 'fiche-neg') +
+      '</div>';
+    };
+    return '<div class="field-label" style="margin-top:22px;">FICHES JOUEURS</div>' +
+      '<div class="fiche-grid">' + card(p1Name, fiches.j1) + card(p2Name, fiches.j2) + '</div>';
+  }
+
+  function renderScenariosBlock(scenarios){
+    return '<div class="field-label" style="margin-top:22px;">SCÉNARIOS POSSIBLES</div>' +
+      '<div class="scenario-list">' + scenarios.map(function(s, idx){
+        return '<div class="scenario-item">' +
+          '<div class="scenario-num">' + (idx + 1) + '</div>' +
+          '<div class="scenario-text">' + s + '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+  }
+
+  function renderNarrativeSectionsBlock(narrative){
+    if(!narrative.sections.length) return '';
+    const html = narrative.sections.map(function(s){
       const body = s.bullets
         ? '<ul class="result-narrative-list">' + s.bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>'
         : '<p>' + s.paragraph + '</p>';
@@ -2887,9 +2936,8 @@
         '<div class="result-narrative-section-label">' + s.label + '</div>' + body +
       '</div>';
     }).join('');
-
-    return '<div class="field-label" style="margin-top:18px;">ANALYSE APPROFONDIE</div>' +
-      '<div class="result-narrative">' + leadHtml + sectionsHtml + '</div>';
+    return '<div class="field-label" style="margin-top:22px;">ANALYSE APPROFONDIE</div>' +
+      '<div class="result-narrative">' + html + '</div>';
   }
 
   function renderTournamentBlock(detail){
@@ -2983,19 +3031,28 @@
   }
 
   function renderAnalysisResult(data, p1Id, p1Name, p2Name){
-    const winnerName = data.predicted_winner_id === p1Id ? p1Name : p2Name;
-    const loserName = winnerName === p1Name ? p2Name : p1Name;
+    // p1IsWinner détermine à QUI (p1 ou p2) attribuer `pct` (la probabilité
+    // du VAINQUEUR prédit, cf. prediction.py::build_prediction -- win_probability
+    // est toujours P(predicted_winner_id), jamais P(player1) par convention).
+    // Ne JAMAIS attribuer `pct` à p1 sans ce test : c'est ce qui causait
+    // l'incohérence "94.6% affiché sur le mauvais joueur" remontée par un
+    // utilisateur (l'Elo le plus haut se retrouvait avec le % le plus bas).
+    const p1IsWinner = data.predicted_winner_id === p1Id;
+    const winnerName = p1IsWinner ? p1Name : p2Name;
+    const loserName = p1IsWinner ? p2Name : p1Name;
     const pct = Math.round(data.win_probability * 1000) / 10;
     const hasSurface = data.detail && data.detail.surface_used && data.detail.surface_used !== 'overall';
     const surfaceTag = hasSurface ? ' · surface ' + data.detail.surface_used : '';
     const surfaceNote = hasSurface ? ' sur ' + data.detail.surface_used : '';
     const box = document.getElementById('analyseResult');
+    const narrative = parseNarrative(data.detail.ai_narrative);
 
     const teaser =
       '<div class="result-badge">' + favoriteLabel(pct) + '</div>' +
       '<div class="result-winner">' + winnerName + ' gagnant probable</div>' +
       '<div class="result-detail">Face à ' + loserName + surfaceTag + '</div>' +
       renderConfidenceWarning(data, p1Name, p2Name) +
+      (narrative ? '<p class="result-lead">' + narrative.lead + '</p>' : '') +
       renderFormBlock(data.detail, p1Name, p2Name) +
       '<div class="field-label" style="margin-top:18px;">RÉSUMÉ RAPIDE</div>' +
       '<div class="result-summary">' + buildSummaryText(data.detail, p1Name, p2Name, winnerName, loserName, surfaceNote) + '</div>' +
@@ -3005,13 +3062,16 @@
       '</div>';
 
     const lockedInner =
-      renderStatCompareBars(data.detail, p1Name, p2Name, pct) +
-      renderForcesClesBlock(data.detail, p1Name, p2Name) +
+      renderStatCompareBars(data.detail, p1Name, p2Name, pct, p1IsWinner) +
       renderFactorsBlock(data.detail) +
+      (narrative && narrative.fiches
+        ? renderFichesBlock(narrative.fiches, p1Name, p2Name)
+        : renderForcesClesBlock(data.detail, p1Name, p2Name)) +
+      (narrative && narrative.scenarios.length ? renderScenariosBlock(narrative.scenarios) : '') +
       renderTournamentBlock(data.detail) +
       renderMarketBlock(data.detail, p1Name, p2Name) +
       renderWeatherBlock(data.detail) +
-      renderNarrativeBlock(data.detail);
+      (narrative ? renderNarrativeSectionsBlock(narrative) : '');
 
     box.innerHTML = teaser +
       '<div class="locked-wrap">' +
@@ -3026,6 +3086,7 @@
       '<div class="result-probability-note">ℹ️ Ce résultat est une <strong>probabilité</strong> calculée par notre modèle (Elo, forme, historique, conditions du match) — pas une certitude. Le tennis reste un sport avec sa part d\'aléa : un résultat n\'est jamais garanti à 100%, quel que soit l\'écart affiché.</div>';
     box.style.display = 'block';
   }
+
 
   // ---------- Paywall : modal checklist puis modal de plans ----------
   const unlockOverlay = document.getElementById('unlockOverlay');
