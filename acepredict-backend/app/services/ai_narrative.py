@@ -40,7 +40,7 @@ TIMEOUT_SECONDS = 45.0
 # modèle décider lui-même s'il réfléchit, et output_config.effort=low limite
 # l'ampleur de cette réflexion pour garantir qu'il reste de la place pour le
 # texte final dans max_tokens.
-MAX_TOKENS = 2000
+MAX_TOKENS = 2600
 
 # NB: avec `thinking` activé, l'API Anthropic n'accepte plus le paramètre
 # `temperature` (400 "temperature is deprecated for this model") -- on ne
@@ -109,30 +109,38 @@ def _build_prompt(ctx: dict) -> str:
         "marché si disponible, conditions de match) pour en tirer une "
         "lecture experte. Si une probabilité de marché est fournie, "
         "commente explicitement si elle confirme ou contredit le modèle "
-        "Elo et ce que ça implique pour la fiabilité du pronostic. Format "
-        "STRICT, dense mais "
-        "sans aucun remplissage — chaque phrase doit apporter une "
-        "information nouvelle, zéro phrase de liaison creuse : "
-        "ligne 1 = une seule phrase de synthèse percutante (max 25 mots, pas "
-        "de préfixe) donnant le facteur le plus décisif du pronostic ; "
-        "puis, séparé par une ligne vide, TOUJOURS deux paragraphes de 3 à "
-        "4 phrases chacun (jamais un seul, jamais de remplissage) : le "
-        "premier croise explicitement au moins deux facteurs entre eux "
+        "Elo et ce que ça implique pour la fiabilité du pronostic. "
+        "Format STRICT en puces courtes uniquement -- AUCUN paragraphe, "
+        "AUCUN bloc de texte continu de plusieurs phrases : chaque idée "
+        "tient sur UNE puce autonome et dense. "
+        "Ligne 1 = une seule phrase de synthèse percutante (max 25 mots, "
+        "pas de préfixe, pas de puce) donnant le facteur le plus décisif "
+        "du pronostic. "
+        "Puis, séparé par une ligne vide, EXACTEMENT ces 3 sections dans "
+        "cet ordre, chacune introduite par une ligne '### ' suivie du nom "
+        "de la section en majuscules et RIEN d'autre sur cette ligne, "
+        "puis ses puces (chacune sur sa propre ligne, commençant par "
+        "\"• \", aucune numérotation) : "
+        "### CROISEMENT -- exactement 3 puces (max 20 mots chacune) qui "
+        "croisent chacune explicitement au moins deux facteurs entre eux "
         "(ex: comment la forme récente renforce ou contredit l'écart Elo, "
         "comment le format du tournoi amplifie ou atténue tel autre "
-        "facteur) — jamais une simple reformulation d'un chiffre isolé ; "
-        "le second propose une lecture complémentaire et distincte (un "
-        "scénario tactique concret probable, OU une mise en perspective "
-        "de la fiabilité réelle du pronostic au vu de l'échantillon "
-        "disponible) — jamais une redite du premier paragraphe ; "
-        "puis, séparé par une ligne vide, chacune sur sa propre ligne "
-        "commençant par \"• \", 3 à 4 puces courtes (max 18 mots chacune) "
-        "parmi : le principal risque de contre-performance/upset, la "
-        "limite de fiabilité la plus importante (échantillon faible, "
-        "donnée absente, signaux contradictoires...), un facteur "
-        "secondaire qui pourrait faire basculer le match, et le niveau de "
-        "confiance global assumé — jamais une puce qui redit ce qui est "
-        "déjà dans la ligne 1 ou les paragraphes. Aucun titre, aucun gras. "
+        "facteur) -- jamais une puce qui ne fait que répéter un chiffre "
+        "déjà affiché ailleurs à l'écran. "
+        "### LECTURE TACTIQUE -- exactement 2 puces (max 20 mots chacune) : "
+        "la première décrit un scénario tactique concret probable pour ce "
+        "match précis, la seconde met en perspective la fiabilité réelle "
+        "du pronostic au vu de l'échantillon de données disponible. "
+        "### VIGILANCE -- 3 à 4 puces courtes (max 18 mots chacune) parmi : "
+        "le principal risque de contre-performance/upset, la limite de "
+        "fiabilité la plus importante (échantillon faible, donnée absente, "
+        "signaux contradictoires...), un facteur secondaire qui pourrait "
+        "faire basculer le match, et le niveau de confiance global assumé "
+        "-- jamais une puce qui redit ce qui est déjà dans la ligne 1 ou "
+        "les autres sections. "
+        "Aucun titre en gras, aucun texte hors de ce format, aucune phrase "
+        "de liaison creuse -- chaque puce doit apporter une information "
+        "nouvelle. "
         "Base-toi STRICTEMENT sur les données fournies ci-dessous : "
         "n'invente aucune statistique, blessure, actualité, classement ou "
         "style de jeu non fourni — si une donnée manque, dis-le plutôt que "
@@ -199,12 +207,12 @@ def _build_prompt(ctx: dict) -> str:
     lines += [
         f"Probabilité calculée par le modèle : {round(ctx['win_probability'] * 100, 1)}% pour {ctx['winner_name']}",
         "",
-        "Rappel du format : 1 phrase de synthèse, puis TOUJOURS 2 paragraphes "
-        "de 3-4 phrases qui croisent vraiment les facteurs entre eux, puis "
-        "3 à 4 puces — rien "
-        "de redondant avec les chiffres déjà donnés ci-dessus, aucun "
-        "remplissage. Ne donne jamais de conseil de pari, de cote, ni de "
-        "garantie de résultat.",
+        "Rappel du format : 1 phrase de synthèse SANS puce, puis "
+        "### CROISEMENT (3 puces), ### LECTURE TACTIQUE (2 puces), "
+        "### VIGILANCE (3 à 4 puces) -- uniquement des puces, jamais de "
+        "paragraphe ni de bloc de texte continu, rien de redondant avec "
+        "les chiffres déjà donnés ci-dessus, aucun remplissage. Ne donne "
+        "jamais de conseil de pari, de cote, ni de garantie de résultat.",
     ]
 
     return "\n".join(lines)
