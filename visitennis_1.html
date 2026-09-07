@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AcePredict</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <style>
   :root{
     --bg: #131a16;
@@ -13,6 +14,8 @@
     --line-strong: rgba(215,242,44,0.16);
     --accent: #D7F22C;
     --accent-dim: rgba(215,242,44,0.12);
+    --accent2: #4FC3F7;
+    --accent2-dim: rgba(79,195,247,0.14);
     --text: #FFFFFF;
     --text-sec: #9AA69A;
     --text-dim: #6C7A6C;
@@ -593,7 +596,7 @@
   }
   .pack-box-btn:hover{ filter:brightness(1.06); }
 
-  /* ---------- Paywall (resultat d'analyse partiellement verrouille) ---------- */
+    /* ---------- Paywall (resultat d'analyse partiellement verrouille) ---------- */
   .result-badge{
     display:inline-block; background: var(--accent-dim); color: var(--accent);
     font-size:11px; font-weight:700; padding:4px 11px; border-radius:999px; margin-bottom:10px;
@@ -606,9 +609,11 @@
 
   .form-row{ display:flex; gap:14px; margin-top:12px; }
   .form-card{ flex:1; min-width:0; background: rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .form-card.p2{ border-color: var(--accent2-dim); }
   .form-card-name{ font-size:12.5px; font-weight:700; margin-bottom:4px; }
+  .form-card-name.p2{ color: var(--accent2); }
   .form-card-label{ font-size:11.5px; color: var(--text-sec); margin-bottom:9px; }
-  .form-card-pills{ display:flex; gap:4px; flex-wrap:wrap; }
+  .form-card-pills{ display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
   .form-pill{ width:20px; height:20px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800; flex-shrink:0; }
   .form-pill.win{ background: rgba(215,242,44,0.18); color: var(--accent); }
   .form-pill.loss{ background: rgba(239,107,93,0.15); color:#ff8a8a; }
@@ -619,6 +624,7 @@
     margin:12px 0 0; padding:12px 14px; border-left:3px solid var(--accent);
     background: rgba(215,242,44,0.06); border-radius:0 8px 8px 0; text-align:left;
   }
+}
 
   /* min-height : la partie floutée (probabilité/Elo/météo) peut être courte
      (ex: sans météo), mais l'overlay par-dessus doit toujours avoir la place
@@ -1128,16 +1134,15 @@
     background: rgba(20,24,10,0.4); border-radius:50%; filter: blur(.5px);
     animation: tb-shadow .85s cubic-bezier(.5,0,.5,1) infinite;
   }
-    .tennis-loader .tb-ball{
+      .tennis-loader .tb-ball{
     position:absolute; left:50%; bottom:7px; width:15px; height:15px; margin-left:-7.5px;
     border-radius:50%;
     /* Balle dans la couleur du fond sombre (pas l'accent) pour bien ressortir
        sur le bouton vert clair pendant "Analyse en cours...". */
     background: radial-gradient(circle at 32% 28%, #3a4730, var(--bg) 55%, #0a0d08 100%);
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
     animation: tb-jump .85s cubic-bezier(.5,0,.5,1) infinite;
   }
-  .tennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
+ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     content:''; position:absolute; top:-12%; left:-12%; width:124%; height:124%;
     border-radius:50%; border:1.1px solid rgba(255,255,255,0.4); border-left-color:transparent; border-right-color:transparent;
   }
@@ -1197,10 +1202,12 @@
   .result-narrative-list li::before{
     content:'•'; position:absolute; left:0; color: var(--accent); font-weight:800;
   }
-  /* Fiches joueurs (points forts / à surveiller par joueur, générées par
+    /* Fiches joueurs (points forts / à surveiller par joueur, générées par
      l'IA -- cf. ai_narrative.py sections FORCES_J1/FAIBLESSES_J1/etc.) :
      deux colonnes séparées par un simple filet vertical plutôt que deux
-     boîtes bordées séparées, pour rester dans une présentation continue. */
+     boîtes bordées séparées, pour rester dans une présentation continue.
+     Le joueur 2 (.p2) reprend --accent2 sur son nom pour éviter le gris
+     "réducteur" et distinguer visuellement les deux joueurs partout. */
   .fiche-grid{
     display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:10px;
     border-top:1px solid var(--line);
@@ -1208,6 +1215,7 @@
   .fiche-card{ padding:14px 16px; text-align:left; }
   .fiche-card:first-child{ border-right:1px solid var(--line); }
   .fiche-card-name{ font-size:13px; font-weight:800; color: var(--text); margin-bottom:10px; }
+  .fiche-card-name.p2{ color: var(--accent2); }
   .fiche-card-sub{
     font-size:10px; letter-spacing:0.06em; text-transform:uppercase; font-weight:800;
     margin:10px 0 6px;
@@ -1238,7 +1246,39 @@
     color: var(--accent); font-size:11px; font-weight:800; display:flex; align-items:center;
     justify-content:center; margin-top:1px;
   }
+  .scenario-item:nth-child(even) .scenario-num{ background: var(--accent2-dim); color: var(--accent2); }
   .scenario-text{ font-size:12.5px; line-height:1.55; color: var(--text-sec); }
+
+  /* Moment clé (IA, section MOMENT_CLE) : callout coloré unique pour casser
+     la présentation en puces et donner un vrai point d'accroche visuel. */
+  .moment-cle-card{
+    margin-top:22px; padding:16px 18px; border-radius:12px; text-align:left;
+    background: linear-gradient(135deg, rgba(79,195,247,0.14), rgba(215,242,44,0.08));
+    border:1px solid var(--accent2-dim);
+  }
+  .moment-cle-label{
+    display:flex; align-items:center; gap:7px; font-size:10px; letter-spacing:0.08em;
+    text-transform:uppercase; font-weight:800; color: var(--accent2); margin-bottom:8px;
+  }
+  .moment-cle-label::before{ content:'⚡'; font-size:12px; }
+  .moment-cle-text{ font-size:13.5px; line-height:1.55; color: var(--text); font-weight:600; }
+
+  /* Verdict expert (IA, section VERDICT_EXPERT) : registre éditorial, en
+     italique, avec une signature -- ton différent des sections en puces. */
+  .verdict-expert-block{
+    margin-top:22px; padding:16px 18px 16px 20px; border-left:3px solid var(--accent2);
+    background: rgba(255,255,255,0.02); border-radius:0 10px 10px 0; text-align:left;
+  }
+  .verdict-expert-label{
+    font-size:10px; letter-spacing:0.08em; text-transform:uppercase; font-weight:800;
+    color: var(--text-dim); margin-bottom:8px;
+  }
+  .verdict-expert-text{
+    font-size:13px; line-height:1.65; color: var(--text-sec); font-style:italic;
+  }
+  .verdict-expert-sign{
+    margin-top:10px; font-size:11px; font-style:normal; font-weight:700; color: var(--accent2);
+  }
 
 .result-forces-cards{ display:flex; flex-direction:column; gap:8px; margin-top:2px; }
   .result-force-card{
@@ -1266,9 +1306,10 @@
     font-size:12px; font-weight:700; color: var(--text-sec);
   }
   .stat-bars-legend-item{ display:flex; align-items:center; gap:6px; }
+  .stat-bars-legend-item.p2{ color: var(--accent2); }
   .stat-bars-dot{ width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
   .stat-bars-dot-left{ background: var(--accent); }
-  .stat-bars-dot-right{ background: var(--text-dim); }
+  .stat-bars-dot-right{ background: var(--accent2); }
   .stat-bar-row{ margin-bottom:16px; }
   .stat-bar-row:last-child{ margin-bottom:0; }
   .stat-bar-header{
@@ -1276,7 +1317,7 @@
     margin-bottom:6px;
   }
   .stat-bar-val{ font-weight:800; font-size:14px; color: var(--text); min-width:46px; }
-  .stat-bar-val-right{ text-align:right; }
+  .stat-bar-val-right{ text-align:right; color: var(--accent2); }
   .stat-bar-label{
     flex:1; text-align:center; color: var(--text-dim); font-size:10.5px;
     letter-spacing:0.05em; text-transform:uppercase; font-weight:700; padding:0 6px;
@@ -1286,7 +1327,7 @@
     background: rgba(255,255,255,0.06);
   }
   .stat-bar-fill-left{ background: var(--accent); transition: width 0.4s ease; }
-  .stat-bar-fill-right{ background: var(--text-dim); opacity:0.5; transition: width 0.4s ease; }
+  .stat-bar-fill-right{ background: var(--accent2); transition: width 0.4s ease; }
   .stat-bar-track-center{
     display:flex; height:7px; border-radius:6px; overflow:hidden;
     background: rgba(255,255,255,0.06); position:relative;
@@ -1299,9 +1340,9 @@
   .stat-bar-half-left{ justify-content:flex-end; }
   .stat-bar-half-right{ justify-content:flex-start; }
   .stat-bar-fill-center-left{ background: var(--accent); height:100%; transition: width 0.4s ease; }
-  .stat-bar-fill-center-right{ background: var(--text-dim); opacity:0.5; height:100%; transition: width 0.4s ease; }
+  .stat-bar-fill-center-right{ background: var(--accent2); height:100%; transition: width 0.4s ease; }
   .stat-bar-note{ margin-top:5px; font-size:11px; color: var(--text-dim); line-height:1.4; }
-  .analyse-msg{
+.analyse-msg{
     font-size:12.5px; border-radius:8px; padding:10px 12px; margin-top:12px; display:none;
   }
   .analyse-msg.error{ display:block; background: rgba(255,90,90,0.1); color:#ff8a8a; border:1px solid rgba(255,90,90,0.25); }
@@ -2803,11 +2844,11 @@
       '<div class="result-factors">' + tags.map(function(t){ return '<span class="result-factor-pill">' + t + '</span>'; }).join('') + '</div>';
   }
 
-    function renderStatCompareBars(detail, p1Name, p2Name, pct, p1IsWinner){
+        function renderStatCompareBars(detail, p1Name, p2Name, pct, p1IsWinner){
     let html = '<div class="stat-bars">' +
       '<div class="stat-bars-legend">' +
         '<span class="stat-bars-legend-item"><span class="stat-bars-dot stat-bars-dot-left"></span>' + p1Name + '</span>' +
-        '<span class="stat-bars-legend-item"><span class="stat-bars-dot stat-bars-dot-right"></span>' + p2Name + '</span>' +
+        '<span class="stat-bars-legend-item p2"><span class="stat-bars-dot stat-bars-dot-right"></span>' + p2Name + '</span>' +
       '</div>';
 
     // `pct` est TOUJOURS la probabilité du vainqueur prédit -- il faut donc
@@ -2826,6 +2867,15 @@
       const streak1 = currentWinStreak(f1.results), streak2 = currentWinStreak(f2.results);
       const maxStreak = Math.max(f1.results.length, f2.results.length, 1);
       html += statBarRowCenter('Victoires consécutives (série en cours)', streak1, streak2, maxStreak, { suffix: 'V' });
+
+      // Jauge supplémentaire (donnée déjà disponible via form_player1/2, pas
+      // inventée) : taux de victoire sur l'échantillon récent suivi.
+      const total1 = f1.wins + f1.losses, total2 = f2.wins + f2.losses;
+      if(total1 > 0 && total2 > 0){
+        const rate1 = Math.round((f1.wins / total1) * 1000) / 10;
+        const rate2 = Math.round((f2.wins / total2) * 1000) / 10;
+        html += statBarRow('Taux de victoire récent', rate1, rate2, { suffix: '%', decimals: 1 });
+      }
     }
 
     const h = detail.h2h;
@@ -2840,6 +2890,16 @@
         { note: detail.fatigue_adjustment ? detail.fatigue_adjustment.note : 'Une charge élevée récente peut jouer sur la fraîcheur physique.' });
     }
 
+    // Jauge supplémentaire : probabilité du marché des paris, quand elle est
+    // disponible -- donnée réelle déjà remontée par prediction.py, montrée
+    // ailleurs uniquement en texte jusqu'ici.
+    const mkt = detail.market_adjustment;
+    if(mkt && mkt.market_player1_prob != null && mkt.market_player2_prob != null){
+      html += statBarRow('Probabilité du marché (paris)',
+        Math.round(mkt.market_player1_prob * 1000) / 10, Math.round(mkt.market_player2_prob * 1000) / 10,
+        { suffix: '%', decimals: 1, note: 'Cote du marché prédictif, indépendante du modèle Elo.' });
+    }
+
     html += '</div>';
     return html;
   }
@@ -2848,10 +2908,11 @@
   // Format attendu (cf. prompt dans ai_narrative.py) : bloc 1 = phrase de
   // synthèse, puis des sections "### NOM" chacune suivie de puces "• "
   // (séparées par une ligne vide entre chaque bloc) : FORCES_J1,
-  // FAIBLESSES_J1, FORCES_J2, FAIBLESSES_J2, CROISEMENT, SCENARIOS,
-  // VIGILANCE -- le parsing reste générique (toute section inconnue ou tout
-  // bloc sans puces retombe proprement dans "sections", en paragraphe) pour
-  // rester robuste si le modèle dévie légèrement du format demandé.
+  // FAIBLESSES_J1, FORCES_J2, FAIBLESSES_J2, CROISEMENT, MOMENT_CLE,
+  // SCENARIOS, VERDICT_EXPERT, VIGILANCE -- le parsing reste générique (toute
+  // section inconnue ou tout bloc sans puces retombe proprement dans
+  // "sections", en paragraphe) pour rester robuste si le modèle dévie
+  // légèrement du format demandé.
   const NARRATIVE_LABELS = {
     'CROISEMENT': 'Croisement des facteurs',
     'LECTURE TACTIQUE': 'Lecture tactique',
@@ -2868,6 +2929,8 @@
     let hasFiches = false;
     const scenarios = [];
     const sections = [];
+    let momentCle = null;
+    let verdictExpert = null;
 
     for(let i = 1; i < blocks.length; i++){
       const rawLines = blocks[i].split(/\n/).map(l => l.trim()).filter(Boolean);
@@ -2887,6 +2950,8 @@
       if(labelKey === 'FORCES_J2'){ fiches.j2.forces = bullets; hasFiches = true; continue; }
       if(labelKey === 'FAIBLESSES_J2'){ fiches.j2.faiblesses = bullets; hasFiches = true; continue; }
       if(labelKey === 'SCENARIOS'){ scenarios.push(...bullets); continue; }
+      if(labelKey === 'MOMENT_CLE'){ momentCle = bullets.join(' ') || lines.join(' '); continue; }
+      if(labelKey === 'VERDICT_EXPERT'){ verdictExpert = bullets.join(' ') || lines.join(' '); continue; }
 
       const label = NARRATIVE_LABELS[labelKey] || (labelKey ? labelKey.charAt(0) + labelKey.slice(1).toLowerCase() : 'Analyse');
       if(isBulletBlock){
@@ -2896,24 +2961,27 @@
       }
     }
 
-    return { lead: lead, fiches: hasFiches ? fiches : null, scenarios: scenarios, sections: sections };
+    return {
+      lead: lead, fiches: hasFiches ? fiches : null, scenarios: scenarios, sections: sections,
+      momentCle: momentCle, verdictExpert: verdictExpert
+    };
   }
 
   function renderFichesBlock(fiches, p1Name, p2Name){
-    const card = function(name, f){
+    const card = function(name, f, isP2){
       if(!f.forces.length && !f.faiblesses.length) return '';
       const list = function(items, cls){
         if(!items.length) return '';
         return '<ul class="fiche-list ' + cls + '">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>';
       };
       return '<div class="fiche-card">' +
-        '<div class="fiche-card-name">' + name + '</div>' +
+        '<div class="fiche-card-name' + (isP2 ? ' p2' : '') + '">' + name + '</div>' +
         '<div class="fiche-card-sub fiche-sub-pos">Points forts</div>' + list(f.forces, 'fiche-pos') +
         '<div class="fiche-card-sub fiche-sub-neg">À surveiller</div>' + list(f.faiblesses, 'fiche-neg') +
       '</div>';
     };
     return '<div class="field-label" style="margin-top:22px;">FICHES JOUEURS</div>' +
-      '<div class="fiche-grid">' + card(p1Name, fiches.j1) + card(p2Name, fiches.j2) + '</div>';
+      '<div class="fiche-grid">' + card(p1Name, fiches.j1, false) + card(p2Name, fiches.j2, true) + '</div>';
   }
 
   function renderScenariosBlock(scenarios){
@@ -2924,6 +2992,27 @@
           '<div class="scenario-text">' + s + '</div>' +
         '</div>';
       }).join('') + '</div>';
+  }
+
+  // Callout coloré unique (section MOMENT_CLE) : casse la présentation en
+  // puces et donne un point d'accroche visuel fort -- l'un des deux ajouts
+  // demandés pour rendre la lecture plus "sexy".
+  function renderMomentCleBlock(text){
+    if(!text) return '';
+    return '<div class="moment-cle-card">' +
+      '<div class="moment-cle-label">Moment clé à surveiller</div>' +
+      '<div class="moment-cle-text">' + text + '</div>' +
+    '</div>';
+  }
+
+  // Registre éditorial (section VERDICT_EXPERT) : ton narratif signé, en
+  // rupture volontaire avec les sections en puces -- second ajout demandé.
+  function renderVerdictExpertBlock(text){
+    if(!text) return '';
+    return '<div class="verdict-expert-block">' +
+      '<div class="verdict-expert-label">Le mot de l\'analyste</div>' +
+      '<div class="verdict-expert-text">' + text + '<div class="verdict-expert-sign">— Analyse AcePredict</div></div>' +
+    '</div>';
   }
 
   function renderNarrativeSectionsBlock(narrative){
@@ -3001,23 +3090,25 @@
   function renderFormBlock(detail, p1Name, p2Name){
     const f1 = detail.form_player1, f2 = detail.form_player2;
     if(!f1 && !f2) return '';
-    const card = (name, form) => {
+    const card = (name, form, isP2) => {
+      const cls = 'form-card' + (isP2 ? ' p2' : '');
+      const nameCls = 'form-card-name' + (isP2 ? ' p2' : '');
       if(!form){
-        return '<div class="form-card"><div class="form-card-name">' + name + '</div>' +
+        return '<div class="' + cls + '"><div class="' + nameCls + '">' + name + '</div>' +
           '<div class="form-card-label">Historique récent indisponible</div></div>';
       }
       const pills = form.results.map(r =>
         '<span class="form-pill ' + (r === 'V' ? 'win' : 'loss') + '">' + r + '</span>'
       ).join('');
-      return '<div class="form-card">' +
-        '<div class="form-card-name">' + name + '</div>' +
+      return '<div class="' + cls + '">' +
+        '<div class="' + nameCls + '">' + name + '</div>' +
         '<div class="form-card-label">' + form.label + '</div>' +
         '<div class="form-card-pills">' + pills + '</div>' +
         '<div class="form-card-record">' + form.wins + 'V - ' + form.losses + 'D sur les ' + form.results.length + ' derniers matchs</div>' +
       '</div>';
     };
     return '<div class="field-label" style="margin-top:18px;">FORME RÉCENTE</div>' +
-      '<div class="form-row">' + card(p1Name, f1) + card(p2Name, f2) + '</div>';
+      '<div class="form-row">' + card(p1Name, f1, false) + card(p2Name, f2, true) + '</div>';
   }
 
   function buildSummaryText(detail, p1Name, p2Name, winnerName, loserName, surfaceNote){
@@ -3057,7 +3148,7 @@
       '<div class="field-label" style="margin-top:18px;">RÉSUMÉ RAPIDE</div>' +
       '<div class="result-summary">' + buildSummaryText(data.detail, p1Name, p2Name, winnerName, loserName, surfaceNote) + '</div>' +
       '<div class="confidence-wrap">' +
-        '<div class="confidence-label-row"><span>Confiance de l\'IA</span><b>' + confidenceLabel(pct) + '</b></div>' +
+        '<div class="confidence-label-row"><span>Niveau de confiance</span><b>' + confidenceLabel(pct) + '</b></div>' +
         '<div class="confidence-bar"><div class="confidence-bar-fill" style="width:' + pct + '%"></div></div>' +
       '</div>';
 
@@ -3067,11 +3158,13 @@
       (narrative && narrative.fiches
         ? renderFichesBlock(narrative.fiches, p1Name, p2Name)
         : renderForcesClesBlock(data.detail, p1Name, p2Name)) +
+      (narrative && narrative.momentCle ? renderMomentCleBlock(narrative.momentCle) : '') +
       (narrative && narrative.scenarios.length ? renderScenariosBlock(narrative.scenarios) : '') +
       renderTournamentBlock(data.detail) +
       renderMarketBlock(data.detail, p1Name, p2Name) +
       renderWeatherBlock(data.detail) +
-      (narrative ? renderNarrativeSectionsBlock(narrative) : '');
+      (narrative ? renderNarrativeSectionsBlock(narrative) : '') +
+      (narrative && narrative.verdictExpert ? renderVerdictExpertBlock(narrative.verdictExpert) : '');
 
     box.innerHTML = teaser +
       '<div class="locked-wrap">' +
