@@ -40,7 +40,7 @@ TIMEOUT_SECONDS = 45.0
 # modèle décider lui-même s'il réfléchit, et output_config.effort=low limite
 # l'ampleur de cette réflexion pour garantir qu'il reste de la place pour le
 # texte final dans max_tokens.
-MAX_TOKENS = 2600
+MAX_TOKENS = 3600
 
 # NB: avec `thinking` activé, l'API Anthropic n'accepte plus le paramètre
 # `temperature` (400 "temperature is deprecated for this model") -- on ne
@@ -112,25 +112,40 @@ def _build_prompt(ctx: dict) -> str:
         "Elo et ce que ça implique pour la fiabilité du pronostic. "
         "Format STRICT en puces courtes uniquement -- AUCUN paragraphe, "
         "AUCUN bloc de texte continu de plusieurs phrases : chaque idée "
-        "tient sur UNE puce autonome et dense. "
+        "tient sur UNE puce autonome et dense. Le lecteur va payer pour "
+        "cette analyse : elle doit avoir une vraie valeur ajoutée experte, "
+        "pas quatre lignes vagues. "
         "Ligne 1 = une seule phrase de synthèse percutante (max 25 mots, "
         "pas de préfixe, pas de puce) donnant le facteur le plus décisif "
         "du pronostic. "
-        "Puis, séparé par une ligne vide, EXACTEMENT ces 3 sections dans "
+        f"Puis, séparé par une ligne vide, EXACTEMENT ces 7 sections dans "
         "cet ordre, chacune introduite par une ligne '### ' suivie du nom "
         "de la section en majuscules et RIEN d'autre sur cette ligne, "
         "puis ses puces (chacune sur sa propre ligne, commençant par "
         "\"• \", aucune numérotation) : "
+        f"### FORCES_J1 -- exactement 3 puces (max 16 mots chacune) sur les "
+        f"points forts concrets de {p1} DANS CE MATCH précis face à ce style "
+        f"d'adversaire (pas des généralités de carrière). "
+        f"### FAIBLESSES_J1 -- exactement 2 à 3 puces (max 16 mots chacune) "
+        f"sur ce qui pourrait désavantager {p1} spécifiquement face à {p2} "
+        "(style de jeu adverse, écart Elo, fatigue, surface, tout facteur "
+        "concret fourni ci-dessous). "
+        f"### FORCES_J2 -- même exercice pour {p2} (exactement 3 puces, max "
+        "16 mots chacune). "
+        f"### FAIBLESSES_J2 -- même exercice pour {p2} (2 à 3 puces, max 16 "
+        "mots chacune). "
         "### CROISEMENT -- exactement 3 puces (max 20 mots chacune) qui "
         "croisent chacune explicitement au moins deux facteurs entre eux "
         "(ex: comment la forme récente renforce ou contredit l'écart Elo, "
         "comment le format du tournoi amplifie ou atténue tel autre "
         "facteur) -- jamais une puce qui ne fait que répéter un chiffre "
         "déjà affiché ailleurs à l'écran. "
-        "### LECTURE TACTIQUE -- exactement 2 puces (max 20 mots chacune) : "
-        "la première décrit un scénario tactique concret probable pour ce "
-        "match précis, la seconde met en perspective la fiabilité réelle "
-        "du pronostic au vu de l'échantillon de données disponible. "
+        "### SCENARIOS -- exactement 2 puces, chacune un scénario tactique "
+        "concret et distinct pour CE match précis (max 30 mots chacune) : "
+        "comment le match pourrait se dérouler compte tenu des styles, de "
+        "la forme et du contexte -- pas une simple probabilité chiffrée, "
+        "un vrai scénario de déroulé (ex: qui doit imposer quoi, à quel "
+        "moment du match ça peut basculer). "
         "### VIGILANCE -- 3 à 4 puces courtes (max 18 mots chacune) parmi : "
         "le principal risque de contre-performance/upset, la limite de "
         "fiabilité la plus importante (échantillon faible, donnée absente, "
@@ -140,11 +155,13 @@ def _build_prompt(ctx: dict) -> str:
         "les autres sections. "
         "Aucun titre en gras, aucun texte hors de ce format, aucune phrase "
         "de liaison creuse -- chaque puce doit apporter une information "
-        "nouvelle. "
+        "nouvelle, jamais de redite entre sections. "
         "Base-toi STRICTEMENT sur les données fournies ci-dessous : "
         "n'invente aucune statistique, blessure, actualité, classement ou "
-        "style de jeu non fourni — si une donnée manque, dis-le plutôt que "
-        "de l'inventer. Si une information de style de jeu est explicitement "
+        "style de jeu non fourni — si une donnée manque pour étayer une "
+        "section (ex: pas de style de jeu connu), raisonne sur ce qui est "
+        "disponible (Elo, forme, H2H, fatigue, tournoi, marché) plutôt que "
+        "d'inventer. Si une information de style de jeu est explicitement "
         "marquée [INFORMATION INCERTAINE], ne t'appuie pas dessus pour un "
         "argument important — mentionne-la au mieux avec la réserve qui va avec.",
         "",
@@ -207,12 +224,15 @@ def _build_prompt(ctx: dict) -> str:
     lines += [
         f"Probabilité calculée par le modèle : {round(ctx['win_probability'] * 100, 1)}% pour {ctx['winner_name']}",
         "",
-        "Rappel du format : 1 phrase de synthèse SANS puce, puis "
-        "### CROISEMENT (3 puces), ### LECTURE TACTIQUE (2 puces), "
-        "### VIGILANCE (3 à 4 puces) -- uniquement des puces, jamais de "
-        "paragraphe ni de bloc de texte continu, rien de redondant avec "
-        "les chiffres déjà donnés ci-dessus, aucun remplissage. Ne donne "
-        "jamais de conseil de pari, de cote, ni de garantie de résultat.",
+        "Rappel du format : 1 phrase de synthèse SANS puce, puis dans cet "
+        "ordre exact -- ### FORCES_J1 (3 puces), ### FAIBLESSES_J1 (2-3 "
+        "puces), ### FORCES_J2 (3 puces), ### FAIBLESSES_J2 (2-3 puces), "
+        "### CROISEMENT (3 puces), ### SCENARIOS (2 puces), ### VIGILANCE "
+        "(3 à 4 puces) -- uniquement des puces, jamais de paragraphe ni de "
+        "bloc de texte continu, rien de redondant avec les chiffres déjà "
+        "donnés ci-dessus ni entre les sections elles-mêmes, aucun "
+        "remplissage. Ne donne jamais de conseil de pari, de cote, ni de "
+        "garantie de résultat.",
     ]
 
     return "\n".join(lines)
