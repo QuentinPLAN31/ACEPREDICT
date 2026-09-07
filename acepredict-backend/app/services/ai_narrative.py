@@ -32,15 +32,15 @@ TIMEOUT_SECONDS = 45.0
 # réponse si le modèle déborde légèrement du format demandé.
 #
 # claude-sonnet-5 fait de l'extended thinking par défaut sur les prompts
-# complexes (le nôtre en fait partie) : sans budget explicite, il peut
-# consommer TOUT max_tokens en "thinking" et ne jamais produire de texte
-# (stop_reason=max_tokens, output vide). On active donc `thinking` avec un
-# budget plafonné et strictement inférieur à max_tokens, pour garantir qu'il
-# reste toujours de la place pour le texte final. L'API Anthropic impose un
-# minimum de 1024 pour budget_tokens quand thinking est activé -- 1200 est
-# donc le plancher pratique le plus bas possible ici.
-MAX_TOKENS = 3200
-THINKING_BUDGET = 1200
+# complexes (le nôtre en fait partie) : sans le contrôler, il peut consommer
+# TOUT max_tokens en "thinking" et ne jamais produire de texte
+# (stop_reason=max_tokens, output vide). Ce modèle utilise le format
+# "adaptive thinking" (différent de l'ancien thinking.type=enabled +
+# budget_tokens, qu'il rejette en 400) : thinking.type=adaptive laisse le
+# modèle décider lui-même s'il réfléchit, et output_config.effort=low limite
+# l'ampleur de cette réflexion pour garantir qu'il reste de la place pour le
+# texte final dans max_tokens.
+MAX_TOKENS = 2000
 
 # NB: avec `thinking` activé, l'API Anthropic n'accepte plus le paramètre
 # `temperature` (400 "temperature is deprecated for this model") -- on ne
@@ -67,7 +67,8 @@ def generate_narrative(context: dict) -> Optional[str]:
             json={
                 "model": settings.anthropic_model,
                 "max_tokens": MAX_TOKENS,
-                "thinking": {"type": "enabled", "budget_tokens": THINKING_BUDGET},
+                "thinking": {"type": "adaptive"},
+                "output_config": {"effort": "low"},
                 "messages": [{"role": "user", "content": _build_prompt(context)}],
             },
             timeout=TIMEOUT_SECONDS,
