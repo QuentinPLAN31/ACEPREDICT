@@ -36,9 +36,11 @@ TIMEOUT_SECONDS = 45.0
 # consommer TOUT max_tokens en "thinking" et ne jamais produire de texte
 # (stop_reason=max_tokens, output vide). On active donc `thinking` avec un
 # budget plafonné et strictement inférieur à max_tokens, pour garantir qu'il
-# reste toujours de la place pour le texte final.
-MAX_TOKENS = 2000
-THINKING_BUDGET = 700
+# reste toujours de la place pour le texte final. L'API Anthropic impose un
+# minimum de 1024 pour budget_tokens quand thinking est activé -- 1200 est
+# donc le plancher pratique le plus bas possible ici.
+MAX_TOKENS = 3200
+THINKING_BUDGET = 1200
 
 # NB: avec `thinking` activé, l'API Anthropic n'accepte plus le paramètre
 # `temperature` (400 "temperature is deprecated for this model") -- on ne
