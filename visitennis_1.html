@@ -1026,7 +1026,9 @@
   .bracket-p .name{ display:flex; align-items:center; gap:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .bracket-p .score{ color: var(--text-dim); font-weight:700; font-variant-numeric:tabular-nums; flex-shrink:0; }
   .bracket-p.winner .name{ color: var(--accent); font-weight:700; }
-  .bracket-p.winner .score{ color: var(--accent); }
+
+          .bracket-p .b-flag{ width:18px; height:18px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; overflow:hidden; }
+    .bracket-p.winner .score{ color: var(--accent); }
 
   .match-row{ display:flex; align-items:center; gap:14px; background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:15px 18px; margin-bottom:8px; }
     .match-row .m-flag{ width:30px; height:30px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; overflow:hidden; }
@@ -1537,9 +1539,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
       <input class="search-bar" id="upcomingSearchInput" placeholder="Rechercher un joueur ou un tournoi...">
       <div class="upr-gender-switch-row">
-        <span class="upr-gender-switch-label" id="upcomingGenderLabelMen">&#9794; Hommes</span>
+                <span class="upr-gender-switch-label" id="upcomingGenderLabelMen"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="10" cy="14" r="7"></circle><line x1="15" y1="9" x2="21" y2="3"></line><polyline points="15 3 21 3 21 9"></polyline></svg> Hommes</span>
         <button type="button" class="upr-gender-switch" id="upcomingGenderSwitch" role="switch" aria-checked="false" aria-label="Filtrer par genre"><span class="upr-gender-switch-knob"></span></button>
-        <span class="upr-gender-switch-label" id="upcomingGenderLabelWomen">&#9792; Femmes</span>
+                <span class="upr-gender-switch-label" id="upcomingGenderLabelWomen"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="9" r="7"></circle><line x1="12" y1="16" x2="12" y2="22"></line><line x1="9" y1="19" x2="15" y2="19"></line></svg> Femmes</span>
       </div>
       <div class="upcoming-filters" id="upcomingFilters"></div>
       <div id="upcomingListPage"></div>
@@ -3599,8 +3601,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
             const p1Wins = m.winner_id && String(m.winner_id) === String(m.player1_id);
             const p2Wins = m.winner_id && String(m.winner_id) === String(m.player2_id);
             return '<div class="bracket-match">' +
-              '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name">' + countryFlag(m.player1_country) + ' ' + m.player1_name + '</span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
-              '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name">' + countryFlag(m.player2_country) + ' ' + m.player2_name + '</span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
+                            '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
+              '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
             '</div>';
           }).join('') +
           '</div>'
