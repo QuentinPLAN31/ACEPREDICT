@@ -438,6 +438,16 @@
     font-size:12px; font-weight:700; width:fit-content;
   }
   .pj-streak-pill.win{ background: rgba(215,242,44,0.15); color: var(--accent); }
+  .pj-rank-card{ display:flex; align-items:center; gap:16px; background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line-strong); border-radius:14px; padding:16px 18px; margin-bottom:14px; }
+  .pj-rank-num{ font-size:26px; font-weight:800; color: var(--accent); }
+  .pj-rank-label{ font-size:11px; color: var(--text-dim); text-transform:uppercase; letter-spacing:.06em; }
+  .pj-hand-chip{ margin-left:auto; font-size:12px; font-weight:700; padding:6px 12px; border-radius:999px; background: var(--accent2-dim); color: var(--accent2); white-space:nowrap; }
+  .pj-level-row{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .pj-level-name{ width:120px; font-size:12.5px; color: var(--text-sec); flex-shrink:0; display:flex; align-items:center; gap:6px; }
+  .pj-level-track{ flex:1; height:8px; border-radius:999px; background: rgba(255,255,255,0.06); overflow:hidden; }
+  .pj-level-fill{ display:block; height:100%; border-radius:999px; }
+  .pj-level-word{ width:90px; text-align:right; font-size:12px; font-weight:700; flex-shrink:0; }
+  .pj-level-best{ font-size:9.5px; background: var(--accent-dim); color: var(--accent); padding:2px 6px; border-radius:999px; font-weight:700; white-space:nowrap; }
   .pj-streak-pill.loss{ background: rgba(232,93,93,0.15); color:#e88585; }
   .pj-form-row{ display:flex; gap:6px; margin: 2px 0 16px; flex-wrap:wrap; }
   .pj-form-dot{
@@ -1058,7 +1068,15 @@
   .hist-winner-label{ font-size:10.5px; color: var(--text-dim); white-space:nowrap; }
 
   .player-row{ display:flex; align-items:center; gap:14px; background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:13px 16px; margin-bottom:8px; }
-  .player-rank{ width:28px; height:28px; border-radius:999px; background: rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; color: var(--text-sec); flex-shrink:0; }
+  .player-rank{ min-width:28px; height:28px; padding:0 7px; border-radius:999px; background: rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color: var(--text-sec); flex-shrink:0; }
+  .player-row.eliminated{ opacity:0.5; }
+  .player-elim-badge{ display:inline-block; margin-left:8px; font-size:10px; font-weight:700; letter-spacing:.03em; color: var(--danger); background: rgba(239,88,96,0.12); border-radius:999px; padding:2px 8px; vertical-align:middle; }
+  .comp-filterbar{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .cfb-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .cfb-btn{ background: rgba(255,255,255,0.03); color: var(--text-sec); border:1px solid var(--line); border-radius:999px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; white-space:nowrap; }
+  .cfb-btn.active{ background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+  .cfb-btn.cfb-clear{ background: rgba(239,88,96,0.1); color:#f27b81; border-color: rgba(239,88,96,0.3); }
+  .cfb-live{ padding-top:2px; border-top:1px dashed var(--line); padding-top:10px; }
   .player-rank.top1{ background:#FFC454; color:#2a1c02; }
   .player-rank.top2{ background:#C9CFCF; color:#20241f; }
   .player-rank.top3{ background:#CE8946; color:#2a1c02; }
@@ -1071,7 +1089,9 @@
   .player-stat-label{ font-size:10.5px; color: var(--text-dim); text-align:right; }
 
   .nations-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
-  .nation-card{ background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:20px 14px; text-align:center; }
+  .nation-card{ background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:20px 14px; text-align:center; cursor:pointer; transition: border-color .15s; }
+  .nation-card:hover{ border-color: var(--line-strong); }
+  .nation-card.active{ border-color: var(--accent); background: linear-gradient(160deg, var(--accent-dim), var(--card-bottom)); }
     .nation-flag{
     width:56px; height:40px; border-radius:6px; overflow:hidden; margin:0 auto 10px;
     display:flex; align-items:center; justify-content:center; background: var(--accent-dim); font-size:26px;
@@ -1948,7 +1968,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <div class="rank-table-wrap">
           <table class="rank-table">
             <thead>
-              <tr><th>#</th><th>Joueur</th><th style="text-align:right;">Elo général</th></tr>
+              <tr><th>#</th><th>Joueur</th><th style="text-align:right;">Niveau</th></tr>
             </thead>
             <tbody id="compRankBody">
               <tr><td colspan="3" class="upcoming-loading">Chargement...</td></tr>
@@ -1958,22 +1978,26 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         </div>
 
         <div class="sub-panel" id="sctab-bracket">
+          <div class="comp-filterbar" id="compFilterBarBracket"></div>
           <div id="compBracketWrap"><div class="upcoming-loading">Chargement...</div></div>
         </div>
       </div>
 
       <!-- MATCHS -->
       <div class="comp-panel" id="ctab-matchs">
+        <div class="comp-filterbar" id="compFilterBarMatchs"></div>
         <div id="compMatchesWrap"><div class="upcoming-loading">Chargement...</div></div>
       </div>
 
       <!-- JOUEURS -->
       <div class="comp-panel" id="ctab-joueurs">
+        <div class="comp-filterbar" id="compFilterBarJoueurs"></div>
         <div id="compPlayersWrap"><div class="upcoming-loading">Chargement...</div></div>
       </div>
 
       <!-- NATIONS -->
       <div class="comp-panel" id="ctab-nations">
+        <div class="comp-filterbar" id="compFilterBarNations"></div>
         <div id="compNationsWrap"><div class="upcoming-loading">Chargement...</div></div>
       </div>
     </section>
@@ -3539,6 +3563,207 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   const COMP_ROUND_ORDER = ['R128','R64','R32','R16','QF','SF','F','RR','BR'];
   const COMP_ROUND_LABEL = { R128:'1er tour', R64:'2e tour', R32:'1/16', R16:'Huitièmes', QF:'Quarts', SF:'Demi-finales', F:'Finale', RR:'Poules', BR:'Petite finale' };
+  const COMP_FINALS_ROUNDS = ['R16','QF','SF','F','BR']; // groupees sous le bouton "Phases finales"
+  function compRoundLabel(r){ return COMP_ROUND_LABEL[r] || r || '?'; }
+
+  // État des filtres de la page compétition (partagé entre les onglets
+  // Matchs / Tableau / Joueurs / Nations, remis à zéro à chaque nouveau
+  // tournoi ouvert). compMatchesRaw garde la liste brute (fusion Match +
+  // Fixture, cf. backend) pour ré-appliquer les filtres sans refetch.
+  let compMatchesRaw = [];
+  let compRoundsPresent = [];
+  let compRoundFilter = null; // null = tous les tours | 'FINALS' | code de tour (ex 'R32')
+  let compLiveOnly = false;   // true = masque les joueurs éliminés / matchs déjà joués
+  let compNationFilter = null; // code pays sélectionné depuis l'onglet Nations
+
+  function compSetRoundFilter(code){
+    compRoundFilter = (compRoundFilter === code) ? null : code;
+    renderCompDetailPanels();
+  }
+  function compSetLiveOnly(v){
+    compLiveOnly = v;
+    renderCompDetailPanels();
+  }
+  function compSetNationFilter(code){
+    compNationFilter = (compNationFilter === code) ? null : code;
+    if(compNationFilter){
+      document.querySelectorAll('.comp-tab').forEach(t=> t.classList.remove('active'));
+      const joueursTab = document.querySelector('.comp-tab[data-ctab="joueurs"]');
+      if(joueursTab) joueursTab.classList.add('active');
+      document.querySelectorAll('.comp-panel').forEach(p=> p.classList.remove('active'));
+      const joueursPanel = document.getElementById('ctab-joueurs');
+      if(joueursPanel) joueursPanel.classList.add('active');
+    }
+    renderCompDetailPanels();
+  }
+
+  function compFilterBarHtml(){
+    const finalsPresent = compRoundsPresent.some(r=> COMP_FINALS_ROUNDS.includes(r));
+    const otherRounds = compRoundsPresent.filter(r=> !COMP_FINALS_ROUNDS.includes(r));
+    let html = '<div class="cfb-row">';
+    html += '<button type="button" class="cfb-btn' + (compRoundFilter===null?' active':'') + '" onclick="compSetRoundFilter(null)">Tous les tours</button>';
+    otherRounds.forEach(r=>{
+      html += '<button type="button" class="cfb-btn' + (compRoundFilter===r?' active':'') + '" onclick="compSetRoundFilter(\'' + r + '\')">' + compRoundLabel(r) + '</button>';
+    });
+    if(finalsPresent){
+      html += '<button type="button" class="cfb-btn' + (compRoundFilter==='FINALS'?' active':'') + '" onclick="compSetRoundFilter(\'FINALS\')">Phases finales</button>';
+    }
+    html += '</div>';
+    html += '<div class="cfb-row cfb-live">';
+    html += '<button type="button" class="cfb-btn' + (!compLiveOnly?' active':'') + '" onclick="compSetLiveOnly(false)">Tout voir</button>';
+    html += '<button type="button" class="cfb-btn' + (compLiveOnly?' active':'') + '" onclick="compSetLiveOnly(true)">En lice uniquement</button>';
+    html += '</div>';
+    if(compNationFilter){
+      html += '<div class="cfb-row"><button type="button" class="cfb-btn cfb-clear" onclick="compSetNationFilter(\'' + compNationFilter + '\')">✕ Nation : ' + compNationFilter + '</button></div>';
+    }
+    return html;
+  }
+
+  // Rend les 4 onglets (Matchs, Tableau, Joueurs, Nations) à partir de
+  // compMatchesRaw + de l'état des filtres ci-dessus. Appelée après le
+  // chargement initial ET à chaque changement de filtre (pas de refetch).
+  function renderCompDetailPanels(){
+    const matchesWrap = document.getElementById('compMatchesWrap');
+    const bracketWrap = document.getElementById('compBracketWrap');
+    const playersWrap = document.getElementById('compPlayersWrap');
+    const nationsWrap = document.getElementById('compNationsWrap');
+    if(!matchesWrap || !bracketWrap || !playersWrap || !nationsWrap) return;
+
+    const barHtml = compFilterBarHtml();
+    ['compFilterBarMatchs','compFilterBarBracket','compFilterBarJoueurs','compFilterBarNations'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.innerHTML = barHtml;
+    });
+
+    const matchInRoundFilter = (m)=>{
+      if(compRoundFilter === null) return true;
+      if(compRoundFilter === 'FINALS') return COMP_FINALS_ROUNDS.includes(m.round);
+      return m.round === compRoundFilter;
+    };
+
+    // Élimination calculée sur TOUT le tournoi (indépendante du filtre de
+    // tour affiché) : un joueur battu une fois reste "éliminé" même si on
+    // filtre sur un tour antérieur à sa défaite.
+    const eliminatedIds = new Set();
+    compMatchesRaw.forEach(m=>{
+      if(!m.winner_id) return;
+      if(m.player1_id && String(m.player1_id) !== String(m.winner_id)) eliminatedIds.add(String(m.player1_id));
+      if(m.player2_id && String(m.player2_id) !== String(m.winner_id)) eliminatedIds.add(String(m.player2_id));
+    });
+
+    let filteredMatches = compMatchesRaw.filter(matchInRoundFilter);
+    if(compLiveOnly) filteredMatches = filteredMatches.filter(m=> !m.winner_id);
+    if(compNationFilter){
+      filteredMatches = filteredMatches.filter(m=> m.player1_country === compNationFilter || m.player2_country === compNationFilter);
+    }
+
+    // --- Matchs ---
+    const sortedMatches = filteredMatches.slice().sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
+    document.getElementById('compTabCountMatchs').textContent = compMatchesRaw.length;
+    matchesWrap.innerHTML = sortedMatches.length ? sortedMatches.map((m, idx)=>
+      '<div class="match-row">' +
+        '<span class="m-player"><span class="m-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span>' +
+        '<span class="m-score">' + (m.score || '—') + '</span>' +
+        '<span class="m-player right"><span class="m-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span>' +
+        '<span class="m-date">' + compRoundLabel(m.round) + (m.date ? ('<br>' + new Date(m.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'})) : '') + '</span>' +
+        '<button class="upr-btn upr-btn-sm" data-idx="' + idx + '" type="button">Analyser</button>' +
+      '</div>'
+    ).join('') : '<div class="upcoming-empty">Aucun match ne correspond à ce filtre.</div>';
+    matchesWrap.querySelectorAll('.upr-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const m = sortedMatches[Number(btn.dataset.idx)];
+        if(m) goAnalyzeUpcomingMatch(m.player1_name, m.player2_name);
+      });
+    });
+
+    // --- Tableau ---
+    const byRound = {};
+    filteredMatches.forEach(m=>{ const r = m.round || '?'; (byRound[r] = byRound[r] || []).push(m); });
+    const roundsToShow = compRoundsPresent.filter(r=> byRound[r] && byRound[r].length);
+    const bracketMatchesFlat = [];
+    bracketWrap.innerHTML = roundsToShow.length ? (
+      '<div class="bracket-wrap"><div class="bracket-cols">' +
+      roundsToShow.map(r=>
+        '<div class="bracket-col"><div class="bracket-col-label">' + compRoundLabel(r).toUpperCase() + '</div>' +
+        byRound[r].map(m=>{
+          const p1Wins = m.winner_id && String(m.winner_id) === String(m.player1_id);
+          const p2Wins = m.winner_id && String(m.winner_id) === String(m.player2_id);
+          const bIdx = bracketMatchesFlat.length;
+          bracketMatchesFlat.push(m);
+          return '<div class="bracket-match">' +
+                          '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
+            '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
+            '<button class="upr-btn upr-btn-sm" style="width:100%; margin-top:6px;" data-bidx="' + bIdx + '" type="button">Analyser</button>' +
+          '</div>';
+        }).join('') +
+        '</div>'
+      ).join('') +
+      '</div></div>'
+    ) : '<div class="upcoming-empty">Aucun tableau ne correspond à ce filtre.</div>';
+    bracketWrap.querySelectorAll('.upr-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const m = bracketMatchesFlat[Number(btn.dataset.bidx)];
+        if(m) goAnalyzeUpcomingMatch(m.player1_name, m.player2_name);
+      });
+    });
+
+    // --- Joueurs : victoires réelles + classement mondial réel (plus de
+    // numérotation arbitraire basée sur des victoires à 0 avant le début
+    // du tournoi -- le badge affiche désormais le classement ATP/WTA
+    // réel du joueur quand on le connaît). ---
+    const winCounts = {}, playerMeta = {};
+    filteredMatches.forEach(m=>{
+      if(m.player1_id) playerMeta[m.player1_id] = { name: m.player1_name, country: m.player1_country, ranking: m.player1_ranking };
+      if(m.player2_id) playerMeta[m.player2_id] = { name: m.player2_name, country: m.player2_country, ranking: m.player2_ranking };
+      if(m.winner_id) winCounts[m.winner_id] = (winCounts[m.winner_id] || 0) + 1;
+    });
+    let playerList = Object.keys(playerMeta).map(id => ({
+      id, name: playerMeta[id].name, country: playerMeta[id].country, ranking: playerMeta[id].ranking,
+      wins: winCounts[id] || 0, eliminated: eliminatedIds.has(String(id)),
+    }));
+    if(compLiveOnly) playerList = playerList.filter(p=> !p.eliminated);
+    playerList.sort((a,b)=>{
+      const ra = (a.ranking == null) ? Infinity : a.ranking;
+      const rb = (b.ranking == null) ? Infinity : b.ranking;
+      if(ra !== rb) return ra - rb;
+      return b.wins - a.wins;
+    });
+    document.getElementById('compTabCountJoueurs').textContent = playerList.length;
+    playersWrap.innerHTML = playerList.length ? playerList.map((p, i)=>{
+      const initials = p.name.split(' ').map(w=> w[0]).filter(Boolean).slice(-2).join('').toUpperCase();
+      const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
+      const rankLabel = (p.ranking != null) ? ('#' + p.ranking) : '—';
+      return '<div class="player-row' + (p.eliminated ? ' eliminated' : '') + '">' +
+        '<span class="player-rank' + rankClass + '" title="Classement mondial">' + rankLabel + '</span>' +
+        '<span class="player-avatar" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">' + initials + '</span>' +
+        '<span class="player-info"><span class="player-name">' + p.name + (p.eliminated ? ' <span class="player-elim-badge">Éliminé</span>' : '') + '</span><span class="player-country"><span class="pc-flag">' + countryFlag(p.country) + '</span>' + (p.country || '?') + '</span></span>' +
+        '<span><span class="player-stat">' + p.wins + '</span><br><span class="player-stat-label">victoire' + (p.wins > 1 ? 's' : '') + '</span></span>' +
+      '</div>';
+    }).join('') : '<div class="upcoming-empty">Aucun joueur ne correspond à ce filtre.</div>';
+    // Photos officielles (via Wikipedia) : chargées en arrière-plan, initiales conservées en repli.
+    playersWrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
+      const name = avatarEl.dataset.playerName;
+      if(!name) return;
+      try {
+        const photoUrl = await getPlayerPhotoUrl(name);
+        if(photoUrl){
+          avatarEl.style.backgroundImage = 'url(' + JSON.stringify(photoUrl).slice(1, -1) + ')';
+          avatarEl.textContent = '';
+        }
+      } catch(err){ /* dégradation gracieuse : initiales conservées */ }
+    });
+
+    // --- Nations : dérivées de la même liste de joueurs déjà filtrée
+    // (donc cohérentes avec le filtre "En lice uniquement"), cliquables
+    // pour filtrer les autres onglets sur cette nation. ---
+    const nationCounts = {};
+    playerList.forEach(p=>{ const key = p.country || '?'; nationCounts[key] = (nationCounts[key] || 0) + 1; });
+    const nationEntries = Object.entries(nationCounts).sort((a,b)=> b[1]-a[1]);
+    document.getElementById('compTabCountNations').textContent = nationEntries.length;
+    nationsWrap.innerHTML = nationEntries.length ? ('<div class="nations-grid">' + nationEntries.map(([code, count])=>
+      '<div class="nation-card' + (compNationFilter===code ? ' active' : '') + '" onclick="compSetNationFilter(\'' + code + '\')"><div class="nation-flag">' + countryFlag(code) + '</div><div class="nation-name">' + (code || '?') + '</div><div class="nation-count">' + count + ' joueur' + (count>1?'s':'') + '</div></div>'
+    ).join('') + '</div>') : '<div class="upcoming-empty">Aucune nation ne correspond à ce filtre.</div>';
+  }
 
   async function loadCompetitionDetail(compId, comp){
     const rankBody = document.getElementById('compRankBody');
@@ -3548,6 +3773,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const nationsWrap = document.getElementById('compNationsWrap');
     const tour = (comp && comp.tour) ? comp.tour : 'atp';
 
+    // Nouveau tournoi ouvert : on repart de filtres neutres.
+    compRoundFilter = null;
+    compLiveOnly = false;
+    compNationFilter = null;
+
     try {
       const [rankRes, matchesRes] = await Promise.all([
         fetch(API_BASE + '/competitions/' + compId + '/ranking?tour=' + tour),
@@ -3556,110 +3786,27 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const ranking = rankRes.ok ? await rankRes.json() : [];
       const matches = matchesRes.ok ? await matchesRes.json() : [];
 
-      // Classement (Elo général, réel -- pas de MJ/V/D/Pts inventés).
+      // Classement : trié par niveau réel (Elo interne), mais affiché en
+      // repère lisible (mot + pourcentage) plutôt qu'en chiffre Elo brut,
+      // pour ne pas demander à l'utilisateur de connaître ce système.
       document.getElementById('compTabCountRank').textContent = ranking.length;
-      rankBody.innerHTML = ranking.length ? ranking.map((p, i) =>
-        '<tr><td class="rk-num">' + (i+1) + '</td><td class="rk-player"><span class="rk-flag">' + countryFlag(p.country) + '</span>' + p.name + '</td>' +
-        '<td style="text-align:right;" class="rk-pts">' + Math.round(p.elo_overall) + '</td></tr>'
-      ).join('') : '<tr><td colspan="3" class="upcoming-empty">Pas encore de classement disponible.</td></tr>';
+      rankBody.innerHTML = ranking.length ? ranking.map((p, i) => {
+        const pct = eloToLevelPct(p.elo_overall);
+        return '<tr><td class="rk-num">' + (i+1) + '</td><td class="rk-player"><span class="rk-flag">' + countryFlag(p.country) + '</span>' + p.name + '</td>' +
+        '<td style="text-align:right;" class="rk-pts">' + (pct != null ? '<span style="color:' + levelColor(pct) + '; font-weight:700;">' + levelWord(pct) + '</span>' : '—') + '</td></tr>';
+      }).join('') : '<tr><td colspan="3" class="upcoming-empty">Pas encore de classement disponible.</td></tr>';
 
-      // Matchs réels, du plus récent au plus ancien.
-      const sortedMatches = matches.slice().sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
-      document.getElementById('compTabCountMatchs').textContent = matches.length;
-      matchesWrap.innerHTML = sortedMatches.length ? sortedMatches.map((m, idx)=>
-        '<div class="match-row">' +
-          '<span class="m-player"><span class="m-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span>' +
-          '<span class="m-score">' + (m.score || '—') + '</span>' +
-          '<span class="m-player right"><span class="m-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span>' +
-          '<span class="m-date">' + (COMP_ROUND_LABEL[m.round] || m.round || '?') + (m.date ? ('<br>' + new Date(m.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'})) : '') + '</span>' +
-          '<button class="upr-btn upr-btn-sm" data-idx="' + idx + '" type="button">Analyser</button>' +
-        '</div>'
-      ).join('') : '<div class="upcoming-empty">Aucun résultat connu pour cette compétition pour le moment.</div>';
-      matchesWrap.querySelectorAll('.upr-btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const m = sortedMatches[Number(btn.dataset.idx)];
-          if(m) goAnalyzeUpcomingMatch(m.player1_name, m.player2_name);
-        });
-      });
+      compMatchesRaw = matches;
+      const byRoundAll = {};
+      matches.forEach(m=>{ const r = m.round || '?'; (byRoundAll[r] = byRoundAll[r] || []).push(m); });
+      compRoundsPresent = Object.keys(byRoundAll).sort((a,b)=> COMP_ROUND_ORDER.indexOf(a) - COMP_ROUND_ORDER.indexOf(b));
 
-      // Tableau : mêmes matchs réels, regroupés par tour (round) dans l'ordre logique.
-      const byRound = {};
-      matches.forEach(m=>{ const r = m.round || '?'; (byRound[r] = byRound[r] || []).push(m); });
-      const roundsPresent = Object.keys(byRound).sort((a,b)=> COMP_ROUND_ORDER.indexOf(a) - COMP_ROUND_ORDER.indexOf(b));
-      const bracketMatchesFlat = [];
-      bracketWrap.innerHTML = roundsPresent.length ? (
-        '<div class="bracket-wrap"><div class="bracket-cols">' +
-        roundsPresent.map(r=>
-          '<div class="bracket-col"><div class="bracket-col-label">' + (COMP_ROUND_LABEL[r] || r).toUpperCase() + '</div>' +
-          byRound[r].map(m=>{
-            const p1Wins = m.winner_id && String(m.winner_id) === String(m.player1_id);
-            const p2Wins = m.winner_id && String(m.winner_id) === String(m.player2_id);
-            const bIdx = bracketMatchesFlat.length;
-            bracketMatchesFlat.push(m);
-            return '<div class="bracket-match">' +
-                            '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
-              '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
-              '<button class="upr-btn upr-btn-sm" style="width:100%; margin-top:6px;" data-bidx="' + bIdx + '" type="button">Analyser</button>' +
-            '</div>';
-          }).join('') +
-          '</div>'
-        ).join('') +
-        '</div></div>'
-      ) : '<div class="upcoming-empty">Pas encore de tableau disponible pour cette compétition.</div>';
-      bracketWrap.querySelectorAll('.upr-btn').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
-          const m = bracketMatchesFlat[Number(btn.dataset.bidx)];
-          if(m) goAnalyzeUpcomingMatch(m.player1_name, m.player2_name);
-        });
-      });
-
-      // Joueurs : victoires réelles dans CETTE compétition, calculées depuis les matchs.
-      const winCounts = {}, playerMeta = {};
-      matches.forEach(m=>{
-        if(m.player1_id) playerMeta[m.player1_id] = { name: m.player1_name, country: m.player1_country };
-        if(m.player2_id) playerMeta[m.player2_id] = { name: m.player2_name, country: m.player2_country };
-        if(m.winner_id) winCounts[m.winner_id] = (winCounts[m.winner_id] || 0) + 1;
-      });
-      const playerList = Object.keys(playerMeta).map(id => ({
-        id, name: playerMeta[id].name, country: playerMeta[id].country, wins: winCounts[id] || 0,
-      })).sort((a,b)=> b.wins - a.wins);
-      document.getElementById('compTabCountJoueurs').textContent = playerList.length;
-      playersWrap.innerHTML = playerList.length ? playerList.map((p, i)=>{
-        const initials = p.name.split(' ').map(w=> w[0]).filter(Boolean).slice(-2).join('').toUpperCase();
-        const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
-        return '<div class="player-row">' +
-          '<span class="player-rank' + rankClass + '">' + (i+1) + '</span>' +
-          '<span class="player-avatar" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">' + initials + '</span>' +
-          '<span class="player-info"><span class="player-name">' + p.name + '</span><span class="player-country"><span class="pc-flag">' + countryFlag(p.country) + '</span>' + (p.country || '?') + '</span></span>' +
-          '<span><span class="player-stat">' + p.wins + '</span><br><span class="player-stat-label">victoire' + (p.wins > 1 ? 's' : '') + '</span></span>' +
-        '</div>';
-      }).join('') : '<div class="upcoming-empty">Aucun joueur connu pour cette compétition pour le moment.</div>';
-      // Photos officielles (via Wikipedia) : chargées en arrière-plan, initiales conservées en repli.
-      playersWrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
-        const name = avatarEl.dataset.playerName;
-        if(!name) return;
-        try {
-          const photoUrl = await getPlayerPhotoUrl(name);
-          if(photoUrl){
-            avatarEl.style.backgroundImage = 'url(' + JSON.stringify(photoUrl).slice(1, -1) + ')';
-            avatarEl.textContent = '';
-          }
-        } catch(err){ /* dégradation gracieuse : initiales conservées */ }
-      });
-
-      // Nations : pays réellement représentés parmi les joueurs de cette compétition.
-      const nationCounts = {};
-      Object.values(playerMeta).forEach(p=>{ const key = p.country || '?'; nationCounts[key] = (nationCounts[key] || 0) + 1; });
-      const nationEntries = Object.entries(nationCounts).sort((a,b)=> b[1]-a[1]);
-      document.getElementById('compTabCountNations').textContent = nationEntries.length;
-      nationsWrap.innerHTML = nationEntries.length ? ('<div class="nations-grid">' + nationEntries.map(([code, count])=>
-        '<div class="nation-card"><div class="nation-flag">' + countryFlag(code) + '</div><div class="nation-name">' + (code || '?') + '</div><div class="nation-count">' + count + ' joueur' + (count>1?'s':'') + '</div></div>'
-      ).join('') + '</div>') : '<div class="upcoming-empty">Aucune nation connue pour cette compétition pour le moment.</div>';
-
+      renderCompDetailPanels();
     } catch(err){
       [rankBody, bracketWrap, matchesWrap, playersWrap, nationsWrap].forEach(el=> el && (el.innerHTML = '<div class="upcoming-empty">Impossible de charger les données pour le moment.</div>'));
     }
   }
+
 
   function openComp(compId){
     const comp = competitionsCache.find(c => c.id === compId);
@@ -3999,6 +4146,38 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     el.style.left = left + 'px';
   }
 
+  // Convertit un Elo brut (peu parlant pour un utilisateur non initie, et
+  // dont l'ecart entre joueurs du haut du classement parait minuscule) en
+  // repere lisible sans formation : un pourcentage de niveau (0-100,
+  // normalise sur une plage Elo plausible du circuit pro) + un mot.
+  function eloToLevelPct(elo){
+    if(elo == null || isNaN(elo)) return null;
+    const pct = Math.round(((elo - 1300) / (2200 - 1300)) * 100);
+    return Math.max(3, Math.min(100, pct));
+  }
+  function levelWord(pct){
+    if(pct >= 80) return 'Excellent';
+    if(pct >= 65) return 'Très solide';
+    if(pct >= 50) return 'Solide';
+    if(pct >= 35) return 'Correct';
+    if(pct >= 20) return 'Fragile';
+    return 'Faible';
+  }
+  function levelColor(pct){
+    if(pct >= 65) return '#D7F22C';
+    if(pct >= 40) return '#4FC3F7';
+    if(pct >= 20) return '#F2B33C';
+    return '#EF6B5D';
+  }
+  function bestSurfaceOf(local){
+    const surfaces = [
+      { key:'hard', label:'Dur', elo: local.elo_hard },
+      { key:'clay', label:'Terre battue', elo: local.elo_clay },
+      { key:'grass', label:'Gazon', elo: local.elo_grass },
+    ];
+    return surfaces.reduce((a,b)=> (b.elo > a.elo ? b : a), surfaces[0]);
+  }
+
   async function showPlayerPopover(box, name){
     const token = ++phHoverToken;
     const el = ensurePlayerPopover();
@@ -4025,11 +4204,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     '</div>';
 
     if(info.local){
+      const popPct = eloToLevelPct(info.local.elo_overall);
+      const popBest = bestSurfaceOf(info.local);
       html +=
-        '<div class="php-row"><span>Elo général</span><b>' + Math.round(info.local.elo_overall) + '</b></div>' +
-        '<div class="php-row"><span>Elo dur</span><b>' + Math.round(info.local.elo_hard) + '</b></div>' +
-        '<div class="php-row"><span>Elo terre battue</span><b>' + Math.round(info.local.elo_clay) + '</b></div>' +
-        '<div class="php-row"><span>Elo gazon</span><b>' + Math.round(info.local.elo_grass) + '</b></div>';
+        '<div class="php-row"><span>Classement mondial</span><b>' + (info.local.current_rank != null ? ('#' + info.local.current_rank) : 'Non classé') + '</b></div>' +
+        (popPct != null ? '<div class="php-row"><span>Niveau général</span><b style="color:' + levelColor(popPct) + ';">' + levelWord(popPct) + '</b></div>' : '') +
+        '<div class="php-row"><span>Meilleure surface</span><b>' + popBest.label + '</b></div>';
     } else if(info.wiki && info.wiki.description){
       html += '<div class="php-loading">' + info.wiki.description + '</div>';
     } else {
@@ -4149,17 +4329,52 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       ? '<img class="pj-photo" src="' + info.wiki.thumbnail + '" alt="' + displayName + '">'
       : '<div class="pj-photo-placeholder">' + (flag || '🎾') + '</div>';
 
-    let statsHtml = '<div class="pj-section-label">RATINGS ELO</div>';
+    // Section "NIVEAU" : classement mondial (le repère le plus universel,
+    // pas besoin d'être initié) + un niveau général en pourcentage/mot +
+    // un niveau par surface en barres, plutôt que des chiffres Elo bruts
+    // qui se ressemblent tous d'un joueur pro à l'autre et ne veulent
+    // rien dire sans contexte pour un utilisateur non formé.
+    let statsHtml = '<div class="pj-section-label">NIVEAU</div>';
     if(info.local){
+      const rankLabel = info.local.current_rank != null ? ('#' + info.local.current_rank) : 'Non classé';
+      const handLabel = info.local.hand === 'L' ? 'Gaucher' : (info.local.hand === 'R' ? 'Droitier' : null);
+      const overallPct = eloToLevelPct(info.local.elo_overall);
+      const surfaces = [
+        { key:'hard', label:'Dur', elo: info.local.elo_hard },
+        { key:'clay', label:'Terre battue', elo: info.local.elo_clay },
+        { key:'grass', label:'Gazon', elo: info.local.elo_grass },
+      ];
+      const best = bestSurfaceOf(info.local);
+
       statsHtml +=
-        '<div class="pj-stats-grid">' +
-          '<div class="pj-stat-card"><div class="pj-stat-value">' + Math.round(info.local.elo_overall) + '</div><div class="pj-stat-label">Général</div></div>' +
-          '<div class="pj-stat-card"><div class="pj-stat-value">' + Math.round(info.local.elo_hard) + '</div><div class="pj-stat-label">Dur</div></div>' +
-          '<div class="pj-stat-card"><div class="pj-stat-value">' + Math.round(info.local.elo_clay) + '</div><div class="pj-stat-label">Terre battue</div></div>' +
-          '<div class="pj-stat-card"><div class="pj-stat-value">' + Math.round(info.local.elo_grass) + '</div><div class="pj-stat-label">Gazon</div></div>' +
+        '<div class="pj-rank-card">' +
+          '<div><div class="pj-rank-num">' + rankLabel + '</div><div class="pj-rank-label">Classement mondial</div></div>' +
+          (handLabel ? '<div class="pj-hand-chip">' + handLabel + '</div>' : '') +
         '</div>';
+
+      if(overallPct != null){
+        statsHtml +=
+          '<div class="pj-winrate-card">' +
+            '<div class="pj-winrate-ring" style="--wr:' + overallPct + '; background: conic-gradient(' + levelColor(overallPct) + ' calc(var(--wr,0)*1%), rgba(255,255,255,0.08) 0);"><span style="color:' + levelColor(overallPct) + ';">' + overallPct + '</span></div>' +
+            '<div class="pj-winrate-info">' +
+              '<div class="pj-winrate-record" style="color:' + levelColor(overallPct) + ';">' + levelWord(overallPct) + '</div>' +
+              '<div class="pj-winrate-label">Niveau général (toutes surfaces)</div>' +
+            '</div>' +
+          '</div>';
+      }
+
+      statsHtml += surfaces.map(s=>{
+        const pct = eloToLevelPct(s.elo);
+        if(pct == null) return '';
+        const color = levelColor(pct);
+        return '<div class="pj-level-row">' +
+          '<span class="pj-level-name">' + s.label + (s.key === best.key ? '<span class="pj-level-best">Meilleure</span>' : '') + '</span>' +
+          '<span class="pj-level-track"><span class="pj-level-fill" style="width:' + pct + '%; background:' + color + ';"></span></span>' +
+          '<span class="pj-level-word" style="color:' + color + ';">' + levelWord(pct) + '</span>' +
+        '</div>';
+      }).join('');
     } else {
-      statsHtml += '<div class="pj-empty-note">Ce joueur n\'est pas encore dans notre base ATP/WTA (circuit Challenger/ITF probablement) — pas de rating Elo disponible pour l\'instant.</div>';
+      statsHtml += '<div class="pj-empty-note">Ce joueur n\'est pas encore dans notre base ATP/WTA (circuit Challenger/ITF probablement) — pas de niveau disponible pour l\'instant.</div>';
     }
 
     const perfHtml = renderPerformanceBlock(info.stats);
