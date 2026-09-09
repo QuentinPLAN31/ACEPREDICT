@@ -1101,21 +1101,7 @@
   .player-stat{ font-size:17px; font-weight:800; color: var(--accent); text-align:right; }
   .player-stat-label{ font-size:10.5px; color: var(--text-dim); text-align:right; }
 
-  .nations-grid{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px; }
-  .nation-card{ background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:20px 14px; text-align:center; cursor:pointer; transition: border-color .15s; }
-  .nation-card:hover{ border-color: var(--line-strong); }
-  .nation-card.active{ border-color: var(--accent); background: linear-gradient(160deg, var(--accent-dim), var(--card-bottom)); }
-    .nation-flag{
-    width:56px; height:40px; border-radius:6px; overflow:hidden; margin:0 auto 10px;
-    display:flex; align-items:center; justify-content:center; background: var(--accent-dim); font-size:26px;
-  }
   .flag-img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .nation-name{ font-size:13.5px; font-weight:600; }
-  .nation-count{ font-size:11.5px; color: var(--text-sec); margin-top:2px; }
-
-  @media (max-width: 900px){
-    .nations-grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
-  }
   @media (max-width: 900px){
     .plans{ grid-template-columns: 1fr; }
     .main{ padding: 28px 22px 40px; }
@@ -1982,20 +1968,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>
           Joueurs <span class="tab-count" id="compTabCountJoueurs">–</span>
         </button>
-        <button class="comp-tab" data-ctab="nations">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg>
-          Nations <span class="tab-count" id="compTabCountNations">–</span>
-        </button>
       </div>
 
       <!-- CLASSEMENT -->
       <div class="comp-panel active" id="ctab-classement">
         <div class="sub-tabs">
-          <button class="sub-tab active" data-sctab="rank">Classement ATP</button>
-          <button class="sub-tab" data-sctab="bracket">Tableau du tournoi</button>
+          <button class="sub-tab" data-sctab="rank">Classement ATP</button>
+          <button class="sub-tab active" data-sctab="bracket">Tableau du tournoi</button>
         </div>
 
-        <div class="sub-panel active" id="sctab-rank">
+        <div class="sub-panel" id="sctab-rank">
           <div class="rank-table-wrap">
           <table class="rank-table">
             <thead>
@@ -2008,7 +1990,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           </div>
         </div>
 
-        <div class="sub-panel" id="sctab-bracket">
+        <div class="sub-panel active" id="sctab-bracket">
           <div class="comp-filterbar" id="compFilterBarBracket"></div>
           <div id="compBracketWrap"><div class="upcoming-loading">Chargement...</div></div>
         </div>
@@ -2026,11 +2008,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         <div id="compPlayersWrap"><div class="upcoming-loading">Chargement...</div></div>
       </div>
 
-      <!-- NATIONS -->
-      <div class="comp-panel" id="ctab-nations">
-        <div class="comp-filterbar" id="compFilterBarNations"></div>
-        <div id="compNationsWrap"><div class="upcoming-loading">Chargement...</div></div>
-      </div>
     </section>
 
     <footer class="site-footer">
@@ -2142,12 +2119,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <button class="auth-close" id="unlockClose" type="button" aria-label="Fermer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
-    <div class="unlock-badge">📈 Basé sur les ratings Elo ATP réels</div>
+    <div class="unlock-badge">📈 Basé sur les vrais niveaux ATP/WTA</div>
     <div class="unlock-title">Tu veux voir l'analyse complète ?</div>
     <div class="unlock-sub">Débloque le détail chiffré de cette prédiction.</div>
     <div class="unlock-checklist">
       <div class="unlock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Probabilité exacte de victoire</div>
-      <div class="unlock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Détail des ratings Elo des deux joueurs</div>
+      <div class="unlock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Détail du niveau des deux joueurs</div>
       <div class="unlock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Impact chiffré des conditions météo</div>
       <div class="unlock-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Analyses illimitées et historique complet</div>
     </div>
@@ -2761,7 +2738,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       if(!res.ok) throw new Error('bad status');
       const matches = await res.json();
       if(!matches.length){
-        list.innerHTML = '<div class="upcoming-empty">Aucun match programmé trouvé entre ces deux joueurs pour le moment — l\'analyse se basera uniquement sur les ratings Elo, sans conditions météo.</div>';
+        list.innerHTML = '<div class="upcoming-empty">Aucun match programmé trouvé entre ces deux joueurs pour le moment — l\'analyse se basera uniquement sur le niveau des deux joueurs, sans conditions météo.</div>';
         return;
       }
       list.innerHTML = matches.map((m, idx) =>
@@ -2782,7 +2759,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       });
       selectedUpcomingMatch = matches[0];
     } catch(err){
-      list.innerHTML = '<div class="upcoming-empty">Calendrier en direct indisponible pour le moment — l\'analyse se basera uniquement sur les ratings Elo, sans conditions météo.</div>';
+      list.innerHTML = '<div class="upcoming-empty">Calendrier en direct indisponible pour le moment — l\'analyse se basera uniquement sur le niveau des deux joueurs, sans conditions météo.</div>';
     }
   }
 
@@ -2857,7 +2834,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const f1 = [], f2 = [];
     if(detail.elo_player1 != null && detail.elo_player2 != null && detail.elo_player1 !== detail.elo_player2){
       const suffix = (detail.surface_used && detail.surface_used !== 'overall') ? ' (' + detail.surface_used + ')' : '';
-      (detail.elo_player1 > detail.elo_player2 ? f1 : f2).push('Meilleur rating Elo' + suffix);
+      (detail.elo_player1 > detail.elo_player2 ? f1 : f2).push('Meilleur niveau général' + suffix);
     }
     const form1 = detail.form_player1, form2 = detail.form_player2;
     if(form1 && form2){
@@ -2901,7 +2878,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   function computeFactorTags(detail){
     const tags = [];
-    if(detail.elo_diff != null && Math.abs(detail.elo_diff) >= 50) tags.push('Écart de rating Elo');
+    if(detail.elo_diff != null && Math.abs(detail.elo_diff) >= 50) tags.push('Écart de niveau général');
     const form1 = detail.form_player1, form2 = detail.form_player2;
     if(form1 && form2){
       const s1 = currentWinStreak(form1.results), s2 = currentWinStreak(form2.results);
@@ -2939,7 +2916,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     html += statBarRow('Probabilité de victoire', p1Pct, p2Pct, { suffix: '%', decimals: 1 });
 
     const surfaceTag = (detail.surface_used && detail.surface_used !== 'overall') ? ' (' + detail.surface_used + ')' : '';
-    html += statBarRow('Rating Elo' + surfaceTag, detail.elo_player1, detail.elo_player2);
+    const levelPct1 = eloToLevelPct(detail.elo_player1), levelPct2 = eloToLevelPct(detail.elo_player2);
+    if(levelPct1 != null && levelPct2 != null){
+      html += statBarRow('Niveau général' + surfaceTag, levelPct1, levelPct2, { suffix: '%' });
+    }
 
     const f1 = detail.form_player1, f2 = detail.form_player2;
     if(f1 && f2){
@@ -2976,7 +2956,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(mkt && mkt.market_player1_prob != null && mkt.market_player2_prob != null){
       html += statBarRow('Probabilité du marché (paris)',
         Math.round(mkt.market_player1_prob * 1000) / 10, Math.round(mkt.market_player2_prob * 1000) / 10,
-        { suffix: '%', decimals: 1, note: 'Cote du marché prédictif, indépendante du modèle Elo.' });
+        { suffix: '%', decimals: 1, note: 'Cote du marché prédictif, indépendante du niveau calculé par notre modèle.' });
     }
 
     html += '</div>';
@@ -3195,9 +3175,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(f1 && f2){
       return 'Sur les ' + f1.results.length + ' derniers matchs suivis, ' + p1Name + ' affiche ' +
         f1.wins + 'V-' + f1.losses + 'D et ' + p2Name + ' ' + f2.wins + 'V-' + f2.losses +
-        'D. Associé à l\'écart de rating Elo' + surfaceNote + ', le modèle donne l\'avantage à ' + winnerName + '.';
+        'D. Associé à l\'écart de niveau général' + surfaceNote + ', le modèle donne l\'avantage à ' + winnerName + '.';
     }
-    return 'L\'écart de rating Elo' + surfaceNote + ' donne l\'avantage à ' + winnerName + ' face à ' + loserName + '.';
+    return 'L\'écart de niveau général' + surfaceNote + ' donne l\'avantage à ' + winnerName + ' face à ' + loserName + '.';
   }
 
   function renderAnalysisResult(data, p1Id, p1Name, p2Name){
@@ -3221,6 +3201,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="result-badge">' + favoriteLabel(pct) + '</div>' +
       '<div class="result-winner">' + winnerName + ' gagnant probable</div>' +
       '<div class="result-detail">Face à ' + loserName + surfaceTag + '</div>' +
+      '<div class="cfb-row" style="margin-top:10px;">' +
+        '<button type="button" class="upr-btn upr-btn-sm" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">Fiche de ' + p1Name + '</button>' +
+        '<button type="button" class="upr-btn upr-btn-sm" data-profile-name="' + p2Name.replace(/"/g,'&quot;') + '">Fiche de ' + p2Name + '</button>' +
+      '</div>' +
       renderConfidenceWarning(data, p1Name, p2Name) +
       (narrative ? '<p class="result-lead">' + narrative.lead + '</p>' : '') +
       renderFormBlock(data.detail, p1Name, p2Name) +
@@ -3251,12 +3235,15 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="locked-overlay">' +
           '<div class="locked-overlay-title">Tu n\'as accès qu\'à une partie de l\'analyse</div>' +
           '<div class="locked-progress"><div class="locked-progress-fill"></div></div>' +
-          '<div class="locked-overlay-sub">L\'analyse complète contient la probabilité exacte, le détail des ratings Elo et l\'impact chiffré de la météo.</div>' +
+          '<div class="locked-overlay-sub">L\'analyse complète contient la probabilité exacte, le détail du niveau des deux joueurs et l\'impact chiffré de la météo.</div>' +
           '<button class="locked-unlock-btn" type="button" onclick="openUnlockModal()">🔓 Débloquer l\'analyse complète</button>' +
         '</div>' +
       '</div>' +
-      '<div class="result-probability-note">ℹ️ Ce résultat est une <strong>probabilité</strong> calculée par notre modèle (Elo, forme, historique, conditions du match) — pas une certitude. Le tennis reste un sport avec sa part d\'aléa : un résultat n\'est jamais garanti à 100%, quel que soit l\'écart affiché.</div>';
+      '<div class="result-probability-note">ℹ️ Ce résultat est une <strong>probabilité</strong> calculée par notre modèle (niveau des joueurs, forme, historique, conditions du match) — pas une certitude. Le tennis reste un sport avec sa part d\'aléa : un résultat n\'est jamais garanti à 100%, quel que soit l\'écart affiché.</div>';
     box.style.display = 'block';
+    box.querySelectorAll('[data-profile-name]').forEach(btn=>{
+      btn.addEventListener('click', ()=> openPlayerProfileByName(btn.dataset.profileName));
+    });
   }
 
 
@@ -3578,7 +3565,19 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const url = API_BASE + '/players?tour=' + joueursDirTour + '&limit=40'
         + (q ? '&q=' + encodeURIComponent(q) : '');
       const res = await fetch(url);
-      const players = res.ok ? await res.json() : [];
+      let players = res.ok ? await res.json() : [];
+      // Classement mondial réel d'abord (les joueurs "non classés" -- sans
+      // current_rank connu -- passent en fin de liste au lieu de squatter
+      // le haut du classement juste parce que leur Elo interne est élevé).
+      players = players.slice().sort((a,b)=>{
+        const ra = (a.current_rank == null) ? Infinity : a.current_rank;
+        const rb = (b.current_rank == null) ? Infinity : b.current_rank;
+        return ra - rb;
+      });
+      // Sans recherche précise, on n'affiche que les joueurs avec un
+      // classement mondial connu -- sinon la liste par défaut est polluée
+      // de profils "non classés" qui n'ont pas leur place dans un top.
+      if(!q) players = players.filter(p=> p.current_rank != null);
       wrap.innerHTML = players.length ? players.map(p=>{
         const initials = (p.name || '').split(' ').map(w=> w[0]).filter(Boolean).slice(-2).join('').toUpperCase();
         const rankLabel = p.current_rank != null ? ('#' + p.current_rank) : '—';
@@ -3663,14 +3662,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   function compRoundLabel(r){ return COMP_ROUND_LABEL[r] || r || '?'; }
 
   // État des filtres de la page compétition (partagé entre les onglets
-  // Matchs / Tableau / Joueurs / Nations, remis à zéro à chaque nouveau
+  // Matchs / Tableau / Joueurs, remis à zéro à chaque nouveau
   // tournoi ouvert). compMatchesRaw garde la liste brute (fusion Match +
   // Fixture, cf. backend) pour ré-appliquer les filtres sans refetch.
   let compMatchesRaw = [];
   let compRoundsPresent = [];
   let compRoundFilter = null; // null = tous les tours | 'FINALS' | code de tour (ex 'R32')
   let compLiveOnly = false;   // true = masque les joueurs éliminés / matchs déjà joués
-  let compNationFilter = null; // code pays sélectionné depuis l'onglet Nations
 
   function compSetRoundFilter(code){
     compRoundFilter = (compRoundFilter === code) ? null : code;
@@ -3680,15 +3678,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     compLiveOnly = v;
     renderCompDetailPanels();
   }
-  function compSetNationFilter(code){
-    // Ne change plus d'onglet automatiquement (c'etait deroutant -- on
-    // reste sur l'onglet Nations, le filtre s'applique et reste actif
-    // meme si on va ensuite manuellement sur Joueurs/Matchs/Tableau).
-    compNationFilter = (compNationFilter === code) ? null : code;
-    renderCompDetailPanels();
-  }
 
-  function compFilterBarHtml(){
+  function compFilterBarHtml(hasEliminated){
     const finalsPresent = compRoundsPresent.some(r=> COMP_FINALS_ROUNDS.includes(r));
     const otherRounds = compRoundsPresent.filter(r=> !COMP_FINALS_ROUNDS.includes(r));
     let html = '<div class="cfb-row">';
@@ -3700,31 +3691,26 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       html += '<button type="button" class="cfb-btn' + (compRoundFilter==='FINALS'?' active':'') + '" onclick="compSetRoundFilter(\'FINALS\')">Phases finales</button>';
     }
     html += '</div>';
-    html += '<div class="cfb-row cfb-live">';
-    html += '<button type="button" class="cfb-btn' + (!compLiveOnly?' active':'') + '" onclick="compSetLiveOnly(false)">Tout voir</button>';
-    html += '<button type="button" class="cfb-btn' + (compLiveOnly?' active':'') + '" onclick="compSetLiveOnly(true)">En lice uniquement</button>';
-    html += '</div>';
-    if(compNationFilter){
-      html += '<div class="cfb-row"><button type="button" class="cfb-btn cfb-clear" onclick="compSetNationFilter(\'' + compNationFilter + '\')">✕ Nation : ' + compNationFilter + '</button></div>';
+    // Le toggle "En lice uniquement" n'a de sens que s'il y a au moins un
+    // joueur déjà éliminé -- sinon le bouton ne change jamais rien à
+    // l'affichage et donne l'impression de ne "servir à rien".
+    if(hasEliminated){
+      html += '<div class="cfb-row cfb-live">';
+      html += '<button type="button" class="cfb-btn' + (!compLiveOnly?' active':'') + '" onclick="compSetLiveOnly(false)">Tout voir</button>';
+      html += '<button type="button" class="cfb-btn' + (compLiveOnly?' active':'') + '" onclick="compSetLiveOnly(true)">En lice uniquement</button>';
+      html += '</div>';
     }
     return html;
   }
 
-  // Rend les 4 onglets (Matchs, Tableau, Joueurs, Nations) à partir de
+  // Rend les 3 onglets (Matchs, Tableau, Joueurs) à partir de
   // compMatchesRaw + de l'état des filtres ci-dessus. Appelée après le
   // chargement initial ET à chaque changement de filtre (pas de refetch).
   function renderCompDetailPanels(){
     const matchesWrap = document.getElementById('compMatchesWrap');
     const bracketWrap = document.getElementById('compBracketWrap');
     const playersWrap = document.getElementById('compPlayersWrap');
-    const nationsWrap = document.getElementById('compNationsWrap');
-    if(!matchesWrap || !bracketWrap || !playersWrap || !nationsWrap) return;
-
-    const barHtml = compFilterBarHtml();
-    ['compFilterBarMatchs','compFilterBarBracket','compFilterBarJoueurs','compFilterBarNations'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.innerHTML = barHtml;
-    });
+    if(!matchesWrap || !bracketWrap || !playersWrap) return;
 
     const matchInRoundFilter = (m)=>{
       if(compRoundFilter === null) return true;
@@ -3741,27 +3727,25 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       if(m.player1_id && String(m.player1_id) !== String(m.winner_id)) eliminatedIds.add(String(m.player1_id));
       if(m.player2_id && String(m.player2_id) !== String(m.winner_id)) eliminatedIds.add(String(m.player2_id));
     });
+    if(eliminatedIds.size === 0) compLiveOnly = false;
+
+    const barHtml = compFilterBarHtml(eliminatedIds.size > 0);
+    ['compFilterBarMatchs','compFilterBarBracket','compFilterBarJoueurs'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.innerHTML = barHtml;
+    });
 
     // matchesForRoster : filtre de tour uniquement -- sert a batir la liste
-    // des joueurs/nations. On n'y applique PAS le filtre nation (sinon les
-    // matchs impliquant un joueur de la nation choisie faisaient aussi
-    // apparaitre son adversaire d'une AUTRE nation dans la liste des
-    // joueurs -- c'etait le bug "Belgique -> un joueur russe apparait")
-    // ni le filtre "en lice" (l'elimination est geree via le flag
-    // `eliminated`, calcule sur TOUT le tournoi, pas en excluant des
-    // matchs du roster -- sinon un joueur pouvait disparaitre du roster
-    // au lieu d'etre marque elimine).
+    // des joueurs. Le filtre "en lice" n'est pas applique ici (l'elimination
+    // est geree via le flag `eliminated`, calcule sur TOUT le tournoi, pas
+    // en excluant des matchs du roster -- sinon un joueur pouvait
+    // disparaitre du roster au lieu d'etre marque elimine).
     const matchesForRoster = compMatchesRaw.filter(matchInRoundFilter);
 
     // filteredMatches : ce qui s'affiche reellement dans Matchs/Tableau --
-    // tour + "en lice" (matchs pas encore joues) + nation (matchs
-    // impliquant au moins un joueur de cette nation, adversaire inclus,
-    // ce qui est normal pour une liste de matchs).
+    // tour + "en lice" (matchs pas encore joues).
     let filteredMatches = matchesForRoster;
     if(compLiveOnly) filteredMatches = filteredMatches.filter(m=> !m.winner_id);
-    if(compNationFilter){
-      filteredMatches = filteredMatches.filter(m=> m.player1_country === compNationFilter || m.player2_country === compNationFilter);
-    }
 
     // --- Matchs ---
     const sortedMatches = filteredMatches.slice().sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
@@ -3782,16 +3766,23 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       });
     });
 
-    // --- Tableau ---
+    // --- Tableau --- Affiche toute la structure du tournoi (y compris les
+    // tours pas encore joués/déterminés, en placeholder), pas seulement les
+    // tours pour lesquels on a déjà des matchs.
     const byRound = {};
     filteredMatches.forEach(m=>{ const r = m.round || '?'; (byRound[r] = byRound[r] || []).push(m); });
-    const roundsToShow = compRoundsPresent.filter(r=> byRound[r] && byRound[r].length);
+    const roundMatchesFilter = (r)=>{
+      if(compRoundFilter === null) return true;
+      if(compRoundFilter === 'FINALS') return COMP_FINALS_ROUNDS.includes(r);
+      return r === compRoundFilter;
+    };
+    const roundsToShow = compRoundsPresent.filter(roundMatchesFilter);
     const bracketMatchesFlat = [];
     bracketWrap.innerHTML = roundsToShow.length ? (
       '<div class="bracket-wrap"><div class="bracket-cols">' +
       roundsToShow.map(r=>
         '<div class="bracket-col"><div class="bracket-col-label">' + compRoundLabel(r).toUpperCase() + '</div>' +
-        byRound[r].map(m=>{
+        ((byRound[r] && byRound[r].length) ? byRound[r].map(m=>{
           const p1Wins = m.winner_id && String(m.winner_id) === String(m.player1_id);
           const p2Wins = m.winner_id && String(m.winner_id) === String(m.player2_id);
           const bIdx = bracketMatchesFlat.length;
@@ -3801,7 +3792,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
             '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
             '<button class="upr-btn upr-btn-sm" style="width:100%; margin-top:6px;" data-bidx="' + bIdx + '" type="button">Analyser</button>' +
           '</div>';
-        }).join('') +
+        }).join('') : (
+          '<div class="bracket-match">' +
+            '<div class="bracket-p"><span class="name" style="color: var(--text-dim);">À déterminer</span></div>' +
+            '<div class="bracket-p"><span class="name" style="color: var(--text-dim);">À déterminer</span></div>' +
+          '</div>'
+        )) +
         '</div>'
       ).join('') +
       '</div></div>'
@@ -3827,10 +3823,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       id, name: playerMeta[id].name, country: playerMeta[id].country, ranking: playerMeta[id].ranking,
       wins: winCounts[id] || 0, eliminated: eliminatedIds.has(String(id)),
     }));
-    // Filtre nation : uniquement les joueurs DE cette nation (pas leurs
-    // adversaires, meme si le match entre les deux reste visible dans
-    // Matchs/Tableau).
-    if(compNationFilter) playerList = playerList.filter(p=> p.country === compNationFilter);
     if(compLiveOnly) playerList = playerList.filter(p=> !p.eliminated);
     playerList.sort((a,b)=>{
       const ra = (a.ranking == null) ? Infinity : a.ranking;
@@ -3865,17 +3857,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         }
       } catch(err){ /* dégradation gracieuse : initiales conservées */ }
     });
-
-    // --- Nations : dérivées de la même liste de joueurs déjà filtrée
-    // (donc cohérentes avec le filtre "En lice uniquement"), cliquables
-    // pour filtrer les autres onglets sur cette nation. ---
-    const nationCounts = {};
-    playerList.forEach(p=>{ const key = p.country || '?'; nationCounts[key] = (nationCounts[key] || 0) + 1; });
-    const nationEntries = Object.entries(nationCounts).sort((a,b)=> b[1]-a[1]);
-    document.getElementById('compTabCountNations').textContent = nationEntries.length;
-    nationsWrap.innerHTML = nationEntries.length ? ('<div class="nations-grid">' + nationEntries.map(([code, count])=>
-      '<div class="nation-card' + (compNationFilter===code ? ' active' : '') + '" onclick="compSetNationFilter(\'' + code + '\')"><div class="nation-flag">' + countryFlag(code) + '</div><div class="nation-name">' + (code || '?') + '</div><div class="nation-count">' + count + ' joueur' + (count>1?'s':'') + '</div></div>'
-    ).join('') + '</div>') : '<div class="upcoming-empty">Aucune nation ne correspond à ce filtre.</div>';
   }
 
   async function loadCompetitionDetail(compId, comp){
@@ -3883,13 +3864,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const bracketWrap = document.getElementById('compBracketWrap');
     const matchesWrap = document.getElementById('compMatchesWrap');
     const playersWrap = document.getElementById('compPlayersWrap');
-    const nationsWrap = document.getElementById('compNationsWrap');
     const tour = (comp && comp.tour) ? comp.tour : 'atp';
 
     // Nouveau tournoi ouvert : on repart de filtres neutres.
     compRoundFilter = null;
     compLiveOnly = false;
-    compNationFilter = null;
 
     try {
       const [rankRes, matchesRes] = await Promise.all([
@@ -3913,10 +3892,22 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const byRoundAll = {};
       matches.forEach(m=>{ const r = m.round || '?'; (byRoundAll[r] = byRoundAll[r] || []).push(m); });
       compRoundsPresent = Object.keys(byRoundAll).sort((a,b)=> COMP_ROUND_ORDER.indexOf(a) - COMP_ROUND_ORDER.indexOf(b));
+      // Complète la structure avec les tours suivants (demies, finale...)
+      // même s'ils n'ont pas encore de match connu, pour que le tableau
+      // complet du tournoi reste visible pendant qu'il est encore en cours.
+      const knockoutRounds = ['R128','R64','R32','R16','QF','SF','F'];
+      const presentKnockout = compRoundsPresent.filter(r=> knockoutRounds.includes(r));
+      if(presentKnockout.length){
+        const firstIdx = knockoutRounds.indexOf(presentKnockout[0]);
+        for(let i=firstIdx; i<knockoutRounds.length; i++){
+          if(!compRoundsPresent.includes(knockoutRounds[i])) compRoundsPresent.push(knockoutRounds[i]);
+        }
+        compRoundsPresent.sort((a,b)=> COMP_ROUND_ORDER.indexOf(a) - COMP_ROUND_ORDER.indexOf(b));
+      }
 
       renderCompDetailPanels();
     } catch(err){
-      [rankBody, bracketWrap, matchesWrap, playersWrap, nationsWrap].forEach(el=> el && (el.innerHTML = '<div class="upcoming-empty">Impossible de charger les données pour le moment.</div>'));
+      [rankBody, bracketWrap, matchesWrap, playersWrap].forEach(el=> el && (el.innerHTML = '<div class="upcoming-empty">Impossible de charger les données pour le moment.</div>'));
     }
   }
 
@@ -3933,9 +3924,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     document.querySelectorAll('.comp-panel').forEach(p=> p.classList.remove('active'));
     document.getElementById('ctab-classement').classList.add('active');
     document.querySelectorAll('.sub-tab').forEach(t=> t.classList.remove('active'));
-    document.querySelector('.sub-tab[data-sctab="rank"]').classList.add('active');
+    document.querySelector('.sub-tab[data-sctab="bracket"]').classList.add('active');
     document.querySelectorAll('.sub-panel').forEach(p=> p.classList.remove('active'));
-    document.getElementById('sctab-rank').classList.add('active');
+    document.getElementById('sctab-bracket').classList.add('active');
     go('comp-detail');
     document.querySelector('.nav-item[data-page="competitions"]').classList.add('active');
     loadCompetitionDetail(compId, comp);
@@ -4261,11 +4252,17 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   // Convertit un Elo brut (peu parlant pour un utilisateur non initie, et
   // dont l'ecart entre joueurs du haut du classement parait minuscule) en
-  // repere lisible sans formation : un pourcentage de niveau (0-100,
-  // normalise sur une plage Elo plausible du circuit pro) + un mot.
+  // repere lisible sans formation : un pourcentage de niveau (0-100).
+  // En pratique la plupart des Elo internes restent proches de la valeur
+  // de depart (1500) tant que l'historique de matchs d'un joueur est
+  // encore limite -- une plage lineaire large (ex 1300-2200) ecrasait donc
+  // presque tout le monde en bas de l'echelle, y compris des joueurs du
+  // top mondial. On centre plutot la courbe sur 1500 (sigmoide, ecart-type
+  // ~150 points d'Elo) pour que les ecarts, meme faibles en Elo brut,
+  // restent lisibles en pourcentage.
   function eloToLevelPct(elo){
     if(elo == null || isNaN(elo)) return null;
-    const pct = Math.round(((elo - 1300) / (2200 - 1300)) * 100);
+    const pct = Math.round(50 + 50 * Math.tanh((elo - 1500) / 150));
     return Math.max(3, Math.min(100, pct));
   }
   function levelWord(pct){
@@ -4273,8 +4270,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(pct >= 65) return 'Très solide';
     if(pct >= 50) return 'Solide';
     if(pct >= 35) return 'Correct';
-    if(pct >= 20) return 'Fragile';
-    return 'Faible';
+    if(pct >= 20) return 'En progression';
+    return 'Débutant';
   }
   function levelColor(pct){
     if(pct >= 65) return '#D7F22C';
