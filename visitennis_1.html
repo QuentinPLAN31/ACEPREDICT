@@ -1065,7 +1065,8 @@
   .player-avatar{ width:38px; height:38px; border-radius:999px; background: var(--accent-dim); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-weight:700; color: var(--accent); font-size:13px; flex-shrink:0; }
   .player-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
   .player-name{ font-size:14px; font-weight:700; }
-  .player-country{ font-size:12px; color: var(--text-sec); margin-top:1px; }
+  .player-country{ font-size:12px; color: var(--text-sec); margin-top:1px; display:inline-flex; align-items:center; gap:5px; }
+  .player-country .pc-flag{ width:18px; height:13px; border-radius:3px; background: var(--accent-dim); display:inline-flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
   .player-stat{ font-size:17px; font-weight:800; color: var(--accent); text-align:right; }
   .player-stat-label{ font-size:10.5px; color: var(--text-dim); text-align:right; }
 
@@ -3629,7 +3630,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         return '<div class="player-row">' +
           '<span class="player-rank' + rankClass + '">' + (i+1) + '</span>' +
           '<span class="player-avatar" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">' + initials + '</span>' +
-          '<span class="player-info"><span class="player-name">' + p.name + '</span><span class="player-country">' + countryFlag(p.country) + ' ' + (p.country || '?') + '</span></span>' +
+          '<span class="player-info"><span class="player-name">' + p.name + '</span><span class="player-country"><span class="pc-flag">' + countryFlag(p.country) + '</span>' + (p.country || '?') + '</span></span>' +
           '<span><span class="player-stat">' + p.wins + '</span><br><span class="player-stat-label">victoire' + (p.wins > 1 ? 's' : '') + '</span></span>' +
         '</div>';
       }).join('') : '<div class="upcoming-empty">Aucun joueur connu pour cette compétition pour le moment.</div>';
