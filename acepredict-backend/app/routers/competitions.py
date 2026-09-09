@@ -5,7 +5,7 @@ Classement / Matchs / Joueurs / Nations (page comp-detail du frontend).
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app import models, schemas
 from app.database import get_db
@@ -41,25 +41,35 @@ def get_competition(competition_id: str, db: Session = Depends(get_db)):
 @router.get("/{competition_id}/matches")
 def get_competition_matches(competition_id: str, db: Session = Depends(get_db)):
     """Alimente les onglets 'Matchs', 'Tableau du tournoi', 'Joueurs' et
-    'Nations' de la page de détail compétition -- tous dérivés côté frontend
-    de cette même liste de matchs réellement joués (table Match, importée
-    depuis les CSV Sackmann par scripts/sync_daily.py). Noms et pays des
-    joueurs dénormalisés ici (même logique que routers/matches.py et
-    routers/analyses.py) pour éviter un aller-retour par joueur côté
-    frontend."""
+    'Nations' de la page de détail compétition -- combine deux sources :
+    1) les matchs réellement joués (table Match, import historique
+       Sackmann par scripts/sync_daily.py) ;
+    2) les matchs à venir / en cours (table Fixture, synchronisée
+       HORAIREMENT par scripts/sync_hourly.py -- cf. routers/matches.py),
+       rattachés à cette compétition par correspondance de nom de tournoi
+       (Fixture n'a pas de FK vers Competition, seulement un nom de
+       tournoi libre côté source externe). Sans ce rapprochement, un
+       tournoi en cours / à venir (donc sans encore aucune ligne Match)
+       apparaissait vide sur cette page alors que ses matchs étaient déjà
+       visibles ailleurs (calendrier 'Matchs à venir'). Noms et pays des
+       joueurs dénormalisés ici (même logique que routers/matches.py et
+       routers/analyses.py) pour éviter un aller-retour par joueur côté
+       frontend."""
+    comp = db.query(models.Competition).filter(models.Competition.id == competition_id).first()
+    if not comp:
+        raise HTTPException(status_code=404, detail="Compétition introuvable")
+
     matches = (
         db.query(models.Match)
         .filter(models.Match.competition_id == competition_id)
         .order_by(models.Match.tourney_date.desc())
         .all()
     )
-    if not matches:
-        return []
 
     player_ids = {m.player1_id for m in matches} | {m.player2_id for m in matches}
     players = {p.id: p for p in db.query(models.Player).filter(models.Player.id.in_(player_ids)).all()}
 
-    return [
+    results = [
         {
             "id": m.id,
             "round": m.round,
@@ -75,6 +85,42 @@ def get_competition_matches(competition_id: str, db: Session = Depends(get_db)):
         }
         for m in matches
     ]
+
+    # Rapprochement par nom (insensible à la casse, sous-chaîne dans les
+    # deux sens pour absorber les variantes -- ex. "US Open" / "US Open
+    # (New York)"). Filtré par tour quand connu pour éviter tout mélange
+    # ATP/WTA sur un nom de tournoi partagé.
+    comp_name = (comp.name or "").strip().lower()
+    if comp_name:
+        fixtures_q = db.query(models.Fixture).options(
+            joinedload(models.Fixture.player1), joinedload(models.Fixture.player2)
+        )
+        if comp.tour:
+            fixtures_q = fixtures_q.filter(models.Fixture.tour == comp.tour)
+        fixtures = fixtures_q.order_by(models.Fixture.scheduled_time.asc()).all()
+
+        for f in fixtures:
+            fname = (f.tournament_name or "").strip().lower()
+            if not fname:
+                continue
+            if comp_name not in fname and fname not in comp_name:
+                continue
+            p1, p2 = f.player1, f.player2
+            results.append({
+                "id": f.id,
+                "round": f.round,
+                "player1_id": p1.id if p1 else None,
+                "player1_name": p1.name if p1 else (f.player1_name_raw or "?"),
+                "player1_country": p1.country if p1 else None,
+                "player2_id": p2.id if p2 else None,
+                "player2_name": p2.name if p2 else (f.player2_name_raw or "?"),
+                "player2_country": p2.country if p2 else None,
+                "winner_id": None,
+                "score": None,
+                "date": f.scheduled_time,
+            })
+
+    return results
 
 
 @router.get("/{competition_id}/ranking")
