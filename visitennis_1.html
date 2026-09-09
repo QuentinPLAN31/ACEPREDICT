@@ -38,6 +38,15 @@
   }
 
   /* ---------- Sidebar ---------- */
+  /* position:sticky + height:100vh + overflow-y:auto : sans ca, en flex
+     row .app etire la sidebar a la hauteur du contenu de .main (via
+     align-items:stretch par defaut) -- sur une page longue (ex.
+     Competitions, avec beaucoup de tournois listes), la sidebar devenait
+     elle-meme tres haute et .sidebar-spacer poussait le bloc du bas
+     (quota / profil / deconnexion) hors de l'ecran, visible seulement en
+     scrollant tout en bas de la tres longue page. Desormais la sidebar
+     garde toujours exactement la hauteur de la fenetre et reste a l'ecran
+     pendant qu'on scrolle le contenu principal. */
   .sidebar{
     width: 258px;
     flex-shrink: 0;
@@ -46,6 +55,10 @@
     display:flex;
     flex-direction: column;
     padding: 28px 20px 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
   }
 
   .brand{
@@ -1468,6 +1481,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/></svg>
         Compétitions
       </button>
+      <button class="nav-item" data-page="joueursdir">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>
+        Joueurs
+      </button>
       <button class="nav-item" data-page="historique">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
         Historique
@@ -1584,6 +1601,20 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
       <input class="search-bar" id="compSearchInput" placeholder="Rechercher une compétition...">
       <div id="compListContainer"><div class="upcoming-loading">Chargement des compétitions...</div></div>
+    </section>
+
+    <!-- JOUEURS (annuaire) -->
+    <section class="page" id="page-joueursdir">
+      <div class="page-head">
+        <h1>Joueurs</h1>
+        <p>Cherche un joueur ATP ou WTA pour voir sa fiche complète</p>
+      </div>
+      <input class="search-bar" id="joueursDirSearchInput" placeholder="Rechercher un joueur (nom)...">
+      <div class="cfb-row" style="margin-bottom:16px;">
+        <button type="button" class="cfb-btn active" id="joueursDirTourAtp">Hommes (ATP)</button>
+        <button type="button" class="cfb-btn" id="joueursDirTourWta">Femmes (WTA)</button>
+      </div>
+      <div id="joueursDirResults"><div class="upcoming-loading">Chargement...</div></div>
     </section>
 
     <!-- HISTORIQUE -->
@@ -3530,6 +3561,71 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const domain = tournamentDomain(comp);
     return '<img class="logo-img" src="https://www.google.com/s2/favicons?domain=' + domain + '&sz=64" alt="" loading="lazy">';
   }
+  // ---------- Annuaire joueurs (page "Joueurs" du menu de gauche) ----------
+  let joueursDirTour = 'atp';
+  let joueursDirDebounce = null;
+
+  function openPlayerProfileByName(name){
+    pendingProfilePlayerName = name;
+    go('joueur');
+  }
+
+  async function loadJoueursDirList(q){
+    const wrap = document.getElementById('joueursDirResults');
+    if(!wrap) return;
+    wrap.innerHTML = '<div class="upcoming-loading">Chargement...</div>';
+    try {
+      const url = API_BASE + '/players?tour=' + joueursDirTour + '&limit=40'
+        + (q ? '&q=' + encodeURIComponent(q) : '');
+      const res = await fetch(url);
+      const players = res.ok ? await res.json() : [];
+      wrap.innerHTML = players.length ? players.map(p=>{
+        const initials = (p.name || '').split(' ').map(w=> w[0]).filter(Boolean).slice(-2).join('').toUpperCase();
+        const rankLabel = p.current_rank != null ? ('#' + p.current_rank) : '—';
+        return '<div class="player-row" style="cursor:pointer;" data-player-name="' + (p.name || '').replace(/"/g,'&quot;') + '">' +
+          '<span class="player-rank" title="Classement mondial">' + rankLabel + '</span>' +
+          '<span class="player-avatar" data-player-name="' + (p.name || '').replace(/"/g,'&quot;') + '">' + initials + '</span>' +
+          '<span class="player-info"><span class="player-name">' + p.name + '</span><span class="player-country"><span class="pc-flag">' + countryFlag(p.country) + '</span>' + (p.country || '?') + '</span></span>' +
+        '</div>';
+      }).join('') : '<div class="upcoming-empty">Aucun joueur ne correspond à ta recherche.</div>';
+      wrap.querySelectorAll('.player-row[data-player-name]').forEach(row=>{
+        row.addEventListener('click', ()=> openPlayerProfileByName(row.dataset.playerName));
+      });
+      // Photos officielles (via Wikipedia), même mécanisme que partout ailleurs.
+      wrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
+        const name = avatarEl.dataset.playerName;
+        if(!name) return;
+        try {
+          const photoUrl = await getPlayerPhotoUrl(name);
+          if(photoUrl){
+            avatarEl.style.backgroundImage = 'url(' + JSON.stringify(photoUrl).slice(1, -1) + ')';
+            avatarEl.textContent = '';
+          }
+        } catch(err){ /* dégradation gracieuse : initiales conservées */ }
+      });
+    } catch(err){
+      wrap.innerHTML = '<div class="upcoming-empty">Impossible de charger les joueurs pour le moment.</div>';
+    }
+  }
+
+  document.getElementById('joueursDirSearchInput').addEventListener('input', (e)=>{
+    clearTimeout(joueursDirDebounce);
+    const q = e.target.value.trim();
+    joueursDirDebounce = setTimeout(()=> loadJoueursDirList(q), 300);
+  });
+  document.getElementById('joueursDirTourAtp').addEventListener('click', ()=>{
+    joueursDirTour = 'atp';
+    document.getElementById('joueursDirTourAtp').classList.add('active');
+    document.getElementById('joueursDirTourWta').classList.remove('active');
+    loadJoueursDirList(document.getElementById('joueursDirSearchInput').value.trim());
+  });
+  document.getElementById('joueursDirTourWta').addEventListener('click', ()=>{
+    joueursDirTour = 'wta';
+    document.getElementById('joueursDirTourWta').classList.add('active');
+    document.getElementById('joueursDirTourAtp').classList.remove('active');
+    loadJoueursDirList(document.getElementById('joueursDirSearchInput').value.trim());
+  });
+
   let competitionsCache = [];
   async function loadCompetitionsList(){
     const container = document.getElementById('compListContainer');
@@ -3585,15 +3681,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     renderCompDetailPanels();
   }
   function compSetNationFilter(code){
+    // Ne change plus d'onglet automatiquement (c'etait deroutant -- on
+    // reste sur l'onglet Nations, le filtre s'applique et reste actif
+    // meme si on va ensuite manuellement sur Joueurs/Matchs/Tableau).
     compNationFilter = (compNationFilter === code) ? null : code;
-    if(compNationFilter){
-      document.querySelectorAll('.comp-tab').forEach(t=> t.classList.remove('active'));
-      const joueursTab = document.querySelector('.comp-tab[data-ctab="joueurs"]');
-      if(joueursTab) joueursTab.classList.add('active');
-      document.querySelectorAll('.comp-panel').forEach(p=> p.classList.remove('active'));
-      const joueursPanel = document.getElementById('ctab-joueurs');
-      if(joueursPanel) joueursPanel.classList.add('active');
-    }
     renderCompDetailPanels();
   }
 
@@ -3651,7 +3742,22 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       if(m.player2_id && String(m.player2_id) !== String(m.winner_id)) eliminatedIds.add(String(m.player2_id));
     });
 
-    let filteredMatches = compMatchesRaw.filter(matchInRoundFilter);
+    // matchesForRoster : filtre de tour uniquement -- sert a batir la liste
+    // des joueurs/nations. On n'y applique PAS le filtre nation (sinon les
+    // matchs impliquant un joueur de la nation choisie faisaient aussi
+    // apparaitre son adversaire d'une AUTRE nation dans la liste des
+    // joueurs -- c'etait le bug "Belgique -> un joueur russe apparait")
+    // ni le filtre "en lice" (l'elimination est geree via le flag
+    // `eliminated`, calcule sur TOUT le tournoi, pas en excluant des
+    // matchs du roster -- sinon un joueur pouvait disparaitre du roster
+    // au lieu d'etre marque elimine).
+    const matchesForRoster = compMatchesRaw.filter(matchInRoundFilter);
+
+    // filteredMatches : ce qui s'affiche reellement dans Matchs/Tableau --
+    // tour + "en lice" (matchs pas encore joues) + nation (matchs
+    // impliquant au moins un joueur de cette nation, adversaire inclus,
+    // ce qui est normal pour une liste de matchs).
+    let filteredMatches = matchesForRoster;
     if(compLiveOnly) filteredMatches = filteredMatches.filter(m=> !m.winner_id);
     if(compNationFilter){
       filteredMatches = filteredMatches.filter(m=> m.player1_country === compNationFilter || m.player2_country === compNationFilter);
@@ -3712,7 +3818,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     // du tournoi -- le badge affiche désormais le classement ATP/WTA
     // réel du joueur quand on le connaît). ---
     const winCounts = {}, playerMeta = {};
-    filteredMatches.forEach(m=>{
+    matchesForRoster.forEach(m=>{
       if(m.player1_id) playerMeta[m.player1_id] = { name: m.player1_name, country: m.player1_country, ranking: m.player1_ranking };
       if(m.player2_id) playerMeta[m.player2_id] = { name: m.player2_name, country: m.player2_country, ranking: m.player2_ranking };
       if(m.winner_id) winCounts[m.winner_id] = (winCounts[m.winner_id] || 0) + 1;
@@ -3721,6 +3827,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       id, name: playerMeta[id].name, country: playerMeta[id].country, ranking: playerMeta[id].ranking,
       wins: winCounts[id] || 0, eliminated: eliminatedIds.has(String(id)),
     }));
+    // Filtre nation : uniquement les joueurs DE cette nation (pas leurs
+    // adversaires, meme si le match entre les deux reste visible dans
+    // Matchs/Tableau).
+    if(compNationFilter) playerList = playerList.filter(p=> p.country === compNationFilter);
     if(compLiveOnly) playerList = playerList.filter(p=> !p.eliminated);
     playerList.sort((a,b)=>{
       const ra = (a.ranking == null) ? Infinity : a.ranking;
@@ -3740,6 +3850,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<span><span class="player-stat">' + p.wins + '</span><br><span class="player-stat-label">victoire' + (p.wins > 1 ? 's' : '') + '</span></span>' +
       '</div>';
     }).join('') : '<div class="upcoming-empty">Aucun joueur ne correspond à ce filtre.</div>';
+    if(compLiveOnly && eliminatedIds.size === 0 && compMatchesRaw.length){
+      playersWrap.innerHTML = '<div class="upcoming-empty">Aucun résultat connu pour ce tournoi pour le moment — tous les joueurs affichés sont donc encore en lice.</div>' + playersWrap.innerHTML;
+    }
     // Photos officielles (via Wikipedia) : chargées en arrière-plan, initiales conservées en repli.
     playersWrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
       const name = avatarEl.dataset.playerName;
@@ -4449,6 +4562,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(name === 'compte' && isLoggedIn()) loadAccount();
     if(name === 'upcoming') loadUpcomingPage();
     if(name === 'competitions') loadCompetitionsList();
+    if(name === 'joueursdir') loadJoueursDirList(document.getElementById('joueursDirSearchInput').value.trim());
     if(name === 'joueur') loadPlayerProfilePage(pendingProfilePlayerName);
     if(name === 'parrainage' && isLoggedIn()) loadReferrals();
     if(name === 'createur' && isLoggedIn()) loadCreatorLink();
