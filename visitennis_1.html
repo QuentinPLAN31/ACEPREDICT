@@ -319,6 +319,7 @@
     cursor: not-allowed; opacity:0.6;
   }
   .upr-btn:disabled:hover{ background: transparent; color: var(--text-dim); border-color: var(--line); }
+  .upr-btn-sm{ padding:7px 12px; font-size:11px; flex-shrink:0; }
   .upr-confidence-pill{
     display:inline-flex; align-items:center; gap:4px; margin-left:8px;
     font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:999px; white-space:nowrap;
@@ -1061,7 +1062,7 @@
   .player-rank.top1{ background:#FFC454; color:#2a1c02; }
   .player-rank.top2{ background:#C9CFCF; color:#20241f; }
   .player-rank.top3{ background:#CE8946; color:#2a1c02; }
-  .player-avatar{ width:38px; height:38px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-weight:700; color: var(--accent); font-size:13px; flex-shrink:0; }
+  .player-avatar{ width:38px; height:38px; border-radius:999px; background: var(--accent-dim); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-weight:700; color: var(--accent); font-size:13px; flex-shrink:0; }
   .player-info{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
   .player-name{ font-size:14px; font-weight:700; }
   .player-country{ font-size:12px; color: var(--text-sec); margin-top:1px; }
@@ -1917,11 +1918,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
 
       <div class="comp-tabs">
-        <button class="comp-tab active" data-ctab="analyse">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
-          Analyse
-        </button>
-        <button class="comp-tab" data-ctab="classement">
+        <button class="comp-tab active" data-ctab="classement">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/></svg>
           Classement <span class="tab-count" id="compTabCountRank">–</span>
         </button>
@@ -1939,20 +1936,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         </button>
       </div>
 
-      <!-- ANALYSE -->
-      <div class="comp-panel active" id="ctab-analyse">
-        <div class="premium-card">
-          <div class="premium-lock">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
-          </div>
-          <h3>Analyse Premium</h3>
-          <p>Accédez aux prédictions du tableau, probabilités de titre, de demi-finale et de sortie précoce pour chaque joueur.</p>
-          <button class="btn-primary" style="width:auto; padding:14px 30px;" onclick="go('pricing')">Passer Premium</button>
-        </div>
-      </div>
-
       <!-- CLASSEMENT -->
-      <div class="comp-panel" id="ctab-classement">
+      <div class="comp-panel active" id="ctab-classement">
         <div class="sub-tabs">
           <button class="sub-tab active" data-sctab="rank">Classement ATP</button>
           <button class="sub-tab" data-sctab="bracket">Tableau du tournoi</button>
@@ -3580,19 +3565,27 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       // Matchs réels, du plus récent au plus ancien.
       const sortedMatches = matches.slice().sort((a,b)=> new Date(b.date||0) - new Date(a.date||0));
       document.getElementById('compTabCountMatchs').textContent = matches.length;
-      matchesWrap.innerHTML = sortedMatches.length ? sortedMatches.map(m=>
+      matchesWrap.innerHTML = sortedMatches.length ? sortedMatches.map((m, idx)=>
         '<div class="match-row">' +
           '<span class="m-player"><span class="m-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span>' +
           '<span class="m-score">' + (m.score || '—') + '</span>' +
           '<span class="m-player right"><span class="m-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span>' +
           '<span class="m-date">' + (COMP_ROUND_LABEL[m.round] || m.round || '?') + (m.date ? ('<br>' + new Date(m.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'})) : '') + '</span>' +
+          '<button class="upr-btn upr-btn-sm" data-idx="' + idx + '" type="button">Analyser</button>' +
         '</div>'
       ).join('') : '<div class="upcoming-empty">Aucun résultat connu pour cette compétition pour le moment.</div>';
+      matchesWrap.querySelectorAll('.upr-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const m = sortedMatches[Number(btn.dataset.idx)];
+          if(m) goAnalyzeUpcomingMatch(m.player1_name, m.player2_name);
+        });
+      });
 
       // Tableau : mêmes matchs réels, regroupés par tour (round) dans l'ordre logique.
       const byRound = {};
       matches.forEach(m=>{ const r = m.round || '?'; (byRound[r] = byRound[r] || []).push(m); });
       const roundsPresent = Object.keys(byRound).sort((a,b)=> COMP_ROUND_ORDER.indexOf(a) - COMP_ROUND_ORDER.indexOf(b));
+      const bracketMatchesFlat = [];
       bracketWrap.innerHTML = roundsPresent.length ? (
         '<div class="bracket-wrap"><div class="bracket-cols">' +
         roundsPresent.map(r=>
@@ -3600,15 +3593,24 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           byRound[r].map(m=>{
             const p1Wins = m.winner_id && String(m.winner_id) === String(m.player1_id);
             const p2Wins = m.winner_id && String(m.winner_id) === String(m.player2_id);
+            const bIdx = bracketMatchesFlat.length;
+            bracketMatchesFlat.push(m);
             return '<div class="bracket-match">' +
                             '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
               '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
+              '<button class="upr-btn upr-btn-sm" style="width:100%; margin-top:6px;" data-bidx="' + bIdx + '" type="button">Analyser</button>' +
             '</div>';
           }).join('') +
           '</div>'
         ).join('') +
         '</div></div>'
       ) : '<div class="upcoming-empty">Pas encore de tableau disponible pour cette compétition.</div>';
+      bracketWrap.querySelectorAll('.upr-btn').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const m = bracketMatchesFlat[Number(btn.dataset.bidx)];
+          if(m) goAnalyzeUpcomingMatch(m.player1_name, m.player2_name);
+        });
+      });
 
       // Joueurs : victoires réelles dans CETTE compétition, calculées depuis les matchs.
       const winCounts = {}, playerMeta = {};
@@ -3626,11 +3628,23 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
         return '<div class="player-row">' +
           '<span class="player-rank' + rankClass + '">' + (i+1) + '</span>' +
-          '<span class="player-avatar">' + initials + '</span>' +
+          '<span class="player-avatar" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">' + initials + '</span>' +
           '<span class="player-info"><span class="player-name">' + p.name + '</span><span class="player-country">' + countryFlag(p.country) + ' ' + (p.country || '?') + '</span></span>' +
           '<span><span class="player-stat">' + p.wins + '</span><br><span class="player-stat-label">victoire' + (p.wins > 1 ? 's' : '') + '</span></span>' +
         '</div>';
       }).join('') : '<div class="upcoming-empty">Aucun joueur connu pour cette compétition pour le moment.</div>';
+      // Photos officielles (via Wikipedia) : chargées en arrière-plan, initiales conservées en repli.
+      playersWrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
+        const name = avatarEl.dataset.playerName;
+        if(!name) return;
+        try {
+          const photoUrl = await getPlayerPhotoUrl(name);
+          if(photoUrl){
+            avatarEl.style.backgroundImage = 'url(' + JSON.stringify(photoUrl).slice(1, -1) + ')';
+            avatarEl.textContent = '';
+          }
+        } catch(err){ /* dégradation gracieuse : initiales conservées */ }
+      });
 
       // Nations : pays réellement représentés parmi les joueurs de cette compétition.
       const nationCounts = {};
@@ -3654,9 +3668,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       ? [comp.location, (comp.tour||'').toUpperCase(), comp.season].filter(Boolean).join(' · ')
       : '';
     document.querySelectorAll('.comp-tab').forEach(t=> t.classList.remove('active'));
-    document.querySelector('.comp-tab[data-ctab="analyse"]').classList.add('active');
+    document.querySelector('.comp-tab[data-ctab="classement"]').classList.add('active');
     document.querySelectorAll('.comp-panel').forEach(p=> p.classList.remove('active'));
-    document.getElementById('ctab-analyse').classList.add('active');
+    document.getElementById('ctab-classement').classList.add('active');
     document.querySelectorAll('.sub-tab').forEach(t=> t.classList.remove('active'));
     document.querySelector('.sub-tab[data-sctab="rank"]').classList.add('active');
     document.querySelectorAll('.sub-panel').forEach(p=> p.classList.remove('active'));
@@ -3918,6 +3932,22 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       pageUrl: (data.content_urls && data.content_urls.desktop && data.content_urls.desktop.page)
         || ('https://en.wikipedia.org/wiki/' + encodeURIComponent((data.title || name).replace(/ /g, '_'))),
     };
+  }
+
+  // Cache léger pour éviter de refaire les mêmes appels Wikipédia quand la
+  // même compétition ou plusieurs vues affichent les mêmes joueurs.
+  const playerPhotoCache = {};
+
+  async function getPlayerPhotoUrl(name){
+    if(!name) return null;
+    if(Object.prototype.hasOwnProperty.call(playerPhotoCache, name)) return playerPhotoCache[name];
+    let url = null;
+    try {
+      const wiki = await fetchWikipediaSummary(name);
+      url = (wiki && wiki.thumbnail) || null;
+    } catch(err){ url = null; }
+    playerPhotoCache[name] = url;
+    return url;
   }
 
   async function getPlayerFullInfo(name){
