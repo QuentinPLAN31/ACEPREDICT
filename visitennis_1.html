@@ -2990,6 +2990,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const sections = [];
     let momentCle = null;
     let verdictExpert = null;
+    let croisement = [];
 
     for(let i = 1; i < blocks.length; i++){
       const rawLines = blocks[i].split(/\n/).map(l => l.trim()).filter(Boolean);
@@ -3011,6 +3012,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       if(labelKey === 'SCENARIOS'){ scenarios.push(...bullets); continue; }
       if(labelKey === 'MOMENT_CLE'){ momentCle = bullets.join(' ') || lines.join(' '); continue; }
       if(labelKey === 'VERDICT_EXPERT'){ verdictExpert = bullets.join(' ') || lines.join(' '); continue; }
+      // Extraite à part (au lieu de retomber dans les sections génériques
+      // plus bas dans la page) pour pouvoir l'afficher juste sous les
+      // fiches joueurs, comme interprétation explicite immédiate.
+      if(labelKey === 'CROISEMENT'){ croisement = bullets; continue; }
 
       const label = NARRATIVE_LABELS[labelKey] || (labelKey ? labelKey.charAt(0) + labelKey.slice(1).toLowerCase() : 'Analyse');
       if(isBulletBlock){
@@ -3022,8 +3027,18 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     return {
       lead: lead, fiches: hasFiches ? fiches : null, scenarios: scenarios, sections: sections,
-      momentCle: momentCle, verdictExpert: verdictExpert
+      momentCle: momentCle, verdictExpert: verdictExpert, croisement: croisement
     };
+  }
+
+  // Interprétation explicite : croise les facteurs (niveau général, forme,
+  // H2H, etc.) affichés séparément ailleurs, placée juste sous les fiches
+  // joueurs pour donner tout de suite une lecture claire plutôt que de la
+  // laisser noyée plus bas dans l'analyse.
+  function renderCroisementBlock(bullets){
+    if(!bullets || !bullets.length) return '';
+    return '<div class="field-label" style="margin-top:22px;">INTERPRÉTATION</div>' +
+      '<ul class="result-narrative-list">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>';
   }
 
   function renderFichesBlock(fiches, p1Name, p2Name){
@@ -3201,9 +3216,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="result-badge">' + favoriteLabel(pct) + '</div>' +
       '<div class="result-winner">' + winnerName + ' gagnant probable</div>' +
       '<div class="result-detail">Face à ' + loserName + surfaceTag + '</div>' +
-      '<div class="cfb-row" style="margin-top:10px;">' +
-        '<button type="button" class="upr-btn upr-btn-sm" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">Fiche de ' + p1Name + '</button>' +
-        '<button type="button" class="upr-btn upr-btn-sm" data-profile-name="' + p2Name.replace(/"/g,'&quot;') + '">Fiche de ' + p2Name + '</button>' +
+      '<div class="form-row" style="margin-top:12px;">' +
+        '<div class="form-card"><div class="form-card-name">' + p1Name + '</div>' +
+          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">Voir la fiche</button></div>' +
+        '<div class="form-card p2"><div class="form-card-name p2">' + p2Name + '</div>' +
+          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p2Name.replace(/"/g,'&quot;') + '">Voir la fiche</button></div>' +
       '</div>' +
       renderConfidenceWarning(data, p1Name, p2Name) +
       (narrative ? '<p class="result-lead">' + narrative.lead + '</p>' : '') +
@@ -3221,6 +3238,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       (narrative && narrative.fiches
         ? renderFichesBlock(narrative.fiches, p1Name, p2Name)
         : renderForcesClesBlock(data.detail, p1Name, p2Name)) +
+      (narrative ? renderCroisementBlock(narrative.croisement) : '') +
       (narrative && narrative.momentCle ? renderMomentCleBlock(narrative.momentCle) : '') +
       (narrative && narrative.scenarios.length ? renderScenariosBlock(narrative.scenarios) : '') +
       renderTournamentBlock(data.detail) +
