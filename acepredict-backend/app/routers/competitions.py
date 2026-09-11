@@ -12,6 +12,40 @@ from app.database import get_db
 
 router = APIRouter(prefix="/competitions", tags=["competitions"])
 
+# Les matchs historiques (table Match, import Sackmann) utilisent déjà des
+# codes de tour normalisés (R128/R64/R32/R16/QF/SF/F/RR/BR). Les matchs à
+# venir/en cours (table Fixture, LiveTennisAPI) arrivent eux avec un libellé
+# libre côté source externe (ex. "Semi-Finals", parfois précédé du nom du
+# tournoi) -- sans normalisation ici, le frontend (qui trie/groupe/filtre
+# sur ces codes, cf. COMP_ROUND_ORDER côté visitennis_1.html) ne reconnaît
+# pas ces libellés et les boutons de filtre par tour restent quasiment
+# vides pour un tournoi en cours. Table de correspondance mots-clés (la
+# plus spécifique en premier) plutôt qu'un match exact, pour absorber les
+# variantes de formulation et un éventuel préfixe "Nom du tournoi - ...".
+_ROUND_KEYWORDS = [
+    # "semi"/"quarter" doivent être testés AVANT "final" : "semi-final" et
+    # "quarter-final" contiennent tous les deux la sous-chaîne "final".
+    ("bronze", "BR"), ("3rd place", "BR"), ("petite finale", "BR"),
+    ("semi", "SF"), ("demi", "SF"),
+    ("quarter", "QF"), ("quart", "QF"),
+    ("round of 16", "R16"), ("huitièm", "R16"), ("huitiem", "R16"), ("1/8", "R16"),
+    ("round of 32", "R32"), ("seiziem", "R32"), ("seizièm", "R32"), ("1/16", "R32"),
+    ("round of 64", "R64"), ("1/32", "R64"),
+    ("round of 128", "R128"), ("1/64", "R128"),
+    ("round robin", "RR"), ("poule", "RR"),
+    ("final", "F"), ("finale", "F"),
+]
+
+
+def _normalize_round(raw: str | None) -> str | None:
+    if not raw:
+        return raw
+    low = raw.strip().lower()
+    for keyword, code in _ROUND_KEYWORDS:
+        if keyword in low:
+            return code
+    return raw
+
 
 @router.get("", response_model=list[schemas.CompetitionOut])
 def list_competitions(include_past: bool = False, db: Session = Depends(get_db)):
@@ -110,7 +144,7 @@ def get_competition_matches(competition_id: str, db: Session = Depends(get_db)):
             p1, p2 = f.player1, f.player2
             results.append({
                 "id": f.id,
-                "round": f.round,
+                "round": _normalize_round(f.round),
                 "player1_id": p1.id if p1 else None,
                 "player1_name": p1.name if p1 else (f.player1_name_raw or "?"),
                 "player1_country": p1.country if p1 else None,

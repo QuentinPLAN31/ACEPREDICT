@@ -138,12 +138,21 @@ async def _resolve_player(db: Session, name: Optional[str], tour: str, country: 
     return await _auto_discover_player(db, name, tour, country, ranking, stats)
 
 
-async def _sync_rankings(db: Session, tour: str) -> int:
+async def _sync_rankings(db: Session, tour: str, stats: Optional[dict] = None) -> int:
+    """Met à jour Player.current_rank depuis le classement live. Crée
+    désormais aussi la fiche des joueurs classés mais absents de notre base
+    (au lieu de les ignorer silencieusement) -- avant ce correctif, seul un
+    joueur DÉJÀ connu par ailleurs (via une fixture à venir, un match
+    historique...) pouvait recevoir un classement, ce qui laissait un
+    classement très troué dès que la couverture des fixtures était
+    partielle -- notamment côté WTA, moins bien couverte que l'ATP par
+    LiveTennisAPI pour les matchs à venir."""
     try:
         rankings = await get_live_client().get_rankings(tour=tour)
     except Exception:
         return 0
     items = rankings.get("data", rankings) if isinstance(rankings, dict) else rankings
+    local_stats = stats if stats is not None else {"created_players": 0}
 
     updated = 0
     now = datetime.utcnow()
@@ -156,7 +165,16 @@ async def _sync_rankings(db: Session, tour: str) -> int:
         if player:
             player.current_rank = rank
             player.current_rank_synced_at = now
-            updated += 1
+        else:
+            country = item.get("country") or item.get("country_code")
+            player = models.Player(name=name.strip(), tour=tour, country=country or None)
+            player.current_rank = rank
+            player.current_rank_synced_at = now
+            has_bio = data_confidence.has_bio_signal(player)
+            player.data_confidence = data_confidence.compute_confidence(0, has_bio_data=has_bio)
+            db.add(player)
+            local_stats["created_players"] += 1
+        updated += 1
     db.commit()
     return updated
 
