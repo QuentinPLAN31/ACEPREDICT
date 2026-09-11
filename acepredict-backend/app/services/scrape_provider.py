@@ -22,7 +22,6 @@ pour ajustement des sélecteurs).
 """
 import logging
 import re
-from datetime import date as date_cls
 from typing import Optional
 
 import httpx
@@ -36,9 +35,6 @@ _HEADERS = {
     "Accept-Language": "en-US,en;q=0.9",
 }
 _TOUR_RANKING_SLUG = {"atp": "atp-men", "wta": "wta-women"}
-_TOUR_RESULTS_TYPE = {"atp": "atp-single", "wta": "wta-single"}
-
-_SCORE_TOKEN_RE = re.compile(r"^\d{1,2}$")
 
 
 async def _get(url: str, params: Optional[dict] = None) -> Optional[str]:
@@ -97,75 +93,119 @@ async def fetch_rankings(tour: str) -> list[dict]:
     return out
 
 
-def _parse_set_scores(cells_text: list[str]) -> str:
-    """Reconstruit un score lisible ('6-4 7-6') à partir des cellules de
-    sets d'une ligne de résultat -- chaque cellule contient un chiffre par
-    set joué (colonnes 'S 1 2 3 4 5' du tableau de résultats)."""
-    digits = [t for t in cells_text if _SCORE_TOKEN_RE.match(t)]
-    return " ".join(digits) if digits else ""
+# Mapping "notre nom de tournoi" -> slug URL tennisexplorer (cf.
+# https://www.tennisexplorer.com/<slug>/<year>/<atp-men|wta-women>/).
+# Rempli au fur et à mesure -- un tournoi absent de cette liste est
+# simplement ignoré par sync_draws_daily.py (pas d'exception). Pour ajouter
+# un tournoi : ouvrir sa page sur tennisexplorer.com et copier le segment
+# d'URL entre le domaine et "/2026/...".
+TOURNAMENT_SLUGS = {
+    "australian open": "australian-open",
+    "roland garros": "french-open", "french open": "french-open",
+    "wimbledon": "wimbledon",
+    "us open": "us-open",
+    "indian wells": "indian-wells",
+    "miami open": "miami",
+    "monte carlo": "monte-carlo",
+    "madrid open": "madrid",
+    "italian open": "rome", "internazionali": "rome",
+    "canadian open": "canada", "national bank open": "canada",
+    "cincinnati": "cincinnati",
+    "shanghai": "shanghai",
+    "paris masters": "paris",
+    "atp finals": "masters", "wta finals": "wta-finals",
+}
+
+_STANDARD_ROUND_CODES = ["R128", "R64", "R32", "R16", "QF", "SF", "F"]
 
 
-async def fetch_results_for_date(tour: str, day: date_cls) -> list[dict]:
-    """Résultats déjà joués pour une date donnée, groupés par tournoi
-    (page /results/?type=...&year=&month=&day=). Retourne une liste de
-    dicts {tournament, winner_name, loser_name, score}. Le round n'est PAS
-    fourni par cette page -- il est déjà connu par ailleurs (Fixture.round,
-    lui-même issu de LiveTennisAPI) et n'a donc pas besoin d'être re-scrapé
-    ici ; ce scraper sert uniquement à récupérer le SCORE final avant que
-    la Fixture correspondante ne soit purgée (cf. sync_hourly.py).
+def _slug_for_competition(comp_name: str) -> Optional[str]:
+    low = (comp_name or "").strip().lower()
+    for key, slug in TOURNAMENT_SLUGS.items():
+        if key in low:
+            return slug
+    return None
 
-    PARSING SPÉCULATIF -- non encore confirmé contre le HTML réel (accès
-    direct bloqué depuis l'environnement où ce fichier a été écrit, cf.
-    scripts/check_scrape_html.py). Chaque match est affiché sur DEUX lignes
-    consécutives (un joueur par ligne, cf. exemple observé : la ligne du
-    vainqueur listée en premier) -- on regroupe les lignes de joueur deux
-    par deux au sein d'un même bloc tournoi. Si le HTML réel ne suit pas ce
-    schéma, cette fonction renverra juste une liste vide (dégradation
-    gracieuse) plutôt que des données fausses -- à corriger avec le dump
-    HTML réel une fois testé en conditions réelles."""
-    type_ = _TOUR_RESULTS_TYPE.get(tour)
-    if not type_:
+
+def _extract_px(style: str, prop: str) -> Optional[int]:
+    m = re.search(r"\b" + re.escape(prop) + r"\s*:\s*(-?\d+)\s*(?:px)?\s*;?", style or "")
+    return int(m.group(1)) if m else None
+
+
+def _clean_draw_name(text: str) -> str:
+    """Retire les marqueurs de seed/wildcard/qualifier ('[1]', '[Q]',
+    '[WC]', '[LL]'...) accolés au nom dans le tableau."""
+    return re.sub(r"\s*\[[^\]]*\]\s*$", "", (text or "").strip()).strip()
+
+
+async def fetch_draw(tour: str, comp_name: str, year: int) -> list[dict]:
+    """Tableau du tournoi (onglet 'Tournament draw' de la page tennis-
+    explorer du tournoi) -- positions en pixels (pas de tableau HTML
+    classique). On regroupe les divs par décalage 'left' (= colonne = tour)
+    puis par 'top' (= emplacement dans le tableau). Le VAINQUEUR d'un match
+    du tour K est déduit STRUCTURELLEMENT : c'est celui des deux joueurs du
+    tour K (positions 2j et 2j+1) dont le nom réapparaît à la position j du
+    tour K+1 -- pas besoin de scraper un score pour ça. Le round est déduit
+    du nombre de colonnes (pas du texte de l'en-tête, peu fiable). Retourne
+    une liste de dicts {round, player1_name, player2_name, winner_name} --
+    UNIQUEMENT pour les matchs déjà joués (une case du tour K+1 encore
+    vide = match pas encore joué, ignoré).
+
+    PARSING NON ENCORE VALIDÉ EN CONDITIONS RÉELLES au moment de l'écriture
+    -- cf. scripts/check_scrape_html.py pour vérifier/ajuster si le
+    résultat est vide ou faux."""
+    slug = _slug_for_competition(comp_name)
+    if not slug:
         return []
-    html = await _get(
-        f"{BASE_URL}/results/",
-        params={"type": type_, "year": day.year, "month": day.month, "day": day.day},
-    )
+    html = await _get(f"{BASE_URL}/{slug}/{year}/{_TOUR_RANKING_SLUG.get(tour, 'atp-men')}/")
     if not html:
         return []
     soup = BeautifulSoup(html, "html.parser")
-    rows: list[dict] = []
-    current_tournament = None
-    for el in soup.find_all(["tr", "h3", "h4"]):
-        if el.name in ("h3", "h4"):
-            txt = el.get_text(strip=True)
-            if txt and len(txt) < 80:
-                current_tournament = txt
+    draw_div = soup.find(id="draw")
+    if not draw_div:
+        return []
+
+    entries = []
+    for div in draw_div.find_all("div", recursive=False):
+        left = _extract_px(div.get("style", ""), "left")
+        top = _extract_px(div.get("style", ""), "top")
+        text = div.get_text(strip=True)
+        if left is None or top is None:
             continue
-        link = el.find("a")
-        if not link:
-            continue
-        player_name = link.get_text(strip=True)
-        if not player_name or len(player_name) > 60:
-            continue
-        cells = [c.get_text(strip=True) for c in el.find_all("td")]
-        rows.append({
-            "tournament": current_tournament,
-            "player_name": player_name,
-            "score": _parse_set_scores(cells),
-        })
+        entries.append((left, top, text))
+
+    columns: dict[int, list[tuple[int, str]]] = {}
+    for left, top, text in entries:
+        columns.setdefault(left, []).append((top, text))
+
+    round_columns = []
+    for left in sorted(columns.keys()):
+        items = sorted(columns[left], key=lambda x: x[0])
+        slots = [(top, _clean_draw_name(text)) for top, text in items if top != 0]
+        if slots:
+            round_columns.append(slots)
+
+    num_transitions = len(round_columns) - 1
+    if num_transitions < 1:
+        return []
+    codes = _STANDARD_ROUND_CODES[-num_transitions:] if num_transitions <= len(_STANDARD_ROUND_CODES) else \
+        ["R128"] * (num_transitions - len(_STANDARD_ROUND_CODES)) + _STANDARD_ROUND_CODES
 
     out: list[dict] = []
-    i = 0
-    while i + 1 < len(rows):
-        a, b = rows[i], rows[i + 1]
-        if a["tournament"] and a["tournament"] == b["tournament"]:
-            out.append({
-                "tournament": a["tournament"],
-                "winner_name": a["player_name"],
-                "loser_name": b["player_name"],
-                "score": a["score"] or b["score"],
-            })
-            i += 2
-        else:
-            i += 1
+    for k in range(1, len(round_columns)):
+        prev_slots = round_columns[k - 1]
+        cur_slots = round_columns[k]
+        round_code = codes[k - 1]
+        for j, (_, winner_name) in enumerate(cur_slots):
+            if not winner_name or 2 * j + 1 >= len(prev_slots):
+                continue
+            p1 = prev_slots[2 * j][1]
+            p2 = prev_slots[2 * j + 1][1]
+            if not p1 or not p2:
+                continue
+            if winner_name == p1 or winner_name == p2:
+                out.append({
+                    "round": round_code, "player1_name": p1, "player2_name": p2,
+                    "winner_name": winner_name,
+                })
     return out
