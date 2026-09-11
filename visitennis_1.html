@@ -204,6 +204,8 @@
     font-weight: 700; margin-bottom: 12px;
   }
   .jargon-star{ color: var(--accent); font-weight: 700; cursor: help; }
+  .clickable-name{ cursor: pointer; }
+  .clickable-name:hover{ text-decoration: underline; color: var(--accent); }
   .team-input{
     width: 100%;
     background: rgba(0,0,0,0.28);
@@ -3050,7 +3052,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         return '<ul class="fiche-list ' + cls + '">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>';
       };
       return '<div class="fiche-card">' +
-        '<div class="fiche-card-name' + (isP2 ? ' p2' : '') + '">' + name + '</div>' +
+        '<div class="fiche-card-name clickable-name' + (isP2 ? ' p2' : '') + '" data-player-name="' + (name || '').replace(/"/g,'&quot;') + '">' + name + '</div>' +
         '<div class="fiche-card-sub fiche-sub-pos">Points forts</div>' + list(f.forces, 'fiche-pos') +
         '<div class="fiche-card-sub fiche-sub-neg">À surveiller</div>' + list(f.faiblesses, 'fiche-neg') +
       '</div>';
@@ -3267,6 +3269,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     box.style.display = 'block';
     box.querySelectorAll('[data-profile-name]').forEach(btn=>{
       btn.addEventListener('click', ()=> openPlayerProfileByName(btn.dataset.profileName));
+    });
+    box.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
+      el.addEventListener('click', ()=> openPlayerProfileByName(el.dataset.playerName));
     });
   }
 
@@ -3783,13 +3788,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     document.getElementById('compTabCountMatchs').textContent = compMatchesRaw.length;
     matchesWrap.innerHTML = sortedMatches.length ? sortedMatches.map((m, idx)=>
       '<div class="match-row">' +
-        '<span class="m-player"><span class="m-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span>' +
+        '<span class="m-player"><span class="m-flag">' + countryFlag(m.player1_country) + '</span><span class="clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span></span>' +
         '<span class="m-score">' + (m.score || '—') + '</span>' +
-        '<span class="m-player right"><span class="m-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span>' +
+        '<span class="m-player right"><span class="m-flag">' + countryFlag(m.player2_country) + '</span><span class="clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span></span>' +
         '<span class="m-date">' + compRoundLabel(m.round) + (m.date ? ('<br>' + new Date(m.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'})) : '') + '</span>' +
         '<button class="upr-btn upr-btn-sm" data-idx="' + idx + '" type="button">Analyser</button>' +
       '</div>'
     ).join('') : '<div class="upcoming-empty">Aucun match ne correspond à ce filtre.</div>';
+    matchesWrap.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(el.dataset.playerName); });
+    });
     matchesWrap.querySelectorAll('.upr-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const m = sortedMatches[Number(btn.dataset.idx)];
@@ -3819,8 +3827,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           const bIdx = bracketMatchesFlat.length;
           bracketMatchesFlat.push(m);
           return '<div class="bracket-match">' +
-                          '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player1_country) + '</span>' + m.player1_name + '</span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
-            '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span>' + m.player2_name + '</span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
+                          '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player1_country) + '</span><span class="clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span></span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
+            '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span><span class="clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span></span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
             '<button class="upr-btn upr-btn-sm" style="width:100%; margin-top:6px;" data-bidx="' + bIdx + '" type="button">Analyser</button>' +
           '</div>';
         }).join('') : (
@@ -3833,6 +3841,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       ).join('') +
       '</div></div>'
     ) : '<div class="upcoming-empty">Aucun tableau ne correspond à ce filtre.</div>';
+    bracketWrap.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(el.dataset.playerName); });
+    });
     bracketWrap.querySelectorAll('.upr-btn').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const m = bracketMatchesFlat[Number(btn.dataset.bidx)];
@@ -3866,7 +3877,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const initials = p.name.split(' ').map(w=> w[0]).filter(Boolean).slice(-2).join('').toUpperCase();
       const rankClass = i === 0 ? ' top1' : i === 1 ? ' top2' : i === 2 ? ' top3' : '';
       const rankLabel = (p.ranking != null) ? ('#' + p.ranking) : '—';
-      return '<div class="player-row' + (p.eliminated ? ' eliminated' : '') + '">' +
+      return '<div class="player-row' + (p.eliminated ? ' eliminated' : '') + '" style="cursor:pointer;" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">' +
         '<span class="player-rank' + rankClass + '" title="Classement mondial">' + rankLabel + '</span>' +
         '<span class="player-avatar" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">' + initials + '</span>' +
         '<span class="player-info"><span class="player-name">' + p.name + (p.eliminated ? ' <span class="player-elim-badge">Éliminé</span>' : '') + '</span><span class="player-country"><span class="pc-flag">' + countryFlag(p.country) + '</span>' + (p.country || '?') + '</span></span>' +
@@ -3876,6 +3887,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(compLiveOnly && eliminatedIds.size === 0 && compMatchesRaw.length){
       playersWrap.innerHTML = '<div class="upcoming-empty">Aucun résultat connu pour ce tournoi pour le moment — tous les joueurs affichés sont donc encore en lice.</div>' + playersWrap.innerHTML;
     }
+    playersWrap.querySelectorAll('.player-row[data-player-name]').forEach(row=>{
+      row.addEventListener('click', ()=> openPlayerProfileByName(row.dataset.playerName));
+    });
     // Photos officielles (via Wikipedia) : chargées en arrière-plan, initiales conservées en repli.
     playersWrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
       const name = avatarEl.dataset.playerName;
@@ -3915,9 +3929,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       document.getElementById('compTabCountRank').textContent = ranking.length;
       rankBody.innerHTML = ranking.length ? ranking.map((p, i) => {
         const pct = eloToLevelPct(p.elo_overall);
-        return '<tr><td class="rk-num">' + (i+1) + '</td><td class="rk-player"><span class="rk-flag">' + countryFlag(p.country) + '</span>' + p.name + '</td>' +
+        return '<tr><td class="rk-num">' + (i+1) + '</td><td class="rk-player"><span class="rk-flag">' + countryFlag(p.country) + '</span><span class="clickable-name" data-player-name="' + (p.name || '').replace(/"/g,'&quot;') + '">' + p.name + '</span></td>' +
         '<td style="text-align:right;" class="rk-pts">' + (pct != null ? '<span style="color:' + levelColor(pct) + '; font-weight:700;">' + levelWord(pct) + '</span>' : '—') + '</td></tr>';
       }).join('') : '<tr><td colspan="3" class="upcoming-empty">Pas encore de classement disponible.</td></tr>';
+      rankBody.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
+        el.addEventListener('click', ()=> openPlayerProfileByName(el.dataset.playerName));
+      });
 
       compMatchesRaw = matches;
       const byRoundAll = {};
