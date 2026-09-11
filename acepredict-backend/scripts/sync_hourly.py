@@ -1,16 +1,25 @@
 """
-Job de synchronisation HORAIRE : matchs à venir (fixtures), classements et,
-pour chaque fixture, cotes de marché + météo — tout est écrit en base (table
-Fixture, players.current_rank) pour que le site ne fasse plus JAMAIS d'appel
-direct à une API externe depuis une requête utilisateur (cf. README
-"Synchronisation des données").
+Job de synchronisation HORAIRE : matchs à venir (fixtures) et, pour chaque
+fixture, cotes de marché + météo — tout est écrit en base (table Fixture)
+pour que le site ne fasse plus JAMAIS d'appel direct à une API externe
+depuis une requête utilisateur (cf. README "Synchronisation des données").
+
+IMPORTANT -- le classement (Player.current_rank) n'est PLUS synchronisé ici
+depuis ce correctif : voir scripts/sync_rankings_daily.py, lancé 1×/jour
+(la nuit) via un cron Railway séparé. Un classement ATP/WTA ne bouge de
+toute façon pas d'heure en heure (les tours eux-mêmes ne le republient
+qu'1×/semaine) -- le synchroniser à chaque passage horaire coûtait ~48
+appels/jour (2 tours × 24 runs) pour une donnée qui ne change jamais dans
+l'intervalle, sur un quota LiveTennisAPI de seulement 100/jour (plan
+FREE). En le sortant d'ici, ce coût tombe à 2 appels/jour, ce qui laisse
+la quasi-totalité du quota disponible pour les fixtures (le vrai besoin
+horaire : matchs à venir/en cours).
 
 Usage :
     python -m scripts.sync_hourly
 
 Pour chaque tour (atp, wta) :
-  1. Récupère le classement (LiveTennisAPI) -> met à jour Player.current_rank.
-  2. Récupère la liste des prochains matchs (LiveTennisAPI) -> upsert Fixture
+  1. Récupère la liste des prochains matchs (LiveTennisAPI) -> upsert Fixture
      par joueur, avec AUTO-DISCOVERY : un joueur absent de notre base est
      créé à la volée, puis on tente une fiche bio via LiveTennisAPI (SEULE
      "source secondaire" disponible ici sans clé ni scraping fragile —
@@ -19,10 +28,10 @@ Pour chaque tour (atp, wta) :
      cf. son propre descriptif). Sans rien trouver, data_confidence =
      "insufficient" plutôt que de bloquer quoi que ce soit — la fiche existe
      quand même, juste marquée comme telle (cf. services/data_confidence.py).
-  3. Pour chaque fixture, résout la ville du tournoi (une fois par tournoi,
+  2. Pour chaque fixture, résout la ville du tournoi (une fois par tournoi,
      mise en cache par livetennis_client.py), puis récupère cotes de marché
      (Polymarket) + météo et les dénormalise sur la ligne.
-  4. Supprime les Fixture de ce tour qui n'apparaissent plus dans le
+  3. Supprime les Fixture de ce tour qui n'apparaissent plus dans le
      calendrier live actuel (match annulé/reporté) ou dont la date
      programmée est trop ancienne (déjà jouées).
 
@@ -33,6 +42,7 @@ des champs laissés à None sur la Fixture concernée.
 """
 import asyncio
 import hashlib
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -41,7 +51,8 @@ from sqlalchemy.orm import Session
 
 from app import models
 from app.database import SessionLocal
-from app.services import data_confidence, market_providers, weather_providers
+from app.routers.competitions import _normalize_round
+from app.services import data_confidence, market_providers, scrape_provider, weather_providers
 from app.services.livetennis_client import get_live_client, is_configured
 
 TOURS = ("atp", "wta")
@@ -138,48 +149,21 @@ async def _resolve_player(db: Session, name: Optional[str], tour: str, country: 
     return await _auto_discover_player(db, name, tour, country, ranking, stats)
 
 
-async def _sync_rankings(db: Session, tour: str, stats: Optional[dict] = None) -> int:
-    """Met à jour Player.current_rank depuis le classement live. Crée
-    désormais aussi la fiche des joueurs classés mais absents de notre base
-    (au lieu de les ignorer silencieusement) -- avant ce correctif, seul un
-    joueur DÉJÀ connu par ailleurs (via une fixture à venir, un match
-    historique...) pouvait recevoir un classement, ce qui laissait un
-    classement très troué dès que la couverture des fixtures était
-    partielle -- notamment côté WTA, moins bien couverte que l'ATP par
-    LiveTennisAPI pour les matchs à venir."""
-    try:
-        rankings = await get_live_client().get_rankings(tour=tour)
-    except Exception:
-        return 0
-    items = rankings.get("data", rankings) if isinstance(rankings, dict) else rankings
-    local_stats = stats if stats is not None else {"created_players": 0}
-
-    updated = 0
-    now = datetime.utcnow()
-    for item in items or []:
-        name = item.get("name")
-        rank = item.get("ranking") or item.get("rank")
-        if not name or not rank:
-            continue
-        player = _find_player(db, name)
-        if player:
-            player.current_rank = rank
-            player.current_rank_synced_at = now
-        else:
-            country = item.get("country") or item.get("country_code")
-            player = models.Player(name=name.strip(), tour=tour, country=country or None)
-            player.current_rank = rank
-            player.current_rank_synced_at = now
-            has_bio = data_confidence.has_bio_signal(player)
-            player.data_confidence = data_confidence.compute_confidence(0, has_bio_data=has_bio)
-            db.add(player)
-            local_stats["created_players"] += 1
-        updated += 1
-    db.commit()
-    return updated
-
-
 async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
+    """
+    IMPORTANT -- quota LiveTennisAPI : le plan FREE ne donne que 100 requêtes
+    par JOUR (tous tours confondus). Avant ce correctif, get_tournament_city()
+    était rappelé pour chaque tournoi en cours à CHAQUE passage horaire (24×/
+    jour), alors que la ville d'un tournoi ne change jamais pendant son
+    déroulement -- avec ne serait-ce que 4-5 tournois en cours simultanément,
+    ça consommait déjà à lui seul la quasi-totalité du quota journalier,
+    laissant get_rankings()/get_upcoming_list() (déjà ~96 appels/jour à eux
+    deux rien qu'en tournant 1×/heure) systématiquement en 429 -- d'où classe-
+    ments et calendriers qui ne se mettaient plus à jour. On réutilise
+    désormais la ville déjà connue depuis n'importe quelle Fixture existante
+    pour ce tournoi (elle est de toute façon déjà stockée en base par un run
+    précédent) avant de rappeler l'API, qui n'est donc plus sollicitée que
+    pour un tournoi VRAIMENT jamais vu."""
     stats = {
         "tour": tour, "fetched": 0, "created_players": 0, "upserted": 0,
         "pruned": 0, "market_found": 0, "weather_found": 0,
@@ -191,6 +175,11 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
     stats["fetched"] = len(matches)
 
     city_cache: dict[str, Optional[str]] = {}
+    known_cities = dict(
+        db.query(models.Fixture.tournament_id_external, models.Fixture.city)
+        .filter(models.Fixture.tournament_id_external.isnot(None), models.Fixture.city.isnot(None))
+        .all()
+    )
     seen_external_ids: set[str] = set()
 
     for m in matches:
@@ -211,10 +200,13 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
         city = None
         if tournament_id:
             if tournament_id not in city_cache:
-                try:
-                    city_cache[tournament_id] = await get_live_client().get_tournament_city(tournament_id)
-                except Exception:
-                    city_cache[tournament_id] = None
+                if tournament_id in known_cities:
+                    city_cache[tournament_id] = known_cities[tournament_id]
+                else:
+                    try:
+                        city_cache[tournament_id] = await get_live_client().get_tournament_city(tournament_id)
+                    except Exception:
+                        city_cache[tournament_id] = None
             city = city_cache[tournament_id]
 
         fixture = db.query(models.Fixture).filter(models.Fixture.external_id == external_id).first()
@@ -270,16 +262,120 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
     # annulé/reporté) OU dont la date programmée est trop ancienne (déjà
     # jouées). Filtré côté Python (pas de composition de clause SQL avec un
     # set potentiellement vide) — le volume par tour reste modeste.
+    #
+    # AVANT de supprimer une Fixture qui a probablement été JOUÉE (date
+    # programmée dans le passé), on tente de la convertir en Match
+    # permanent -- sinon son résultat disparaît purement et simplement du
+    # site (c'est ce qui rendait "dernière victoire/défaite" et les
+    # boutons de filtre par tour obsolètes). Le round est déjà connu
+    # (Fixture.round vient de LiveTennisAPI) -- seul le SCORE final manque,
+    # récupéré par scraping (scrape_provider.fetch_results_for_date), sans
+    # coût de quota API.
     stale_cutoff = datetime.utcnow() - STALE_AFTER
+    now = datetime.utcnow()
+    results_cache: dict = {}
+    persisted = 0
     for f in db.query(models.Fixture).filter(models.Fixture.tour == tour).all():
         is_too_old = bool(f.scheduled_time and f.scheduled_time < stale_cutoff)
         is_gone_from_live_calendar = f.external_id not in seen_external_ids
-        if is_too_old or is_gone_from_live_calendar:
-            db.delete(f)
-            stats["pruned"] += 1
+        if not (is_too_old or is_gone_from_live_calendar):
+            continue
+        likely_played = bool(f.scheduled_time and f.scheduled_time < now)
+        if likely_played:
+            try:
+                if await _persist_fixture_as_match(db, f, tour, results_cache):
+                    persisted += 1
+            except Exception:
+                pass
+        db.delete(f)
+        stats["pruned"] += 1
+    stats["persisted_as_match"] = persisted
     db.commit()
 
     return stats
+
+
+def _match_surname_in_name(scraped_name: str, full_name: str) -> bool:
+    """tennisexplorer donne des noms du style 'Djokovic N.' (nom de famille
+    en premier) -- on compare juste le premier mot (nom de famille) en tant
+    que mot entier dans le nom complet connu chez nous, insensible à la
+    casse. Best-effort : mieux vaut rater un rapprochement que se tromper
+    de joueur."""
+    surname = (scraped_name or "").strip().split(" ")[0].strip(".,").lower()
+    if not surname or len(surname) < 3:
+        return False
+    return bool(re.search(r"\b" + re.escape(surname) + r"\b", (full_name or "").lower()))
+
+
+async def _persist_fixture_as_match(db: Session, f: "models.Fixture", tour: str, results_cache: dict) -> bool:
+    """Si le score de cette Fixture (déjà jouée) est retrouvé par
+    scraping, crée le Match permanent correspondant. Ne fait RIEN (retourne
+    False) si le score n'est pas retrouvé -- la Fixture est alors quand
+    même supprimée par l'appelant, comme avant ce correctif (pas de
+    régression, juste une opportunité de gagner l'historique en plus)."""
+    if not f.scheduled_time or not f.player1_id or not f.player2_id:
+        return False
+    # Idempotence : si un Match existe déjà pour cette paire à cette date, on ne
+    # duplique pas (un run précédent a pu déjà le persister).
+    day_start = f.scheduled_time.replace(hour=0, minute=0, second=0, microsecond=0)
+    day_end = day_start + timedelta(days=1)
+    already = (
+        db.query(models.Match)
+        .filter(
+            models.Match.tourney_date >= day_start, models.Match.tourney_date < day_end,
+            ((models.Match.player1_id == f.player1_id) & (models.Match.player2_id == f.player2_id))
+            | ((models.Match.player1_id == f.player2_id) & (models.Match.player2_id == f.player1_id)),
+        )
+        .first()
+    )
+    if already:
+        return False
+
+    day = f.scheduled_time.date()
+    if day not in results_cache:
+        try:
+            results_cache[day] = await scrape_provider.fetch_results_for_date(tour, day)
+        except Exception:
+            results_cache[day] = []
+    day_results = results_cache[day]
+    if not day_results:
+        return False
+
+    p1_raw, p2_raw = f.player1_name_raw or "", f.player2_name_raw or ""
+    for r in day_results:
+        w, l = r.get("winner_name") or "", r.get("loser_name") or ""
+        p1_is_winner = _match_surname_in_name(w, p1_raw) and _match_surname_in_name(l, p2_raw)
+        p2_is_winner = _match_surname_in_name(w, p2_raw) and _match_surname_in_name(l, p1_raw)
+        if not (p1_is_winner or p2_is_winner):
+            continue
+        winner_id = f.player1_id if p1_is_winner else f.player2_id
+        surface = None
+        try:
+            surface = models.SurfaceEnum(f.surface) if f.surface else None
+        except Exception:
+            surface = None
+        competition_id = None
+        fname = (f.tournament_name or "").strip().lower()
+        if fname:
+            for comp in db.query(models.Competition).filter(models.Competition.tour == tour).all():
+                cname = (comp.name or "").strip().lower()
+                if cname and (cname in fname or fname in cname):
+                    competition_id = comp.id
+                    break
+        match = models.Match(
+            competition_id=competition_id,
+            tourney_date=f.scheduled_time,
+            round=_normalize_round(f.round),
+            surface=surface,
+            player1_id=f.player1_id,
+            player2_id=f.player2_id,
+            winner_id=winner_id,
+            score=r.get("score") or None,
+            source="scrape",
+        )
+        db.add(match)
+        return True
+    return False
 
 
 async def _run_async(db: Session) -> dict:
@@ -287,9 +383,7 @@ async def _run_async(db: Session) -> dict:
     if not report["configured"]:
         return report
     for tour in TOURS:
-        rankings_updated = await _sync_rankings(db, tour)
         tour_report = await _sync_fixtures_for_tour(db, tour)
-        tour_report["rankings_updated"] = rankings_updated
         report["tours"].append(tour_report)
     return report
 
@@ -313,7 +407,6 @@ def main():
         print(
             f"[sync_hourly] {t['tour'].upper()} : {t['fetched']} match(s) récupéré(s), "
             f"{t['created_players']} joueur(s) découvert(s), {t['upserted']} fixture(s) mise(s) à jour, "
-            f"{t['rankings_updated']} classement(s) mis à jour, "
             f"{t['market_found']} cote(s) trouvée(s), {t['weather_found']} météo(s) trouvée(s), "
             f"{t['pruned']} fixture(s) obsolète(s) purgée(s)."
         )
