@@ -172,6 +172,15 @@ async def fetch_draw(tour: str, comp_name: str, year: int) -> list[dict]:
         text = div.get_text(strip=True)
         if left is None or top is None:
             continue
+        # Le tableau positionne aussi des divs de SCORE ("6-3, 7-6(2), 6-2")
+        # au même décalage 'left' que les noms de joueurs -- si on les
+        # laissait dans la liste des emplacements, ça décale tout
+        # l'alignement joueur/tour suivant. Un nom de joueur (ou "bye", ou
+        # un emplacement pas encore déterminé = texte vide) ne commence
+        # jamais par un chiffre ; un score, si -- filtre ciblé plutôt que
+        # d'exiger un lien (une "bye" n'a pas de lien mais doit rester).
+        if text[:1].isdigit():
+            continue
         entries.append((left, top, text))
 
     columns: dict[int, list[tuple[int, str]]] = {}
