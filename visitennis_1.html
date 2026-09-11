@@ -112,10 +112,10 @@
   .nav-item .badge{
     margin-left:auto;
     background: var(--accent);
-    color: #14180a;
-    font-size: 10.5px;
-    font-weight: 700;
-    padding: 2px 8px;
+    color: #000;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 3px 9px;
     border-radius: 999px;
     letter-spacing: 0.02em;
   }
@@ -203,6 +203,7 @@
     font-size: 10.5px; letter-spacing: 0.08em; color: var(--text-dim);
     font-weight: 700; margin-bottom: 12px;
   }
+  .jargon-star{ color: var(--accent); font-weight: 700; cursor: help; }
   .team-input{
     width: 100%;
     background: rgba(0,0,0,0.28);
@@ -1574,7 +1575,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     <!-- PROFIL JOUEUR -->
     <section class="page" id="page-joueur">
-      <button class="pj-back" type="button" onclick="go('upcoming')">&larr; Retour</button>
+      <button class="pj-back" type="button" onclick="go(profileReturnPage)">&larr; Retour</button>
       <div id="playerProfileContent"><div class="upcoming-loading">Chargement du profil...</div></div>
     </section>
 
@@ -2990,6 +2991,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const sections = [];
     let momentCle = null;
     let verdictExpert = null;
+    let croisement = [];
 
     for(let i = 1; i < blocks.length; i++){
       const rawLines = blocks[i].split(/\n/).map(l => l.trim()).filter(Boolean);
@@ -3011,6 +3013,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       if(labelKey === 'SCENARIOS'){ scenarios.push(...bullets); continue; }
       if(labelKey === 'MOMENT_CLE'){ momentCle = bullets.join(' ') || lines.join(' '); continue; }
       if(labelKey === 'VERDICT_EXPERT'){ verdictExpert = bullets.join(' ') || lines.join(' '); continue; }
+      // Extraite à part (au lieu de retomber dans les sections génériques
+      // plus bas dans la page) pour pouvoir l'afficher juste sous les
+      // fiches joueurs, comme interprétation explicite immédiate.
+      if(labelKey === 'CROISEMENT'){ croisement = bullets; continue; }
 
       const label = NARRATIVE_LABELS[labelKey] || (labelKey ? labelKey.charAt(0) + labelKey.slice(1).toLowerCase() : 'Analyse');
       if(isBulletBlock){
@@ -3022,8 +3028,18 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     return {
       lead: lead, fiches: hasFiches ? fiches : null, scenarios: scenarios, sections: sections,
-      momentCle: momentCle, verdictExpert: verdictExpert
+      momentCle: momentCle, verdictExpert: verdictExpert, croisement: croisement
     };
+  }
+
+  // Interprétation explicite : croise les facteurs (niveau général, forme,
+  // H2H, etc.) affichés séparément ailleurs, placée juste sous les fiches
+  // joueurs pour donner tout de suite une lecture claire plutôt que de la
+  // laisser noyée plus bas dans l'analyse.
+  function renderCroisementBlock(bullets){
+    if(!bullets || !bullets.length) return '';
+    return '<div class="field-label" style="margin-top:22px;">INTERPRÉTATION</div>' +
+      '<ul class="result-narrative-list">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>';
   }
 
   function renderFichesBlock(fiches, p1Name, p2Name){
@@ -3201,9 +3217,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="result-badge">' + favoriteLabel(pct) + '</div>' +
       '<div class="result-winner">' + winnerName + ' gagnant probable</div>' +
       '<div class="result-detail">Face à ' + loserName + surfaceTag + '</div>' +
-      '<div class="cfb-row" style="margin-top:10px;">' +
-        '<button type="button" class="upr-btn upr-btn-sm" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">Fiche de ' + p1Name + '</button>' +
-        '<button type="button" class="upr-btn upr-btn-sm" data-profile-name="' + p2Name.replace(/"/g,'&quot;') + '">Fiche de ' + p2Name + '</button>' +
+      '<div class="form-row" style="margin-top:12px;">' +
+        '<div class="form-card"><div class="form-card-name">' + p1Name + '</div>' +
+          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">Voir la fiche</button></div>' +
+        '<div class="form-card p2"><div class="form-card-name p2">' + p2Name + '</div>' +
+          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p2Name.replace(/"/g,'&quot;') + '">Voir la fiche</button></div>' +
       '</div>' +
       renderConfidenceWarning(data, p1Name, p2Name) +
       (narrative ? '<p class="result-lead">' + narrative.lead + '</p>' : '') +
@@ -3221,6 +3239,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       (narrative && narrative.fiches
         ? renderFichesBlock(narrative.fiches, p1Name, p2Name)
         : renderForcesClesBlock(data.detail, p1Name, p2Name)) +
+      (narrative ? renderCroisementBlock(narrative.croisement) : '') +
       (narrative && narrative.momentCle ? renderMomentCleBlock(narrative.momentCle) : '') +
       (narrative && narrative.scenarios.length ? renderScenariosBlock(narrative.scenarios) : '') +
       renderTournamentBlock(data.detail) +
@@ -3229,9 +3248,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       (narrative ? renderNarrativeSectionsBlock(narrative) : '') +
       (narrative && narrative.verdictExpert ? renderVerdictExpertBlock(narrative.verdictExpert) : '');
 
-    box.innerHTML = teaser +
+    const jargonFound = [];
+    const annotatedTeaser = annotateJargon(teaser, jargonFound);
+    const annotatedLockedInner = annotateJargon(lockedInner, jargonFound);
+
+    box.innerHTML = annotatedTeaser +
       '<div class="locked-wrap">' +
-        '<div class="locked-content">' + lockedInner + '</div>' +
+        '<div class="locked-content">' + annotatedLockedInner + '</div>' +
         '<div class="locked-overlay">' +
           '<div class="locked-overlay-title">Tu n\'as accès qu\'à une partie de l\'analyse</div>' +
           '<div class="locked-progress"><div class="locked-progress-fill"></div></div>' +
@@ -3239,7 +3262,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           '<button class="locked-unlock-btn" type="button" onclick="openUnlockModal()">🔓 Débloquer l\'analyse complète</button>' +
         '</div>' +
       '</div>' +
-      '<div class="result-probability-note">ℹ️ Ce résultat est une <strong>probabilité</strong> calculée par notre modèle (niveau des joueurs, forme, historique, conditions du match) — pas une certitude. Le tennis reste un sport avec sa part d\'aléa : un résultat n\'est jamais garanti à 100%, quel que soit l\'écart affiché.</div>';
+      '<div class="result-probability-note">ℹ️ Ce résultat est une <strong>probabilité</strong> calculée par notre modèle (niveau des joueurs, forme, historique, conditions du match) — pas une certitude. Le tennis reste un sport avec sa part d\'aléa : un résultat n\'est jamais garanti à 100%, quel que soit l\'écart affiché.</div>' +
+      renderLexiqueBlock(jargonFound);
     box.style.display = 'block';
     box.querySelectorAll('[data-profile-name]').forEach(btn=>{
       btn.addEventListener('click', ()=> openPlayerProfileByName(btn.dataset.profileName));
@@ -3552,7 +3576,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   let joueursDirTour = 'atp';
   let joueursDirDebounce = null;
 
+  // Retenu pour que le bouton "Retour" de la fiche joueur ramène vraiment
+  // à l'endroit d'où on venait (annuaire, analyse, tournoi...) au lieu de
+  // toujours renvoyer vers "Matchs à venir".
+  let profileReturnPage = 'upcoming';
+
   function openPlayerProfileByName(name){
+    const activePage = document.querySelector('.page.active');
+    if(activePage && activePage.id !== 'page-joueur') profileReturnPage = activePage.id.replace('page-', '');
     pendingProfilePlayerName = name;
     go('joueur');
   }
@@ -4112,8 +4143,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         nameEl.addEventListener('click', (e)=>{
           e.stopPropagation();
           hidePlayerPopover();
-          pendingProfilePlayerName = name;
-          go('joueur');
+          openPlayerProfileByName(name);
         });
       }
     });
@@ -4134,6 +4164,39 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   function renderConfidenceWarning(data, p1Name, p2Name){
     return '';
+  }
+
+  // Petit lexique : les quelques termes techniques qui peuvent apparaître
+  // dans une analyse (le texte généré par Claude ou les libellés du
+  // backend) reçoivent un astérisque à leur première occurrence, expliqué
+  // dans un encart "LEXIQUE" en bas de l'analyse -- uniquement les termes
+  // réellement présents dans CETTE analyse, jamais une liste générique.
+  const JARGON_TERMS = [
+    { term: 'Bo5', def: 'le match se joue en 5 sets, il faut en gagner 3 pour l\'emporter (format des Grands Chelems messieurs).' },
+    { term: 'Bo3', def: 'le match se joue en 3 sets, il faut en gagner 2 pour l\'emporter (format le plus courant).' },
+    { term: 'H2H', def: 'historique des confrontations directes entre les deux joueurs.' },
+    { term: 'tie-break', def: 'jeu décisif joué à 6 jeux partout dans un set pour départager les deux joueurs.' },
+    { term: 'upset', def: 'un résultat surprise, quand le joueur donné perdant l\'emporte.' },
+  ];
+
+  function annotateJargon(html, found){
+    JARGON_TERMS.forEach(j=>{
+      if(found.some(f=> f.term === j.term)) return;
+      const re = new RegExp('\\b' + j.term.replace(/[-]/g, '\\-') + '\\b');
+      if(re.test(html)){
+        html = html.replace(re, j.term + '<sup class="jargon-star">*</sup>');
+        found.push(j);
+      }
+    });
+    return html;
+  }
+
+  function renderLexiqueBlock(found){
+    if(!found.length) return '';
+    return '<div class="field-label" style="margin-top:18px;">LEXIQUE</div>' +
+      '<div class="result-summary" style="font-size:12.5px;"><ul style="margin:0; padding-left:18px;">' +
+        found.map(j => '<li><b>' + j.term + '</b> : ' + j.def + '</li>').join('') +
+      '</ul></div>';
   }
 
   function surfacePillHtml(surface){
@@ -4403,11 +4466,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     }
 
     if(stats.serve_stats){
+      const ss = stats.serve_stats;
+      const statCard = (val, label, suffix) => val == null ? '' :
+        '<div class="pj-stat-card"><div class="pj-stat-value">' + val + (suffix || '') + '</div><div class="pj-stat-label">' + label + '</div></div>';
       html += '<div class="pj-stats-grid">' +
-        '<div class="pj-stat-card"><div class="pj-stat-value">' + stats.serve_stats.avg_aces_per_match + '</div><div class="pj-stat-label">Aces / match (moy.)</div></div>' +
-        (stats.serve_stats.avg_double_faults_per_match != null
-          ? '<div class="pj-stat-card"><div class="pj-stat-value">' + stats.serve_stats.avg_double_faults_per_match + '</div><div class="pj-stat-label">Double fautes / match (moy.)</div></div>'
-          : '') +
+        statCard(ss.avg_aces_per_match, 'Aces / match (moy.)') +
+        statCard(ss.avg_double_faults_per_match, 'Double fautes / match (moy.)') +
+        statCard(ss.first_serve_in_pct, '1ères balles au service dans le carré', '%') +
+        statCard(ss.first_serve_won_pct, 'Points gagnés sur 1ère balle', '%') +
+        statCard(ss.second_serve_won_pct, 'Points gagnés sur 2ème balle', '%') +
+        statCard(ss.break_points_saved_pct, 'Balles de break sauvées', '%') +
       '</div>';
     }
 

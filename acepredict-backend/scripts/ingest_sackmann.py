@@ -176,6 +176,17 @@ def ingest_csv(path: str, tour: str = "atp", db: Session | None = None) -> int:
                         "w_ace": row.get("w_ace"), "w_df": row.get("w_df"),
                         "l_ace": row.get("l_ace"), "l_df": row.get("l_df"),
                         "winner_rank": row.get("winner_rank"), "loser_rank": row.get("loser_rank"),
+                        # Détail du service (mêmes colonnes Sackmann que ci-dessus,
+                        # capturées en plus pour permettre des stats de service
+                        # complètes côté fiche joueur -- cf. players.py::get_player_stats.
+                        "w_svpt": row.get("w_svpt"), "w_1stIn": row.get("w_1stIn"),
+                        "w_1stWon": row.get("w_1stWon"), "w_2ndWon": row.get("w_2ndWon"),
+                        "w_SvGms": row.get("w_SvGms"), "w_bpSaved": row.get("w_bpSaved"),
+                        "w_bpFaced": row.get("w_bpFaced"),
+                        "l_svpt": row.get("l_svpt"), "l_1stIn": row.get("l_1stIn"),
+                        "l_1stWon": row.get("l_1stWon"), "l_2ndWon": row.get("l_2ndWon"),
+                        "l_SvGms": row.get("l_SvGms"), "l_bpSaved": row.get("l_bpSaved"),
+                        "l_bpFaced": row.get("l_bpFaced"),
                     },
                     source="sackmann",
                 )

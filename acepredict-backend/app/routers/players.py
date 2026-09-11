@@ -138,25 +138,61 @@ def get_player_stats(player_id: str, limit_recent: int = 10, db: Session = Depen
         reverse=True,
     )
 
+    def _to_int(raw):
+        try:
+            return int(raw) if raw not in (None, "") else None
+        except (TypeError, ValueError):
+            return None
+
     ace_values: list[int] = []
     df_values: list[int] = []
+    # Détail du service, calculé match par match puis moyenné -- chaque
+    # ratio (ex: 1ère balle in) n'est ajouté au panier que pour les matchs
+    # où le dénominateur est connu et non nul, pour ne jamais fausser la
+    # moyenne avec un 0/0.
+    first_in_pcts: list[float] = []
+    first_won_pcts: list[float] = []
+    second_won_pcts: list[float] = []
+    bp_saved_pcts: list[float] = []
     for m in matches:
         stats = m.stats or {}
         is_winner_side = m.winner_id == player_id
-        ace_raw = stats.get("w_ace") if is_winner_side else stats.get("l_ace")
-        df_raw = stats.get("w_df") if is_winner_side else stats.get("l_df")
+        prefix = "w_" if is_winner_side else "l_"
+        ace_raw = stats.get(prefix + "ace")
+        df_raw = stats.get(prefix + "df")
         for raw, bucket in ((ace_raw, ace_values), (df_raw, df_values)):
-            try:
-                if raw not in (None, ""):
-                    bucket.append(int(raw))
-            except (TypeError, ValueError):
-                pass
+            val = _to_int(raw)
+            if val is not None:
+                bucket.append(val)
+
+        svpt = _to_int(stats.get(prefix + "svpt"))
+        first_in = _to_int(stats.get(prefix + "1stIn"))
+        first_won = _to_int(stats.get(prefix + "1stWon"))
+        second_won = _to_int(stats.get(prefix + "2ndWon"))
+        bp_saved = _to_int(stats.get(prefix + "bpSaved"))
+        bp_faced = _to_int(stats.get(prefix + "bpFaced"))
+
+        if svpt and first_in is not None:
+            first_in_pcts.append(first_in / svpt * 100)
+        if first_in and first_won is not None:
+            first_won_pcts.append(first_won / first_in * 100)
+        if svpt and first_in is not None and second_won is not None and svpt > first_in:
+            second_won_pcts.append(second_won / (svpt - first_in) * 100)
+        if bp_faced:
+            bp_saved_pcts.append((bp_saved or 0) / bp_faced * 100)
+
+    def _avg(values):
+        return round(sum(values) / len(values), 1) if values else None
 
     serve_stats = None
     if ace_values:
         serve_stats = {
             "avg_aces_per_match": round(sum(ace_values) / len(ace_values), 1),
             "avg_double_faults_per_match": round(sum(df_values) / len(df_values), 1) if df_values else None,
+            "first_serve_in_pct": _avg(first_in_pcts),
+            "first_serve_won_pct": _avg(first_won_pcts),
+            "second_serve_won_pct": _avg(second_won_pcts),
+            "break_points_saved_pct": _avg(bp_saved_pcts),
             "matches_with_data": len(ace_values),
         }
 
