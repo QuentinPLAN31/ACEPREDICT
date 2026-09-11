@@ -1,8 +1,12 @@
 """
 Analyse approfondie en langage naturel, générée par l'API Anthropic (Claude)
-à partir des facteurs déjà calculés par prediction.py (Elo, forme récente,
-head-to-head, fatigue, météo). C'est la partie "un vrai travail de fond" de
-l'analyse : le modèle Elo donne un chiffre, ce service explique le chiffre.
+à partir des facteurs déjà calculés par prediction.py (niveau général des
+deux joueurs -- dérivé de l'Elo interne mais jamais exposé comme tel --,
+forme récente, head-to-head, fatigue, météo). C'est la partie "un vrai
+travail de fond" de l'analyse : le modèle donne un chiffre, ce service
+explique le chiffre. Le prompt ci-dessous parle volontairement de "niveau
+général" et jamais d'"Elo" : ce vocabulaire technique n'est pas censé
+apparaître dans une app grand public non initiée au tennis.
 Optionnel et à dégradation gracieuse, comme Stripe/météo/LiveTennisAPI
 ailleurs dans ce backend : sans ANTHROPIC_API_KEY configurée (ou en cas
 d'erreur réseau/API), generate_narrative() retourne None et l'analyse
@@ -93,23 +97,69 @@ def generate_narrative(context: dict) -> Optional[str]:
         return None
 
 
+# Même calibration que le frontend (visitennis_1.html::eloToLevelPct /
+# levelWord) : traduit l'Elo interne (jamais montré tel quel) en repère
+# lisible sans initiation -- un pourcentage de niveau + un mot, centrés sur
+# la valeur de départ 1500 plutôt que sur une plage brute qui écraserait
+# tout le monde en bas de l'échelle. Les deux implémentations doivent rester
+# alignées pour que le récit de Claude et l'UI racontent la même histoire.
+def _elo_to_level_pct(elo: Optional[float]) -> Optional[int]:
+    if elo is None:
+        return None
+    import math
+    pct = round(50 + 50 * math.tanh((elo - 1500) / 150))
+    return max(3, min(100, pct))
+
+
+def _level_word(pct: Optional[int]) -> str:
+    if pct is None:
+        return "Inconnu"
+    if pct >= 80:
+        return "Excellent"
+    if pct >= 65:
+        return "Très solide"
+    if pct >= 50:
+        return "Solide"
+    if pct >= 35:
+        return "Correct"
+    if pct >= 20:
+        return "En progression"
+    return "Débutant"
+
+
+def _level_context_line(p1: str, p2: str, elo1: Optional[float], elo2: Optional[float]) -> str:
+    pct1, pct2 = _elo_to_level_pct(elo1), _elo_to_level_pct(elo2)
+    if pct1 is None or pct2 is None:
+        return f"Niveau général : donnée insuffisante pour {p1} et/ou {p2}."
+    return (
+        f"Niveau général (sur 100, 50 = niveau moyen du circuit) : "
+        f"{p1} {pct1} ({_level_word(pct1)}) — {p2} {pct2} ({_level_word(pct2)}), "
+        f"écart de {abs(pct1 - pct2)} points de niveau"
+    )
+
+
 def _build_prompt(ctx: dict) -> str:
     p1, p2 = ctx["player1_name"], ctx["player2_name"]
 
     lines = [
         "Tu es un analyste tennis professionnel senior qui rédige pour une "
-        "application de pronostics payante. Le lecteur voit déjà, ailleurs à "
-        "l'écran, tous les chiffres bruts sous forme de barres visuelles "
-        "(probabilité, Elo, forme, confrontations directes, charge de "
-        "matchs) : ton rôle n'est PAS de les répéter ni de les reformuler en "
-        "phrases, mais d'apporter une VALEUR AJOUTÉE que ces chiffres seuls "
-        "ne montrent pas — en croisant mentalement TOUS les facteurs "
-        "disponibles (écart Elo, dynamique de forme, poids réel du H2H selon "
-        "son échantillon, fatigue, format/niveau du tournoi, probabilité de "
-        "marché si disponible, conditions de match) pour en tirer une "
-        "lecture experte. Si une probabilité de marché est fournie, "
-        "commente explicitement si elle confirme ou contredit le modèle "
-        "Elo et ce que ça implique pour la fiabilité du pronostic. "
+        "application de pronostics payante grand public, PAS pour des "
+        "initiés : n'utilise JAMAIS le mot \"Elo\" ni aucun jargon de "
+        "système de classement/rating dans ta réponse -- dis \"niveau "
+        "général\" ou \"niveau\" à la place, toujours en langage courant. "
+        "Le lecteur voit déjà, ailleurs à l'écran, tous les chiffres bruts "
+        "sous forme de barres visuelles (probabilité, niveau général, "
+        "forme, confrontations directes, charge de matchs) : ton rôle "
+        "n'est PAS de les répéter ni de les reformuler en phrases, mais "
+        "d'apporter une VALEUR AJOUTÉE que ces chiffres seuls ne montrent "
+        "pas — en croisant mentalement TOUS les facteurs disponibles "
+        "(écart de niveau général, dynamique de forme, poids réel du H2H "
+        "selon son échantillon, fatigue, format/niveau du tournoi, "
+        "probabilité de marché si disponible, conditions de match) pour en "
+        "tirer une lecture experte. Si une probabilité de marché est "
+        "fournie, commente explicitement si elle confirme ou contredit le "
+        "niveau général estimé et ce que ça implique pour la fiabilité du "
+        "pronostic. "
         "Format STRICT en puces courtes uniquement -- AUCUN paragraphe, "
         "AUCUN bloc de texte continu de plusieurs phrases : chaque idée "
         "tient sur UNE puce autonome et dense. Le lecteur va payer pour "
@@ -130,18 +180,18 @@ def _build_prompt(ctx: dict) -> str:
         f"d'adversaire (pas des généralités de carrière). "
         f"### FAIBLESSES_J1 -- exactement 2 à 3 puces (max 16 mots chacune) "
         f"sur ce qui pourrait désavantager {p1} spécifiquement face à {p2} "
-        "(style de jeu adverse, écart Elo, fatigue, surface, tout facteur "
-        "concret fourni ci-dessous). "
+        "(style de jeu adverse, écart de niveau général, fatigue, surface, "
+        "tout facteur concret fourni ci-dessous). "
         f"### FORCES_J2 -- même exercice pour {p2} (exactement 3 puces, max "
         "16 mots chacune). "
         f"### FAIBLESSES_J2 -- même exercice pour {p2} (2 à 3 puces, max 16 "
         "mots chacune). "
         "### CROISEMENT -- exactement 3 puces (max 20 mots chacune) qui "
         "croisent chacune explicitement au moins deux facteurs entre eux "
-        "(ex: comment la forme récente renforce ou contredit l'écart Elo, "
-        "comment le format du tournoi amplifie ou atténue tel autre "
-        "facteur) -- jamais une puce qui ne fait que répéter un chiffre "
-        "déjà affiché ailleurs à l'écran. "
+        "(ex: comment la forme récente renforce ou contredit l'écart de "
+        "niveau général, comment le format du tournoi amplifie ou atténue "
+        "tel autre facteur) -- jamais une puce qui ne fait que répéter un "
+        "chiffre déjà affiché ailleurs à l'écran. "
         "### MOMENT_CLE -- AUCUNE puce : une seule phrase percutante (max "
         "30 mots) identifiant LE moment ou point de bascule tactique le "
         "plus décisif à surveiller pendant le match (ex: un jeu précis, un "
@@ -173,13 +223,14 @@ def _build_prompt(ctx: dict) -> str:
         "n'invente aucune statistique, blessure, actualité, classement ou "
         "style de jeu non fourni — si une donnée manque pour étayer une "
         "section (ex: pas de style de jeu connu), raisonne sur ce qui est "
-        "disponible (Elo, forme, H2H, fatigue, tournoi, marché) plutôt que "
-        "d'inventer. Si une information de style de jeu est explicitement "
-        "marquée [INFORMATION INCERTAINE], ne t'appuie pas dessus pour un "
-        "argument important — mentionne-la au mieux avec la réserve qui va avec.",
+        "disponible (niveau général, forme, H2H, fatigue, tournoi, marché) "
+        "plutôt que d'inventer. Si une information de style de jeu est "
+        "explicitement marquée [INFORMATION INCERTAINE], ne t'appuie pas "
+        "dessus pour un argument important — mentionne-la au mieux avec la "
+        "réserve qui va avec.",
         "",
         f"Match : {p1} vs {p2}" + (f" (surface : {ctx['surface_used']})" if ctx.get("surface_used") and ctx["surface_used"] != "overall" else ""),
-        f"Elo : {p1} {ctx['elo_player1']} — {p2} {ctx['elo_player2']} (écart {ctx['elo_diff']})",
+        _level_context_line(p1, p2, ctx.get("elo_player1"), ctx.get("elo_player2")),
     ]
 
     f1, f2 = ctx.get("form_player1"), ctx.get("form_player2")
