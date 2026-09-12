@@ -69,6 +69,14 @@ def _parse_ranking_page(html: str) -> list[dict]:
             name = link.get_text(strip=True) if link else None
             if not name:
                 continue
+            # La page de classement expose aussi un tableau de classement en
+            # DOUBLE (ex. "Dabrowski / Stefani") -- notre parsing générique
+            # (toutes les <table> de la page) le récupère par erreur en même
+            # temps que le simple, créant une pseudo-fiche "joueur" pour une
+            # PAIRE au même rang qu'un vrai joueur en simple. Un nom de
+            # joueur en simple ne contient jamais "/".
+            if "/" in name:
+                continue
             country = None
             flag_img = tr.find("img")
             if flag_img:

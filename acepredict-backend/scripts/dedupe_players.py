@@ -87,6 +87,31 @@ def run(dry_run: bool = False) -> dict:
                     continue
                 groups.setdefault(key, []).append(p)
 
+            # Deuxième passe : fusionne aussi les groupes dont l'un des noms
+            # est un SOUS-ENSEMBLE de mots de l'autre (ex. "Sorana Cirstea"
+            # vs "Cirstea Sorana-Mihaela" -- un second prénom présent dans
+            # une variante mais pas l'autre empêchait toute correspondance
+            # avec l'égalité stricte ci-dessus). On exige au moins 2 mots
+            # communs pour limiter le risque de faux positif (un seul mot
+            # partagé, ex. un nom de famille très courant, ne suffit pas).
+            merged_any = True
+            while merged_any:
+                merged_any = False
+                keys = list(groups.keys())
+                for i in range(len(keys)):
+                    for j in range(i + 1, len(keys)):
+                        a, b = keys[i], keys[j]
+                        if a == b or a not in groups or b not in groups:
+                            continue
+                        if len(a & b) >= 2 and (a <= b or b <= a):
+                            bigger = a if len(a) >= len(b) else b
+                            smaller = b if bigger is a else a
+                            groups[bigger].extend(groups.pop(smaller))
+                            merged_any = True
+                            break
+                    if merged_any:
+                        break
+
             for group in groups.values():
                 if len(group) < 2:
                     continue
