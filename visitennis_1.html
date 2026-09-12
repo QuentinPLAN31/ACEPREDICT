@@ -1044,14 +1044,22 @@
   .rank-table .rk-num{ color: var(--text-dim); font-weight:700; width:28px; }
   .rank-table-wrap{ overflow-x:auto; }
 
-  .bracket-wrap{ background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:16px; padding:22px; overflow-x:auto; }
-  .bracket-cols{ display:flex; gap:26px; min-width:760px; }
-  .bracket-col{ flex:1; display:flex; flex-direction:column; justify-content:space-around; gap:16px; }
-  .bracket-col-label{ font-size:10.5px; letter-spacing:.06em; color: var(--text-dim); font-weight:700; text-align:center; margin-bottom:6px; }
-  .bracket-match{ background: rgba(255,255,255,0.02); border:1px solid var(--line); border-radius:10px; padding:8px 10px; font-size:12.5px; }
-  .bracket-p{ display:flex; align-items:center; justify-content:space-between; padding:3px 0; gap:8px; }
-  .bracket-p .name{ display:flex; align-items:center; gap:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .bracket-p .score{ color: var(--text-dim); font-weight:700; font-variant-numeric:tabular-nums; flex-shrink:0; }
+  /* Tableau du tournoi -- une seule liste verticale (round par round),
+     intégrée au scroll normal de la page : pas de zone à scroll horizontal
+     dédiée, pas de boutons de filtre (cf. renderCompDetailPanels). */
+  .bracket-wrap{ background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:16px; padding:16px; }
+  .bracket-round{ margin-bottom:18px; }
+  .bracket-round:last-child{ margin-bottom:0; }
+  .bracket-round-label{ font-size:11px; letter-spacing:.06em; color: var(--accent); font-weight:700; text-transform:uppercase; margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  .bracket-match{ display:flex; align-items:center; gap:10px; padding:7px 4px; border-bottom:1px solid var(--line); font-size:12.5px; cursor:pointer; }
+  .bracket-match:last-child{ border-bottom:none; }
+  .bracket-match:hover{ background: rgba(255,255,255,0.03); }
+  .bracket-p{ flex:1; display:flex; align-items:center; gap:6px; min-width:0; }
+  .bracket-p .name{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .bracket-p.winner .name{ font-weight:700; }
+  .bracket-p:not(.winner) .name{ color: var(--text-dim); }
+  .bracket-vs{ color: var(--text-dim); font-size:10.5px; flex-shrink:0; }
+  .bracket-score{ color: var(--text-dim); font-weight:700; font-variant-numeric:tabular-nums; flex-shrink:0; font-size:11.5px; }
   .bracket-p.winner .name{ color: var(--accent); font-weight:700; }
 
           .bracket-p .b-flag{ width:18px; height:18px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; overflow:hidden; }
@@ -3789,8 +3797,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     });
     if(eliminatedIds.size === 0) compLiveOnly = false;
 
+    // Le tableau (bracket) n'a plus de barre de filtre : il affiche
+    // désormais TOUJOURS tous les tours d'un coup (cf. plus bas), donc pas
+    // de compFilterBarBracket ici -- ne reste que Matchs/Joueurs.
     const barHtml = compFilterBarHtml(eliminatedIds.size > 0);
-    ['compFilterBarMatchs','compFilterBarBracket','compFilterBarJoueurs'].forEach(id=>{
+    ['compFilterBarMatchs','compFilterBarJoueurs'].forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.innerHTML = barHtml;
     });
@@ -3829,52 +3840,45 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       });
     });
 
-    // --- Tableau --- Affiche toute la structure du tournoi (y compris les
-    // tours pas encore joués/déterminés, en placeholder), pas seulement les
-    // tours pour lesquels on a déjà des matchs.
+    // --- Tableau --- Une seule liste verticale, TOUS les tours d'un coup
+    // (y compris ceux pas encore joués/déterminés, en placeholder) -- plus
+    // aucun bouton de filtre ni de zone à scroll horizontal dédiée : ça
+    // s'intègre au scroll normal de la page, comme le reste du site.
     const byRound = {};
-    filteredMatches.forEach(m=>{ const r = m.round || '?'; (byRound[r] = byRound[r] || []).push(m); });
-    const roundMatchesFilter = (r)=>{
-      if(compRoundFilter === null) return true;
-      if(compRoundFilter === 'FINALS') return COMP_FINALS_ROUNDS.includes(r);
-      return r === compRoundFilter;
-    };
-    const roundsToShow = compRoundsPresent.filter(roundMatchesFilter);
+    compMatchesRaw.forEach(m=>{ const r = m.round || '?'; (byRound[r] = byRound[r] || []).push(m); });
     const bracketMatchesFlat = [];
-    bracketWrap.innerHTML = roundsToShow.length ? (
-      '<div class="bracket-wrap"><div class="bracket-cols">' +
-      roundsToShow.map(r=>
-        '<div class="bracket-col"><div class="bracket-col-label">' + compRoundLabel(r).toUpperCase() + '</div>' +
+    bracketWrap.innerHTML = compRoundsPresent.length ? (
+      '<div class="bracket-wrap">' +
+      compRoundsPresent.map(r=>
+        '<div class="bracket-round"><div class="bracket-round-label">' + compRoundLabel(r) + '</div>' +
         ((byRound[r] && byRound[r].length) ? byRound[r].map(m=>{
           const p1Wins = m.winner_id && String(m.winner_id) === String(m.player1_id);
           const p2Wins = m.winner_id && String(m.winner_id) === String(m.player2_id);
           const bIdx = bracketMatchesFlat.length;
           bracketMatchesFlat.push(m);
-          return '<div class="bracket-match">' +
-                          '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player1_country) + '</span><span class="clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span></span><span class="score">' + (p1Wins ? (m.score || '') : '') + '</span></div>' +
-            '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name"><span class="b-flag">' + countryFlag(m.player2_country) + '</span><span class="clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span></span><span class="score">' + (p2Wins ? (m.score || '') : '') + '</span></div>' +
-            '<button class="upr-btn upr-btn-sm" style="width:100%; margin-top:6px;" data-bidx="' + bIdx + '" type="button">Analyser</button>' +
+          const scoreLabel = m.score ? m.score : (m.winner_id ? '' : (m.date ? new Date(m.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'}) : 'à venir'));
+          return '<div class="bracket-match" data-bidx="' + bIdx + '">' +
+            '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span></div>' +
+            '<span class="bracket-vs">vs</span>' +
+            '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span></div>' +
+            '<span class="bracket-score">' + scoreLabel + '</span>' +
           '</div>';
         }).join('') : (
-          '<div class="bracket-match">' +
-            '<div class="bracket-p"><span class="name" style="color: var(--text-dim);">À déterminer</span></div>' +
-            '<div class="bracket-p"><span class="name" style="color: var(--text-dim);">À déterminer</span></div>' +
-          '</div>'
+          '<div class="bracket-match"><div class="bracket-p"><span class="name" style="color: var(--text-dim);">À déterminer</span></div><span class="bracket-vs">vs</span><div class="bracket-p"><span class="name" style="color: var(--text-dim);">À déterminer</span></div></div>'
         )) +
         '</div>'
       ).join('') +
-      '</div></div>'
-    ) : '<div class="upcoming-empty">Aucun tableau ne correspond à ce filtre.</div>';
-    bracketWrap.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
-      el.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(el.dataset.playerName); });
-    });
-    bracketWrap.querySelectorAll('.upr-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const m = bracketMatchesFlat[Number(btn.dataset.bidx)];
+      '</div>'
+    ) : '<div class="upcoming-empty">Tableau pas encore disponible pour ce tournoi.</div>';
+    bracketWrap.querySelectorAll('.bracket-match[data-bidx]').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        const m = bracketMatchesFlat[Number(row.dataset.bidx)];
         if(m) goAnalyzeUpcomingMatch(m.player1_name, m.player2_name);
       });
     });
-
+    bracketWrap.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(el.dataset.playerName); });
+    });
     // --- Joueurs : victoires réelles + classement mondial réel (plus de
     // numérotation arbitraire basée sur des victoires à 0 avant le début
     // du tournoi -- le badge affiche désormais le classement ATP/WTA
