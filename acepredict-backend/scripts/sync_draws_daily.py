@@ -43,12 +43,49 @@ def _match_surname_in_name(scraped_name: str, full_name: str) -> bool:
     return bool(re.search(r"\b" + re.escape(surname) + r"\b", (full_name or "").lower()))
 
 
+def _surname_is_last_word(scraped_name: str, full_name: str) -> bool:
+    """Comme _match_surname_in_name, mais exige que le nom de famille
+    scrapé soit le DERNIER mot du nom complet (la vraie position du nom de
+    famille) -- élimine les faux positifs où le mot apparaît ailleurs dans
+    le nom (ex. scraped_name='Paul' ne doit PAS matcher 'Jean Paul Kadangah
+    Kili' -- 'Paul' y est un prénom composé, pas le nom de famille -- ni
+    'Paul Jubb', où c'est le PRÉNOM)."""
+    surname = (scraped_name or "").strip().lower()
+    words = (full_name or "").strip().lower().split()
+    return bool(surname) and bool(words) and words[-1] == surname
+
+
 def _find_player_for_tour(db: Session, scraped_name: str, tour: str) -> Optional[models.Player]:
     candidates = db.query(models.Player).filter(models.Player.tour == tour).all()
-    matches = [p for p in candidates if _match_surname_in_name(scraped_name, p.name)]
+
+    # 1) Ne garder que les joueurs dont le nom de famille scrapé est bien le
+    # DERNIER mot de leur nom complet (élimine par ex. 'Paul' matchant
+    # 'Jean Paul Kadangah Kili' ou 'Paul Jubb' -- 'Paul' y est un prénom,
+    # pas le nom de famille de Tommy Paul).
+    matches = [p for p in candidates if _surname_is_last_word(scraped_name, p.name)]
+    if not matches:
+        # Repli : au cas où notre nom stocké ne finit pas exactement par ce
+        # mot (ordre inhabituel, nom de famille composé...) -- on retente
+        # avec l'ancien critère, plus permissif.
+        matches = [p for p in candidates if _match_surname_in_name(scraped_name, p.name)]
+
     if len(matches) == 1:
         return matches[0]
-    return None  # absent ou ambigu (plusieurs joueurs du même nom de famille) -- on ne devine pas
+    if len(matches) > 1:
+        # Toujours ambigu (cas réel : des frères partageant le même nom de
+        # famille, ex. les 2 Cerundolo, les 2 Tsitsipas) -- on départage par
+        # le classement ATP/WTA connu (current_rank), le joueur en tableau
+        # principal d'un tournoi de cette envergure étant quasi toujours
+        # celui qui a le meilleur classement (le plus petit nombre) parmi
+        # les homonymes. Si un seul a un classement connu, on le prend ; si
+        # aucun n'en a, on reste prudent et on ne devine pas.
+        ranked = [p for p in matches if p.current_rank is not None]
+        if len(ranked) == 1:
+            return ranked[0]
+        if len(ranked) > 1:
+            return min(ranked, key=lambda p: p.current_rank)
+        return None  # toujours ambigu, aucun classement pour départager
+    return None  # absent
 
 
 async def sync_draw_for_competition(db: Session, comp: models.Competition) -> dict:
