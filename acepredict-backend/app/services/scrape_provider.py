@@ -146,6 +146,22 @@ TOURNAMENT_SLUGS = {
 }
 
 _STANDARD_ROUND_CODES = ["R128", "R64", "R32", "R16", "QF", "SF", "F"]
+# Taille du tableau (nb de joueurs) de la 1ere colonne -> round correspondant.
+# Cette 1ere colonne (tirage initial) est TOUJOURS entierement peuplee des le
+# debut du tournoi et NE CHANGE PLUS ensuite -- contrairement au nombre total
+# de colonnes affichees par la page (qui, lui, grandit au fil du tournoi à
+# mesure que les tours suivants sont determines). D'ou le bug corrige ici :
+# `codes = _STANDARD_ROUND_CODES[-num_transitions:]` deduisait le round
+# depuis la FIN de la liste de colonnes, donc le round attribue a une MEME
+# colonne (donc au meme match) changeait selon le nombre de colonnes deja
+# visibles au moment du scraping -- un match R128 scrape tot dans le tournoi
+# (peu de colonnes encore visibles) pouvait ainsi etre etiquete "SF" par
+# erreur, puis un scraping ulterieur (plus de colonnes visibles) le
+# re-creait sous le bon nom faute de le reconnaitre comme deja connu
+# (l'idempotence de sync_draws_daily comparait aussi le round) : doublons +
+# rounds R16/QF/SF qui restaient vides pendant que R128 se remplissait de
+# lignes en trop.
+_DRAW_SIZE_TO_ROUND = {128: "R128", 64: "R64", 32: "R32", 16: "R16", 8: "QF", 4: "SF", 2: "F"}
 
 
 def _slug_for_competition(comp_name: str) -> Optional[str]:
@@ -226,8 +242,24 @@ async def fetch_draw(tour: str, comp_name: str, year: int) -> list[dict]:
     num_transitions = len(round_columns) - 1
     if num_transitions < 1:
         return []
-    codes = _STANDARD_ROUND_CODES[-num_transitions:] if num_transitions <= len(_STANDARD_ROUND_CODES) else \
-        ["R128"] * (num_transitions - len(_STANDARD_ROUND_CODES)) + _STANDARD_ROUND_CODES
+    # Round de depart deduit de la taille du tirage initial (1ere colonne),
+    # stable quel que soit l'avancement du tournoi au moment du scraping --
+    # cf. commentaire sur _DRAW_SIZE_TO_ROUND plus haut. Repli sur l'ancien
+    # calcul (depuis la fin) uniquement si la taille de la 1ere colonne ne
+    # correspond a aucune taille de tableau standard (ex: page mal parsee).
+    first_col_size = len(round_columns[0])
+    start_round = _DRAW_SIZE_TO_ROUND.get(first_col_size)
+    if start_round is not None and start_round in _STANDARD_ROUND_CODES:
+        start_idx = _STANDARD_ROUND_CODES.index(start_round)
+        codes = _STANDARD_ROUND_CODES[start_idx:start_idx + num_transitions]
+        # Le tableau contient plus de transitions que de rounds standards
+        # connus a partir de ce point (ne devrait pas arriver) -- on comble
+        # au pire avec le dernier code plutot que planter.
+        while len(codes) < num_transitions:
+            codes.append(_STANDARD_ROUND_CODES[-1])
+    else:
+        codes = _STANDARD_ROUND_CODES[-num_transitions:] if num_transitions <= len(_STANDARD_ROUND_CODES) else \
+            ["R128"] * (num_transitions - len(_STANDARD_ROUND_CODES)) + _STANDARD_ROUND_CODES
 
     out: list[dict] = []
     for k in range(1, len(round_columns)):

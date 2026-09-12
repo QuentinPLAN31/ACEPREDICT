@@ -78,17 +78,27 @@ async def sync_draw_for_competition(db: Session, comp: models.Competition) -> di
         else:
             continue
 
-        # Idempotence : même compétition + round + paire déjà connue -> on ne duplique pas.
+        # Idempotence : même compétition + paire de joueurs déjà connue -> on
+        # met à jour la ligne existante plutôt que de dupliquer. Comparer sur
+        # la PAIRE SEULE (round exclu de la clé) est indispensable : le round
+        # d'un même match peut être recalculé différemment d'un scraping à
+        # l'autre tant que le tableau évolue (cf. correctif dans
+        # scrape_provider._DRAW_SIZE_TO_ROUND) -- comparer round+paire
+        # créait un doublon à chaque fois que le round recalculé changeait.
         already = (
             db.query(models.Match)
             .filter(
-                models.Match.competition_id == comp.id, models.Match.round == e["round"],
+                models.Match.competition_id == comp.id,
                 ((models.Match.player1_id == p1.id) & (models.Match.player2_id == p2.id))
                 | ((models.Match.player1_id == p2.id) & (models.Match.player2_id == p1.id)),
             )
             .first()
         )
         if already:
+            if already.round != e["round"] or already.winner_id != winner_id:
+                already.round = e["round"]
+                already.winner_id = winner_id
+                result["matches_created"] += 0  # mise à jour, pas une création
             continue
 
         # Date approximative : on ne connaît pas la date exacte du match via
