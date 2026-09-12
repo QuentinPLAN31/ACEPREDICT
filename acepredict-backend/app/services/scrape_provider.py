@@ -50,17 +50,7 @@ async def _get(url: str, params: Optional[dict] = None) -> Optional[str]:
         return None
 
 
-async def fetch_rankings(tour: str) -> list[dict]:
-    """Classement ATP/WTA (page /ranking/<slug>/). Retourne une liste de
-    dicts {rank, name, country, points} -- structure volontairement proche
-    de ce que renvoyait LiveTennisAPI.get_rankings() pour rester un
-    remplacement direct côté appelant."""
-    slug = _TOUR_RANKING_SLUG.get(tour)
-    if not slug:
-        return []
-    html = await _get(f"{BASE_URL}/ranking/{slug}/")
-    if not html:
-        return []
+def _parse_ranking_page(html: str) -> list[dict]:
     soup = BeautifulSoup(html, "html.parser")
     out: list[dict] = []
     # Générique plutôt que dépendant d'une classe CSS précise : on prend la
@@ -81,8 +71,17 @@ async def fetch_rankings(tour: str) -> list[dict]:
                 continue
             country = None
             flag_img = tr.find("img")
-            if flag_img and flag_img.get("alt"):
-                country = flag_img.get("alt").strip()
+            if flag_img:
+                country = (flag_img.get("alt") or flag_img.get("title") or "").strip() or None
+            if not country:
+                # Repli : certains flags sont un <span> avec une classe/texte
+                # de code pays (ex. class="flag flag-fra") plutôt qu'un <img alt=...>.
+                flag_span = tr.find(class_=re.compile(r"flag", re.I))
+                if flag_span:
+                    for cls in flag_span.get("class", []):
+                        if cls != "flag" and len(cls.replace("flag-", "")) in (2, 3):
+                            country = cls.replace("flag-", "").upper()
+                            break
             points = None
             for cell in reversed(cells):
                 txt = cell.get_text(strip=True).replace(",", "").replace("\xa0", "")
@@ -90,6 +89,36 @@ async def fetch_rankings(tour: str) -> list[dict]:
                     points = int(txt)
                     break
             out.append({"rank": rank, "name": name, "country": country, "points": points})
+    return out
+
+
+async def fetch_rankings(tour: str, pages: int = 10) -> list[dict]:
+    """Classement ATP/WTA (page /ranking/<slug>/?page=N, 50 par page).
+    Retourne une liste de dicts {rank, name, country, points} -- structure
+    volontairement proche de ce que renvoyait LiveTennisAPI.get_rankings()
+    pour rester un remplacement direct côté appelant.
+
+    `pages` (10 par défaut = jusqu'au rang ~500) : couvre largement les
+    joueurs susceptibles d'apparaître dans un tableau de Grand Chelem (128
+    têtes de série + qualifiés, ces derniers pouvant être classés bien
+    au-delà du top 100) -- avant ce correctif, seule la 1ère page (top 50)
+    était récupérée, ce qui laissait des trous dans l'annuaire joueurs dès
+    qu'un joueur classé entre ~50 et ~500 apparaissait ailleurs (analyse,
+    tableau d'un tournoi...) sans jamais avoir reçu son vrai classement.
+    Sans coût de quota (scraping) -- s'arrête plus tôt si une page ne
+    renvoie aucune ligne (fin de liste atteinte)."""
+    slug = _TOUR_RANKING_SLUG.get(tour)
+    if not slug:
+        return []
+    out: list[dict] = []
+    for page in range(1, pages + 1):
+        html = await _get(f"{BASE_URL}/ranking/{slug}/", params={"page": page} if page > 1 else None)
+        if not html:
+            break
+        page_rows = _parse_ranking_page(html)
+        if not page_rows:
+            break
+        out.extend(page_rows)
     return out
 
 
