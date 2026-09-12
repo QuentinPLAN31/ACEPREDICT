@@ -3748,6 +3748,30 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const playersWrap = document.getElementById('compPlayersWrap');
     if(!matchesWrap || !bracketWrap || !playersWrap) return;
 
+    // Aucune donnée du tout pour ce tournoi (pas juste "rien ne correspond
+    // au filtre") : message dédié et explicite plutôt que de laisser
+    // chaque onglet afficher son "Aucun ... ne correspond à ce filtre"
+    // générique, qui donne l'impression d'un bug/filtre mal réglé alors
+    // que le tournoi n'a simplement pas encore commencé (ou pas encore
+    // été synchronisé).
+    if(compMatchesRaw.length === 0){
+      const notStartedHtml = '<div class="upcoming-empty" style="padding:20px 12px; text-align:center;">'
+        + '📅 Ce tournoi n\'a pas encore de données disponibles.<br>'
+        + '<span style="opacity:.8;">Soit il n\'a pas encore commencé, soit sa synchronisation est en cours — reviens un peu plus tard.</span>'
+        + '</div>';
+      matchesWrap.innerHTML = notStartedHtml;
+      bracketWrap.innerHTML = notStartedHtml;
+      playersWrap.innerHTML = notStartedHtml;
+      document.getElementById('compTabCountMatchs').textContent = 0;
+      const countJoueurs = document.getElementById('compTabCountJoueurs');
+      if(countJoueurs) countJoueurs.textContent = 0;
+      ['compFilterBarMatchs','compFilterBarBracket','compFilterBarJoueurs'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = '';
+      });
+      return;
+    }
+
     const matchInRoundFilter = (m)=>{
       if(compRoundFilter === null) return true;
       if(compRoundFilter === 'FINALS') return COMP_FINALS_ROUNDS.includes(m.round);
