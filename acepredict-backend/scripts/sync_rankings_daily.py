@@ -19,6 +19,7 @@ Schedule, ou un second service "Cron Job" pointant sur cette commande.
 """
 import re
 import sys
+import unicodedata
 from datetime import datetime
 from typing import Optional
 
@@ -31,8 +32,16 @@ from app.services import data_confidence, scrape_provider
 TOURS = ("atp", "wta")
 
 
+def _strip_accents(txt: str) -> str:
+    return unicodedata.normalize("NFKD", txt or "").encode("ascii", "ignore").decode("ascii")
+
+
 def _name_words(name: str) -> set[str]:
-    return {w for w in re.split(r"[\s\-]+", (name or "").strip().lower()) if w}
+    # Accents retirés : sinon "Paštiková" (tennisexplorer) ne matchait
+    # jamais "Pastikova"/"Paštikova" (import Sackmann, encodage parfois
+    # différent) -- ratage silencieux qui, combiné à l'ordre nom/prénom,
+    # faisait créer un nouveau doublon à CHAQUE run pour ces joueurs.
+    return {w for w in re.split(r"[\s\-]+", _strip_accents(name).strip().lower()) if w}
 
 
 def _build_player_index(db: Session, tour: str) -> list[models.Player]:
