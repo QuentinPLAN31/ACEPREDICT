@@ -17,6 +17,7 @@ Usage :
 les jours à 03h00 UTC) -- Railway > service backend > Settings > Cron
 Schedule, ou un second service "Cron Job" pointant sur cette commande.
 """
+import re
 import sys
 from datetime import datetime
 from typing import Optional
@@ -30,10 +31,48 @@ from app.services import data_confidence, scrape_provider
 TOURS = ("atp", "wta")
 
 
-def _find_player(db: Session, name: str) -> Optional[models.Player]:
-    if not name or not name.strip():
+def _name_words(name: str) -> set[str]:
+    return {w for w in re.split(r"[\s\-]+", (name or "").strip().lower()) if w}
+
+
+def _build_player_index(db: Session, tour: str) -> list[models.Player]:
+    return db.query(models.Player).filter(models.Player.tour == tour).all()
+
+
+def _find_player(scraped_name: str, candidates: list[models.Player]) -> Optional[models.Player]:
+    """tennisexplorer affiche le classement au format 'Nom Prénom' (ex.
+    'Sinner Jannik'), alors que notre base stocke la plupart du temps
+    'Prénom Nom' (import historique Sackmann) -- un match EXACT (ilike)
+    ratait donc quasi tous les joueurs déjà connus, ce qui créait un
+    DOUBLON pour chacun (nouvelle fiche sans pays/photo/historique) au lieu
+    de simplement mettre à jour son rang -- c'est ce qui expliquait à la
+    fois des classements qui ne bougeaient pas (le doublon fraîchement créé
+    n'était pas forcément celui affiché ailleurs) et des fiches incomplètes
+    ('?' pour le pays, initiales à la place de la photo) même pour des
+    joueurs top 10 déjà bien renseignés chez nous. On compare désormais par
+    ENSEMBLE de mots (l'ordre n'a plus d'importance), puis, à défaut, par
+    nom de famille seul (1er mot du format tennisexplorer) si ça désigne un
+    unique joueur -- jamais de devinette en cas d'ambiguïté."""
+    if not scraped_name or not scraped_name.strip():
         return None
-    return db.query(models.Player).filter(models.Player.name.ilike(name.strip())).first()
+    target = _name_words(scraped_name)
+    if not target:
+        return None
+    exact = [p for p in candidates if _name_words(p.name) == target]
+    if len(exact) == 1:
+        return exact[0]
+    if len(exact) > 1:
+        return None  # ambigu -- on ne devine pas
+
+    surname = scraped_name.strip().split()[0]
+    if len(surname) >= 3:
+        surname_matches = [
+            p for p in candidates
+            if re.search(r"\b" + re.escape(surname.lower()) + r"\b", (p.name or "").lower())
+        ]
+        if len(surname_matches) == 1:
+            return surname_matches[0]
+    return None
 
 
 async def _sync_rankings(db: Session, tour: str, stats: Optional[dict] = None) -> int:
@@ -47,6 +86,7 @@ async def _sync_rankings(db: Session, tour: str, stats: Optional[dict] = None) -
     ce biais)."""
     items = await scrape_provider.fetch_rankings(tour)
     local_stats = stats if stats is not None else {"created_players": 0}
+    candidates = _build_player_index(db, tour)
 
     updated = 0
     now = datetime.utcnow()
@@ -55,10 +95,15 @@ async def _sync_rankings(db: Session, tour: str, stats: Optional[dict] = None) -
         rank = item.get("rank")
         if not name or not rank:
             continue
-        player = _find_player(db, name)
+        player = _find_player(name, candidates)
         if player:
             player.current_rank = rank
             player.current_rank_synced_at = now
+            # Rétro-comble le pays s'il manquait -- ne JAMAIS écraser une
+            # valeur déjà connue (l'import historique est plus fiable que
+            # le scraping, qui rate encore le pays sur beaucoup de lignes).
+            if not player.country and item.get("country"):
+                player.country = item.get("country")
         else:
             country = item.get("country")
             player = models.Player(name=name.strip(), tour=tour, country=country or None)
@@ -67,6 +112,8 @@ async def _sync_rankings(db: Session, tour: str, stats: Optional[dict] = None) -
             has_bio = data_confidence.has_bio_signal(player)
             player.data_confidence = data_confidence.compute_confidence(0, has_bio_data=has_bio)
             db.add(player)
+            db.flush()
+            candidates.append(player)
             local_stats["created_players"] += 1
         updated += 1
     db.commit()
