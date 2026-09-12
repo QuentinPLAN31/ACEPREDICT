@@ -226,6 +226,14 @@ async def fetch_draw(tour: str, comp_name: str, year: int) -> list[dict]:
         # d'exiger un lien (une "bye" n'a pas de lien mais doit rester).
         if text[:1].isdigit():
             continue
+        # La page place aussi un lien/widget "H2H" (face-à-face) au même
+        # genre de décalage 'left' qu'une colonne de tour -- si on le
+        # laissait passer, BeautifulSoup lui crée sa PROPRE "colonne" d'un
+        # seul élément entre l'avant-dernier et le dernier tour réels, ce qui
+        # décale ensuite le calcul du round de tous les tours suivants (cf.
+        # scripts/check_draw_structure.py, colonne 'H2H' repérée en pratique).
+        if text.strip().lower() == "h2h":
+            continue
         entries.append((left, top, text))
 
     columns: dict[int, list[tuple[int, str]]] = {}
@@ -238,6 +246,18 @@ async def fetch_draw(tour: str, comp_name: str, year: int) -> list[dict]:
         slots = [(top, _clean_draw_name(text)) for top, text in items if top != 0]
         if slots:
             round_columns.append(slots)
+
+    # La page place aussi, avant la vraie 1ère colonne (le tirage initial,
+    # TOUJOURS entièrement rempli de vrais noms), un élément décoratif isolé
+    # à 'left' quasi nul (une seule "case" vide) -- observé en pratique via
+    # scripts/check_draw_structure.py. Non filtré, il devient round_columns[0]
+    # avec 1 seule entrée, ce qui fait échouer la détection du round de
+    # départ (_DRAW_SIZE_TO_ROUND) et décale TOUS les tours d'un cran. On ne
+    # retire que les colonnes de tête entièrement vides (jamais une colonne
+    # de fin -- un tour final "pas encore déterminé" est lui légitimement
+    # vide et doit être conservé).
+    while round_columns and not any(name for _, name in round_columns[0]):
+        round_columns.pop(0)
 
     num_transitions = len(round_columns) - 1
     if num_transitions < 1:
