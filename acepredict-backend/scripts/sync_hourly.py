@@ -256,21 +256,23 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
 
     db.commit()
 
-    # Purge : fixtures de ce tour absentes du calendrier live actuel (match
-    # annulé/reporté) OU dont la date programmée est trop ancienne (déjà
-    # jouées). Filtré côté Python (pas de composition de clause SQL avec un
-    # set potentiellement vide) — le volume par tour reste modeste.
-    #
-    # La conversion en Match PERMANENT des matchs déjà joués ne se fait
-    # PLUS ici : voir scripts/sync_draws_daily.py (1×/jour), qui scrape
-    # directement le tableau du tournoi (round + vainqueur) plutôt que
-    # d'essayer de rattraper chaque Fixture individuellement au moment de
-    # sa purge.
+    # Purge : UNIQUEMENT les fixtures dont la date programmée est trop
+    # ancienne (déjà jouées). On ne purge PLUS les fixtures simplement
+    # "absentes du calendrier live actuel" (seen_external_ids) -- BUG
+    # DÉCOUVERT ce jour : si l'appel get_upcoming_list() d'un tour renvoie
+    # un lot incomplet ou anormalement restreint lors d'un passage horaire
+    # (aléa réseau/API, fenêtre de résultats étroite côté LiveTennisAPI...),
+    # cette règle supprimait TOUT le calendrier déjà connu de ce tour qui
+    # n'apparaissait pas dans ce lot précis -- observé en conditions
+    # réelles : calendrier ATP réduit à un seul match alors que le
+    # calendrier WTA (fetch réussi ce coup-ci) restait complet. Un match
+    # annulé/reporté reste désormais affiché jusqu'à sa date programmée
+    # puis se purge normalement via is_too_old -- compromis largement
+    # préférable à la perte de calendrier entier observée.
     stale_cutoff = datetime.utcnow() - STALE_AFTER
     for f in db.query(models.Fixture).filter(models.Fixture.tour == tour).all():
         is_too_old = bool(f.scheduled_time and f.scheduled_time < stale_cutoff)
-        is_gone_from_live_calendar = f.external_id not in seen_external_ids
-        if is_too_old or is_gone_from_live_calendar:
+        if is_too_old:
             db.delete(f)
             stats["pruned"] += 1
     db.commit()
