@@ -108,29 +108,22 @@ def _find_player(db: Session, name: str) -> Optional[models.Player]:
 
 async def _auto_discover_player(db: Session, name: str, tour: str, country: Optional[str],
                                   ranking: Optional[int], stats: dict) -> models.Player:
-    """Crée la fiche d'un joueur inconnu, tente de l'enrichir via
-    LiveTennisAPI (seule source secondaire disponible, cf. en-tête du
-    fichier), et fixe data_confidence en conséquence — jamais bloquant."""
+    """Crée la fiche d'un joueur inconnu à partir des seules infos déjà
+    présentes dans le match (nom/pays/classement) -- SANS appel API
+    supplémentaire de fiche bio par joueur. Avant ce correctif, chaque
+    nouveau joueur déclenchait un get_player_profile() séparé ; c'était
+    tenable tant que seuls atp/wta (peu de joueurs jamais vus) étaient
+    synchronisés, mais l'ajout du Challenger côté ATP (cf. plus haut) fait
+    déjà remonter des dizaines/centaines de joueurs inconnus en un seul
+    passage horaire -- assez pour épuiser à lui seul le quota LiveTennisAPI
+    (100 requêtes/jour, plan FREE) et faire échouer le fetch WTA suivant
+    dans le même run. Le classement/pays du match suffisent ; sans eux,
+    data_confidence tombe simplement à "insufficient", ce qui n'empêche pas
+    la fiche d'exister."""
     player = models.Player(name=name.strip(), tour=tour, country=country or None)
     if ranking:
         player.current_rank = ranking
         player.current_rank_synced_at = datetime.utcnow()
-
-    profile = None
-    try:
-        profile = await get_live_client().get_player_profile(name)
-    except Exception:
-        profile = None
-
-    if profile:
-        if not player.country and profile.get("country"):
-            player.country = profile.get("country")
-        if not player.hand and profile.get("hand"):
-            player.hand = profile.get("hand")
-        rank_from_profile = profile.get("ranking") or profile.get("rank")
-        if player.current_rank is None and rank_from_profile:
-            player.current_rank = rank_from_profile
-            player.current_rank_synced_at = datetime.utcnow()
 
     has_bio = data_confidence.has_bio_signal(player)
     player.data_confidence = data_confidence.compute_confidence(0, has_bio_data=has_bio)
