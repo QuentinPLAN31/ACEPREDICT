@@ -1280,11 +1280,17 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
      Le joueur 2 (.p2) reprend --accent2 sur son nom pour éviter le gris
      "réducteur" et distinguer visuellement les deux joueurs partout. */
   .fiche-grid{
-    display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:10px;
-    border-top:1px solid var(--line);
+    display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px;
   }
-  .fiche-card{ padding:14px 16px; text-align:left; }
-  .fiche-card:first-child{ border-right:1px solid var(--line); }
+  .fiche-card{
+    padding:14px 16px; text-align:left; border-radius:12px;
+    background: var(--accent-dim); border:1px solid var(--line-strong);
+    border-top:3px solid var(--accent);
+  }
+  .fiche-card.p2{
+    background: var(--accent2-dim); border-color: rgba(79,195,247,0.22);
+    border-top:3px solid var(--accent2);
+  }
   .fiche-card-name{ font-size:13px; font-weight:800; color: var(--text); margin-bottom:10px; }
   .fiche-card-name.p2{ color: var(--accent2); }
   .fiche-card-sub{
@@ -1294,6 +1300,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .fiche-card-sub:first-of-type{ margin-top:0; }
   .fiche-sub-pos{ color: var(--accent); }
   .fiche-sub-neg{ color:#ffb066; }
+  .fiche-card.p2 .fiche-sub-pos{ color: var(--accent2); }
   .fiche-list{ margin:0; padding:0; list-style:none; }
   .fiche-list li{
     position:relative; padding-left:15px; margin-bottom:6px; font-size:12px;
@@ -1302,9 +1309,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .fiche-list li:last-child{ margin-bottom:0; }
   .fiche-pos li::before{ content:'✓'; position:absolute; left:0; color: var(--accent); font-weight:800; font-size:10.5px; }
   .fiche-neg li::before{ content:'!'; position:absolute; left:2px; color:#ffb066; font-weight:800; font-size:10.5px; }
+  .fiche-card.p2 .fiche-pos li::before{ color: var(--accent2); }
   @media (max-width:520px){
     .fiche-grid{ grid-template-columns:1fr; }
-    .fiche-card:first-child{ border-right:none; border-bottom:1px solid var(--line); }
   }
 
   /* Scénarios possibles (IA) : liste numérotée, pas de boîte pleine par
@@ -3040,7 +3047,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         if(!items.length) return '';
         return '<ul class="fiche-list ' + cls + '">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>';
       };
-      return '<div class="fiche-card">' +
+      return '<div class="fiche-card' + (isP2 ? ' p2' : '') + '">' +
         '<div class="fiche-card-name clickable-name' + (isP2 ? ' p2' : '') + '" data-player-name="' + (name || '').replace(/"/g,'&quot;') + '">' + name + '</div>' +
         '<div class="fiche-card-sub fiche-sub-pos">Points forts</div>' + list(f.forces, 'fiche-pos') +
         '<div class="fiche-card-sub fiche-sub-neg">À surveiller</div>' + list(f.faiblesses, 'fiche-neg') +
