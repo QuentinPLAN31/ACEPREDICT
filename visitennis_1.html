@@ -1064,6 +1064,7 @@
 
           .bracket-p .b-flag{ width:18px; height:18px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; overflow:hidden; }
     .bracket-p.winner .score{ color: var(--accent); }
+  .b-avatar{ width:22px; height:22px; border-radius:999px; background: var(--accent-dim); background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; font-weight:700; color: var(--accent); font-size:9px; flex-shrink:0; }
 
   .match-row{ display:flex; align-items:center; gap:14px; background: linear-gradient(160deg, var(--card-top), var(--card-bottom)); border:1px solid var(--line); border-radius:12px; padding:15px 18px; margin-bottom:8px; }
     .match-row .m-flag{ width:30px; height:30px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; overflow:hidden; }
@@ -3586,8 +3587,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(!wrap) return;
     wrap.innerHTML = '<div class="upcoming-loading">Chargement...</div>';
     try {
-      const url = API_BASE + '/players?tour=' + joueursDirTour + '&limit=40'
-        + (q ? '&q=' + encodeURIComponent(q) : '');
+      // Sans recherche : &sort=rank, INDISPENSABLE côté backend (pas
+      // juste une préférence d'affichage) -- sinon le backend renvoie son
+      // top N par Elo interne AVANT tout tri, et un joueur bien classé
+      // ATP/WTA mais avec un Elo interne plus faible n'est simplement
+      // jamais renvoyé (d'où les classements #17/#33 manquants).
+      const url = API_BASE + '/players?tour=' + joueursDirTour + '&limit=100'
+        + (q ? '&q=' + encodeURIComponent(q) : '&sort=rank');
       const res = await fetch(url);
       let players = res.ok ? await res.json() : [];
       // Classement mondial réel d'abord (les joueurs "non classés" -- sans
@@ -3609,10 +3615,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           '<span class="player-rank" title="Classement mondial">' + rankLabel + '</span>' +
           '<span class="player-avatar" data-player-name="' + (p.name || '').replace(/"/g,'&quot;') + '">' + initials + '</span>' +
           '<span class="player-info"><span class="player-name">' + p.name + '</span><span class="player-country"><span class="pc-flag">' + countryFlag(p.country) + '</span>' + (p.country || '?') + '</span></span>' +
+          '<button type="button" class="upr-btn upr-btn-sm" data-player-name="' + (p.name || '').replace(/"/g,'&quot;') + '">Fiche</button>' +
         '</div>';
       }).join('') : '<div class="upcoming-empty">Aucun joueur ne correspond à ta recherche.</div>';
       wrap.querySelectorAll('.player-row[data-player-name]').forEach(row=>{
         row.addEventListener('click', ()=> openPlayerProfileByName(row.dataset.playerName));
+      });
+      wrap.querySelectorAll('.upr-btn[data-player-name]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(btn.dataset.playerName); });
       });
       // Photos officielles (via Wikipedia), même mécanisme que partout ailleurs.
       wrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
@@ -3837,10 +3847,18 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           const bIdx = bracketMatchesFlat.length;
           bracketMatchesFlat.push(m);
           const scoreLabel = m.score ? m.score : (m.winner_id ? '' : (m.date ? new Date(m.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'}) : 'à venir'));
+          const p1Initials = (m.player1_name || '').split(' ').map(w=> w[0]).filter(Boolean).slice(-2).join('').toUpperCase();
+          const p2Initials = (m.player2_name || '').split(' ').map(w=> w[0]).filter(Boolean).slice(-2).join('').toUpperCase();
           return '<div class="bracket-match" data-bidx="' + bIdx + '">' +
-            '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '"><span class="name clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span></div>' +
+            '<div class="bracket-p' + (p1Wins ? ' winner' : '') + '">' +
+              '<span class="b-avatar" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + p1Initials + '</span>' +
+              '<span class="name clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span>' +
+            '</div>' +
             '<span class="bracket-vs">vs</span>' +
-            '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '"><span class="name clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span></div>' +
+            '<div class="bracket-p' + (p2Wins ? ' winner' : '') + '">' +
+              '<span class="b-avatar" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + p2Initials + '</span>' +
+              '<span class="name clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span>' +
+            '</div>' +
             '<span class="bracket-score">' + scoreLabel + '</span>' +
             '<button class="upr-btn upr-btn-sm" data-bidx="' + bIdx + '" type="button">Analyser</button>' +
           '</div>';
@@ -3860,6 +3878,22 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     });
     bracketWrap.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
       el.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(el.dataset.playerName); });
+    });
+    bracketWrap.querySelectorAll('.b-avatar[data-player-name]').forEach(el=>{
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(el.dataset.playerName); });
+    });
+    // Photos officielles (via Wikipedia) dans le tableau -- même mécanisme
+    // que les avatars des onglets Joueurs, initiales conservées en repli.
+    bracketWrap.querySelectorAll('.b-avatar[data-player-name]').forEach(async (avatarEl)=>{
+      const name = avatarEl.dataset.playerName;
+      if(!name) return;
+      try {
+        const photoUrl = await getPlayerPhotoUrl(name);
+        if(photoUrl){
+          avatarEl.style.backgroundImage = 'url(' + JSON.stringify(photoUrl).slice(1, -1) + ')';
+          avatarEl.textContent = '';
+        }
+      } catch(err){ /* dégradation gracieuse : initiales conservées */ }
     });
     // --- Joueurs : victoires réelles + classement mondial réel (plus de
     // numérotation arbitraire basée sur des victoires à 0 avant le début
@@ -3892,6 +3926,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<span class="player-avatar" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">' + initials + '</span>' +
         '<span class="player-info"><span class="player-name">' + p.name + (p.eliminated ? ' <span class="player-elim-badge">Éliminé</span>' : '') + '</span><span class="player-country"><span class="pc-flag">' + countryFlag(p.country) + '</span>' + (p.country || '?') + '</span></span>' +
         '<span><span class="player-stat">' + p.wins + '</span><br><span class="player-stat-label">victoire' + (p.wins > 1 ? 's' : '') + '</span></span>' +
+        '<button type="button" class="upr-btn upr-btn-sm" data-player-name="' + p.name.replace(/"/g,'&quot;') + '">Fiche</button>' +
       '</div>';
     }).join('') : '<div class="upcoming-empty">Aucun joueur ne correspond à ce filtre.</div>';
     if(compLiveOnly && eliminatedIds.size === 0 && compMatchesRaw.length){
@@ -3899,6 +3934,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     }
     playersWrap.querySelectorAll('.player-row[data-player-name]').forEach(row=>{
       row.addEventListener('click', ()=> openPlayerProfileByName(row.dataset.playerName));
+    });
+    playersWrap.querySelectorAll('.upr-btn[data-player-name]').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{ e.stopPropagation(); openPlayerProfileByName(btn.dataset.playerName); });
     });
     // Photos officielles (via Wikipedia) : chargées en arrière-plan, initiales conservées en repli.
     playersWrap.querySelectorAll('.player-avatar[data-player-name]').forEach(async (avatarEl)=>{
