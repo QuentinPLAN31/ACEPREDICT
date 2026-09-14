@@ -19,13 +19,6 @@ Usage :
     python -m scripts.sync_hourly
 
 Pour chaque tour (atp, wta) :
-  0. Côté "atp" uniquement : l'API tierce classe le Challenger à part
-     ("challenger"), jamais sous "atp", alors que le niveau équivalent côté
-     femmes (WTA 125, ex. Sao Paulo/Guadalajara) est déjà étiqueté "wta" --
-     un tour ATP creux entre deux tournois faisait donc tomber l'onglet
-     Hommes à 1 seul match pendant que Femmes en affichait des dizaines. On
-     interroge donc aussi "challenger" et on le fusionne dans "atp" (+1
-     appel API/heure, quota large toujours disponible, cf. plus bas).
   1. Récupère la liste des prochains matchs (LiveTennisAPI) -> upsert Fixture
      par joueur, avec AUTO-DISCOVERY : un joueur absent de notre base est
      créé à la volée, puis on tente une fiche bio via LiveTennisAPI (SEULE
@@ -166,24 +159,21 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
         "tour": tour, "fetched": 0, "created_players": 0, "upserted": 0,
         "pruned": 0, "market_found": 0, "weather_found": 0,
     }
-    # Notre schéma ne distingue que 2 tours (atp/wta), mais l'API tierce
-    # catégorise elle-même en atp/wta/challenger/itf. Constaté en conditions
-    # réelles : côté femmes, les tournois WTA 125 (ex. Sao Paulo, Guadalajara)
-    # sont déjà étiquetés "wta" par l'API -- ils remontent donc naturellement
-    # dans l'onglet Femmes. Côté hommes, l'équivalent (Challenger) est
-    # étiqueté à part ("challenger"), jamais "atp" : sans ce complément, la
-    # semaine où le circuit ATP principal est creux (entre deux tournois),
-    # l'onglet Hommes tombe à 1 seul match alors que des dizaines de matchs
-    # Challenger bien réels ont lieu au même moment. On les inclut donc pour
-    # rétablir la même couverture que côté femmes.
-    EXTRA_API_TOURS = {"atp": ["challenger"]}
-    api_tours = [tour] + EXTRA_API_TOURS.get(tour, [])
-    matches = []
-    for api_tour in api_tours:
-        try:
-            matches += await get_live_client().get_upcoming_list(tour=api_tour, limit=FIXTURE_LIST_LIMIT)
-        except Exception:
-            continue
+    # REVERT (2026-09-13) -- on avait tenté d'inclure aussi tour="challenger"
+    # côté ATP pour compenser un calendrier ATP principal creux (cf. git
+    # log). Constaté en conditions réelles : la catégorie "challenger" de
+    # cette API n'est PAS spécifique aux hommes -- plusieurs tournois
+    # remontés (Valencia, Caldas da Rainha, Szczecin...) contiennent en
+    # réalité des tableaux femmes ET hommes côte à côte, tous étiquetés
+    # "challenger" sans distinction de genre. Résultat : des joueuses se
+    # sont retrouvées mélangées dans l'onglet Hommes. On revient donc à un
+    # simple fetch par tour officiel (atp/wta) -- un calendrier ATP plus
+    # creux une semaine donnée reflète la réalité du circuit, c'est
+    # préférable à des données mélangées par genre.
+    try:
+        matches = await get_live_client().get_upcoming_list(tour=tour, limit=FIXTURE_LIST_LIMIT)
+    except Exception:
+        return stats
     stats["fetched"] = len(matches)
 
     city_cache: dict[str, Optional[str]] = {}
