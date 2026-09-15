@@ -1245,13 +1245,18 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .upcoming-card-date{ font-size:12px; color: var(--accent); font-weight:700; text-align:right; white-space:nowrap; flex-shrink:0; }
   .result-weather{
     margin-top:12px; padding-top:12px; border-top:1px solid var(--line);
-    font-size:12px; color: var(--text-sec); text-align:left;
+    font-size:12.5px; color: var(--text); text-align:left;
   }
   .result-weather-row{ display:flex; justify-content:space-between; gap:10px; margin-bottom:3px; }
-  .result-weather-note{ margin-top:8px; font-size:11.5px; color: var(--text-dim); line-height:1.4; }
+  /* Notes d'avertissement (⚠️) : avant en --text-dim (la couleur la PLUS
+     discrète du thème), ce qui les faisait passer pour du texte secondaire
+     alors que ce sont des infos qui pèsent sur le pronostic -- alignées sur
+     l'orange déjà utilisé pour "à surveiller" (cf. .fiche-sub-neg) pour
+     qu'elles ressortent au lieu de se fondre dans le fond. */
+  .result-weather-note{ margin-top:8px; font-size:12px; font-weight:600; color:#ffb066; line-height:1.45; }
   .result-narrative{
     margin-top:10px; padding-top:14px; border-top:1px solid var(--line); text-align:left;
-    font-size:12.5px; line-height:1.68; color: var(--text-sec);
+    font-size:13px; line-height:1.68; color: var(--text);
   }
   .result-narrative-lead{
     margin:0 0 16px; padding-bottom:14px; border-bottom:1px solid var(--line);
@@ -1303,8 +1308,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .fiche-card.p2 .fiche-sub-pos{ color: var(--accent2); }
   .fiche-list{ margin:0; padding:0; list-style:none; }
   .fiche-list li{
-    position:relative; padding-left:15px; margin-bottom:6px; font-size:12px;
-    color: var(--text-sec); line-height:1.45;
+    position:relative; padding-left:15px; margin-bottom:6px; font-size:12.5px;
+    color: var(--text); line-height:1.45;
   }
   .fiche-list li:last-child{ margin-bottom:0; }
   .fiche-pos li::before{ content:'✓'; position:absolute; left:0; color: var(--accent); font-weight:800; font-size:10.5px; }
@@ -1325,7 +1330,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     justify-content:center; margin-top:1px;
   }
   .scenario-item:nth-child(even) .scenario-num{ background: var(--accent2-dim); color: var(--accent2); }
-  .scenario-text{ font-size:12.5px; line-height:1.55; color: var(--text-sec); }
+  .scenario-text{ font-size:13px; line-height:1.55; color: var(--text); font-weight:500; }
 
   /* Moment clé (IA, section MOMENT_CLE) : callout coloré unique pour casser
      la présentation en puces et donner un vrai point d'accroche visuel. */
@@ -1352,7 +1357,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     color: var(--text-dim); margin-bottom:8px;
   }
   .verdict-expert-text{
-    font-size:13px; line-height:1.65; color: var(--text-sec); font-style:italic;
+    font-size:13.5px; line-height:1.65; color: var(--text); font-style:italic; font-weight:500;
   }
   .verdict-expert-sign{
     margin-top:10px; font-size:11px; font-style:normal; font-weight:700; color: var(--accent2);
@@ -1419,7 +1424,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .stat-bar-half-right{ justify-content:flex-start; }
   .stat-bar-fill-center-left{ background: var(--accent); height:100%; transition: width 0.4s ease; }
   .stat-bar-fill-center-right{ background: var(--accent2); height:100%; transition: width 0.4s ease; }
-  .stat-bar-note{ margin-top:5px; font-size:11px; color: var(--text-dim); line-height:1.4; }
+  /* Même correctif que .result-weather-note ci-dessus : ces notes portent
+     un ⚠️ (H2H écrasant, charge de matchs...) qui pèse réellement sur le
+     pronostic -- --text-dim les rendait invisibles/anecdotiques. */
+  .stat-bar-note{ margin-top:5px; font-size:11.5px; font-weight:600; color:#ffb066; line-height:1.45; }
 .analyse-msg{
     font-size:12.5px; border-radius:8px; padding:10px 12px; margin-top:12px; display:none;
   }
