@@ -147,6 +147,12 @@ class UsageQuota(Base):
     period_end = Column(DateTime, nullable=True)
     analyses_used = Column(Integer, default=0)
     analyses_limit = Column(Integer, default=5)  # ex: plan free = 5/mois
+    # Analyses achetées à l'unité (pack ponctuel, cf. routers/billing.py
+    # "pack5"), en plus de analyses_limit -- stockées à part pour ne PAS être
+    # effacées par le reset périodique de analyses_limit (cf. deps.py
+    # require_quota, qui réinitialise analyses_limit à la valeur de base du
+    # plan à chaque nouvelle période -- un pack acheté doit survivre à ça).
+    bonus_analyses = Column(Integer, default=0)
 
     user = relationship("User", back_populates="quota")
 

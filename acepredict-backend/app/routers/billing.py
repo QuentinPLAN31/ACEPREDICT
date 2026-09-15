@@ -114,7 +114,9 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                     analyses_limit=PLAN_QUOTAS.get(user.plan.value, 5),
                 )
                 db.add(user.quota)
-            user.quota.analyses_limit += 5
+            # bonus_analyses (pas analyses_limit) : survit au reset
+            # périodique du quota de base (cf. deps.py require_quota).
+            user.quota.bonus_analyses = (user.quota.bonus_analyses or 0) + 5
             db.commit()
         elif user and plan:
             user.plan = models.PlanEnum(plan)
