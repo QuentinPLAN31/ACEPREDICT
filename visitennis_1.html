@@ -65,7 +65,7 @@
     display:flex;
     align-items:center;
     gap:10px;
-    margin-bottom: 4px;
+    margin-bottom: 28px;
   }
   .brand-mark{
     width: 32px; height: 32px;
@@ -75,7 +75,6 @@
   }
   .brand-mark svg{ width:32px; height:32px; }
   .brand-name{ font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: var(--accent); }
-  .brand-sub{ font-size: 11.5px; color: var(--text-dim); margin: 2px 0 26px 40px; }
 
   .nav-label{
     font-size: 10.5px;
@@ -108,6 +107,23 @@
     background: var(--accent-dim);
     border-color: var(--line-strong);
     color: var(--accent);
+  }
+  /* "Nouvelle analyse" (ex-"Matchs") : c'est l'action principale du site,
+     elle mérite de ressortir visuellement des autres items de nav plutôt
+     que de se fondre dedans -- dégradé de couleurs chaudes (contraste
+     volontaire avec le thème vert/bleu du reste de l'app). */
+  .nav-item.nav-item-primary{
+    background: linear-gradient(135deg, #ff7a45, #ffb020);
+    color: #1a1204;
+    font-weight: 800;
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(255,122,69,0.28);
+  }
+  .nav-item.nav-item-primary:hover{ filter: brightness(1.07); color:#1a1204; }
+  .nav-item.nav-item-primary.active{
+    background: linear-gradient(135deg, #ff7a45, #ffb020);
+    color: #1a1204;
+    border-color: transparent;
   }
   .nav-item .badge{
     margin-left:auto;
@@ -199,9 +215,15 @@
     border-radius: 16px;
     padding: 26px;
   }
+  /* Titres de section (SCÉNARIOS POSSIBLES, INTERPRÉTATION, ANALYSE
+     APPROFONDIE, etc.) : étaient en --text-dim (couleur la plus discrète du
+     thème) à 10.5px -- ils se noyaient dans le fond et l'analyse entière
+     paraissait tassée. Passés en accent + petit filet dessous, avec plus
+     d'air, pour vraiment marquer chaque section. */
   .field-label{
-    font-size: 10.5px; letter-spacing: 0.08em; color: var(--text-dim);
-    font-weight: 700; margin-bottom: 12px;
+    font-size: 12px; letter-spacing: 0.09em; color: var(--accent);
+    font-weight: 800; margin-bottom: 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--line-strong);
   }
   .jargon-star{ color: var(--accent); font-weight: 700; cursor: help; }
   .clickable-name{ cursor: pointer; }
@@ -1432,6 +1454,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     font-size:12.5px; border-radius:8px; padding:10px 12px; margin-top:12px; display:none;
   }
   .analyse-msg.error{ display:block; background: rgba(255,90,90,0.1); color:#ff8a8a; border:1px solid rgba(255,90,90,0.25); }
+  /* Bouton rouge affiché quand le quota d'analyses est atteint (402) -- avant
+     ça, juste une phrase noyée dans le bandeau d'erreur, facile à rater. */
+  .upgrade-cta-btn{
+    display:block; width:100%; margin-top:10px; padding:11px 14px;
+    background: var(--danger); color:#fff; border:none; border-radius:9px;
+    font-weight:800; font-size:13px; font-family:inherit; cursor:pointer;
+  }
+  .upgrade-cta-btn:hover{ filter:brightness(1.08); }
   .analyse-result{
     margin-top:18px; background: var(--accent-dim); border:1px solid var(--line-strong);
     border-radius:12px; padding:20px; text-align:center;
@@ -1478,13 +1508,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </span>
       <span class="brand-name">AcePredict</span>
     </div>
-    <div class="brand-sub">Analyse IA de matchs</div>
 
     <div class="nav-label">ANALYSE</div>
     <nav class="nav">
-      <button class="nav-item active" data-page="matchs">
+      <button class="nav-item active nav-item-primary" data-page="matchs">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
-        Matchs
+        Nouvelle analyse
       </button>
       <button class="nav-item" data-page="upcoming">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
@@ -1695,10 +1724,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <div class="plan-sub">Pour découvrir l'IA</div>
           <div class="plan-billed-note" style="display:none;"></div>
           <ul class="plan-feats">
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>1 analyse par jour</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>2 analyses par jour</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Analyse réduite</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Stats clés</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Probabilités exactes 1x/jour</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Probabilités exactes 2x/jour</li>
             <li class="off"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>Questions personnelles à l'IA</li>
           </ul>
           <button class="plan-btn filled">Débloquer - 10€/mois</button>
@@ -2879,7 +2908,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       return '<div class="result-force-card"><div class="result-force-card-name">' + name + '</div>' +
         '<ul class="result-force-list">' + items.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul></div>';
     };
-    return '<div class="field-label" style="margin-top:18px;">FORCES CLÉS IDENTIFIÉES</div>' +
+    return '<div class="field-label" style="margin-top:28px;">FORCES CLÉS IDENTIFIÉES</div>' +
       '<div class="result-forces-cards">' + card(p1Name, forces.f1) + card(p2Name, forces.f2) + '</div>';
   }
 
@@ -2903,7 +2932,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   function renderFactorsBlock(detail){
     const tags = computeFactorTags(detail);
     if(!tags.length) return '';
-    return '<div class="field-label" style="margin-top:18px;">FACTEURS PRIS EN COMPTE</div>' +
+    return '<div class="field-label" style="margin-top:28px;">FACTEURS PRIS EN COMPTE</div>' +
       '<div class="result-factors">' + tags.map(function(t){ return '<span class="result-factor-pill">' + t + '</span>'; }).join('') + '</div>';
   }
 
@@ -3044,7 +3073,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // laisser noyée plus bas dans l'analyse.
   function renderCroisementBlock(bullets){
     if(!bullets || !bullets.length) return '';
-    return '<div class="field-label" style="margin-top:22px;">INTERPRÉTATION</div>' +
+    return '<div class="field-label" style="margin-top:32px;">INTERPRÉTATION</div>' +
       '<ul class="result-narrative-list">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>';
   }
 
@@ -3061,12 +3090,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="fiche-card-sub fiche-sub-neg">À surveiller</div>' + list(f.faiblesses, 'fiche-neg') +
       '</div>';
     };
-    return '<div class="field-label" style="margin-top:22px;">FICHES JOUEURS</div>' +
+    return '<div class="field-label" style="margin-top:32px;">FICHES JOUEURS</div>' +
       '<div class="fiche-grid">' + card(p1Name, fiches.j1, false) + card(p2Name, fiches.j2, true) + '</div>';
   }
 
   function renderScenariosBlock(scenarios){
-    return '<div class="field-label" style="margin-top:22px;">SCÉNARIOS POSSIBLES</div>' +
+    return '<div class="field-label" style="margin-top:32px;">SCÉNARIOS POSSIBLES</div>' +
       '<div class="scenario-list">' + scenarios.map(function(s, idx){
         return '<div class="scenario-item">' +
           '<div class="scenario-num">' + (idx + 1) + '</div>' +
@@ -3106,7 +3135,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="result-narrative-section-label">' + s.label + '</div>' + body +
       '</div>';
     }).join('');
-    return '<div class="field-label" style="margin-top:22px;">ANALYSE APPROFONDIE</div>' +
+    return '<div class="field-label" style="margin-top:32px;">ANALYSE APPROFONDIE</div>' +
       '<div class="result-narrative">' + html + '</div>';
   }
 
@@ -3188,7 +3217,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="form-card-record">' + form.wins + 'V - ' + form.losses + 'D sur les ' + form.results.length + ' derniers matchs</div>' +
       '</div>';
     };
-    return '<div class="field-label" style="margin-top:18px;">FORME RÉCENTE</div>' +
+    return '<div class="field-label" style="margin-top:28px;">FORME RÉCENTE</div>' +
       '<div class="form-row">' + card(p1Name, f1, false) + card(p2Name, f2, true) + '</div>';
   }
 
@@ -3232,7 +3261,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       renderConfidenceWarning(data, p1Name, p2Name) +
       (narrative ? '<p class="result-lead">' + narrative.lead + '</p>' : '') +
       renderFormBlock(data.detail, p1Name, p2Name) +
-      '<div class="field-label" style="margin-top:18px;">RÉSUMÉ RAPIDE</div>' +
+      '<div class="field-label" style="margin-top:28px;">RÉSUMÉ RAPIDE</div>' +
       '<div class="result-summary">' + buildSummaryText(data.detail, p1Name, p2Name, winnerName, loserName, surfaceNote) + '</div>' +
       '<div class="confidence-wrap">' +
         '<div class="confidence-label-row"><span>Niveau de confiance</span><b>' + confidenceLabel(pct) + '</b></div>' +
@@ -3348,7 +3377,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         });
         if(res.status === 401){ openAuth('login', runAnalysis); return; }
         if(res.status === 402){
-          setAuthMsg(msg, 'error', "Quota d'analyses atteint pour ton plan gratuit. Passe à un plan supérieur pour continuer.");
+          msg.className = 'analyse-msg error';
+          msg.innerHTML = "Quota d'analyses atteint pour ton plan." +
+            '<button type="button" class="upgrade-cta-btn" id="quotaUpgradeBtn">Passer au plan supérieur ou acheter des analyses</button>';
+          const upBtn = document.getElementById('quotaUpgradeBtn');
+          if(upBtn) upBtn.addEventListener('click', ()=> go('pricing'));
           return;
         }
         if(!res.ok){
@@ -4250,7 +4283,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   function renderLexiqueBlock(found){
     if(!found.length) return '';
-    return '<div class="field-label" style="margin-top:18px;">LEXIQUE</div>' +
+    return '<div class="field-label" style="margin-top:28px;">LEXIQUE</div>' +
       '<div class="result-summary" style="font-size:12.5px;"><ul style="margin:0; padding-left:18px;">' +
         found.map(j => '<li><b>' + j.term + '</b> : ' + j.def + '</li>').join('') +
       '</ul></div>';
