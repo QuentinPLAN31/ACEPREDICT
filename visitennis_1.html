@@ -2740,6 +2740,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'factor.recent_form': 'Forme récente comparée',
       'factor.h2h_known': 'Historique des confrontations',
       'factor.surface': 'Analyse spécifique à la surface',
+      'factor.playing_style': 'Style de jeu analysé',
       'force.best_general_level': 'Meilleur niveau général',
       'force.win_streak': 'Série de {n} victoires en cours',
       'force.great_form': 'En grande forme ({w}V-{l}D)',
@@ -3179,6 +3180,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'factor.recent_form': 'Forma reciente comparada',
       'factor.h2h_known': 'Historial de enfrentamientos',
       'factor.surface': 'Análisis específico de la superficie',
+      'factor.playing_style': 'Estilo de juego analizado',
       'force.best_general_level': 'Mejor nivel general',
       'force.win_streak': 'Racha de {n} victorias en curso',
       'force.great_form': 'En gran forma ({w}V-{l}D)',
@@ -3618,6 +3620,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'factor.recent_form': 'Recent form compared',
       'factor.h2h_known': 'Head-to-head history',
       'factor.surface': 'Surface-specific analysis',
+      'factor.playing_style': 'Playing style analyzed',
       'force.best_general_level': 'Best overall level',
       'force.win_streak': '{n}-match win streak in progress',
       'force.great_form': 'In great form ({w}W-{l}L)',
@@ -4553,11 +4556,17 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       // ajuster le pronostic -- reste un facteur réellement pris en compte.
       tags.push(t('factor.h2h_known'));
     }
-    if(detail.fatigue_adjustment) tags.push(t('factor.fatigue'));
-    if(detail.weather_adjustment) tags.push(t('factor.weather'));
-    if(detail.tournament_adjustment) tags.push(t('factor.tournament'));
+    // À partir d'ici, on liste TOUT ce qui a réellement nourri l'analyse (le
+    // contexte transmis à l'IA), pas seulement ce qui a numériquement fait
+    // bouger la probabilité -- une donnée peut être "prise en compte" (elle
+    // apparaît dans le commentaire, les cartes météo/tournoi, etc.) sans
+    // avoir déclenché d'ajustement chiffré.
+    if(detail.fatigue_player1 && detail.fatigue_player2) tags.push(t('factor.fatigue'));
+    if(detail.weather && !detail.weather.indoor) tags.push(t('factor.weather'));
+    if(detail.tournament_context) tags.push(t('factor.tournament'));
     if(detail.market_adjustment) tags.push(t('factor.market'));
     if(detail.style_matchup) tags.push(t('factor.style'));
+    if(detail.style_player1 || detail.style_player2) tags.push(t('factor.playing_style'));
     if(detail.surface_used && detail.surface_used !== 'overall') tags.push(t('factor.surface'));
     return tags;
   }
