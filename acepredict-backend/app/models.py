@@ -67,8 +67,16 @@ class User(Base):
 
     id = Column(UUIDType, primary_key=True, default=gen_uuid)
     email = Column(String, unique=True, nullable=False, index=True)
-    hashed_password = Column(String, nullable=False)
+    # Nullable : un compte créé via "Se connecter avec Google" n'a pas de mot
+    # de passe local (cf. routers/auth.py /auth/google). Un compte classique
+    # en a toujours un.
+    hashed_password = Column(String, nullable=True)
     full_name = Column(String, nullable=True)
+
+    # Identifiant "sub" du jeton Google (stable, unique par compte Google) --
+    # cf. routers/auth.py /auth/google. Nullable : la majorité des comptes
+    # sont créés par e-mail/mot de passe classique.
+    google_id = Column(String, nullable=True, unique=True, index=True)
 
     plan = Column(Enum(PlanEnum), nullable=False, default=PlanEnum.free)
     stripe_customer_id = Column(String, nullable=True, unique=True)

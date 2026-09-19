@@ -17,6 +17,14 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     refresh_token_expire_days: int = 30
 
+    # "Se connecter / S'inscrire avec Google" (cf. routers/auth.py /auth/google).
+    # Client ID OAuth 2.0 (type "Application Web") créé sur
+    # https://console.cloud.google.com/apis/credentials -- sert à vérifier que
+    # le jeton d'identité Google reçu du frontend a bien été émis pour CETTE
+    # app (vérification de l'audience), pas pour une autre. Le même Client ID
+    # doit être renseigné côté frontend (GOOGLE_CLIENT_ID dans visitennis_1.html).
+    google_client_id: str = ""
+
     # Stripe
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""

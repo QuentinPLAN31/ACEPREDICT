@@ -21,6 +21,15 @@ class UserLogin(BaseModel):
     password: str
 
 
+class GoogleAuthRequest(BaseModel):
+    """Jeton d'identité (ID token) renvoyé par Google Identity Services côté
+    frontend après connexion -- cf. routers/auth.py /auth/google. Le backend
+    le revérifie intégralement auprès de Google, jamais fait confiance à ce
+    qui vient du navigateur."""
+    id_token: str
+    ref_code: Optional[str] = None
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"

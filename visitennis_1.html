@@ -1312,6 +1312,15 @@
   .auth-msg.error{ display:block; background: rgba(255,90,90,0.1); color:#ff8a8a; border:1px solid rgba(255,90,90,0.25); }
   .auth-msg.success{ display:block; background: var(--accent-dim); color: var(--accent); border:1px solid var(--line-strong); }
   .auth-panel{ display:none; }
+  /* "Se connecter / S'inscrire avec Google" -- bouton officiel Google
+     Identity Services (rendu par leur propre script, cf. JS plus bas),
+     encadré d'un séparateur "ou" avant les champs e-mail/mot de passe. */
+  .auth-google-btn{ display:flex; justify-content:center; min-height:40px; }
+  .auth-divider{
+    display:flex; align-items:center; gap:12px; margin:18px 0;
+    font-size:12px; font-weight:600; color: var(--text-sec); text-transform:uppercase; letter-spacing:.05em;
+  }
+  .auth-divider::before, .auth-divider::after{ content:''; flex:1; height:1px; background: var(--line); }
   .auth-panel.active{ display:block; }
 
   /* ---------- Recherche de joueurs ---------- */
@@ -1632,6 +1641,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .guest-cta{ text-align:center; }
   .guest-cta .btn-primary{ width:auto; padding:13px 28px; margin-top:4px; }
 </style>
+<!-- "Se connecter / S'inscrire avec Google" (cf. JS plus bas, section
+     "Google Identity Services") -- chargé en async, la connexion Google
+     n'est simplement pas proposée tant qu'il n'a pas fini de charger. -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -2258,6 +2271,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <div class="auth-panel active" id="authPanelLogin">
       <div class="auth-title" data-i18n="auth.login_title">Content de te revoir</div>
       <div class="auth-sub" data-i18n="auth.login_sub">Connecte-toi pour accéder à tes analyses et à ton historique.</div>
+      <div class="auth-google-btn" id="googleBtnLogin"></div>
+      <div class="auth-divider" data-i18n="auth.or_divider">ou</div>
       <form class="auth-form" id="loginForm">
         <div class="auth-field">
           <label for="loginEmail" data-i18n="auth.email">E-mail</label>
@@ -2277,6 +2292,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <div class="auth-panel" id="authPanelRegister">
       <div class="auth-title" data-i18n="auth.register_title">Créer un compte</div>
       <div class="auth-sub" data-i18n="auth.register_sub">Rejoins AcePredict et commence à analyser tes premiers matchs.</div>
+      <div class="auth-google-btn" id="googleBtnRegister"></div>
+      <div class="auth-divider" data-i18n="auth.or_divider">ou</div>
       <form class="auth-form" id="registerForm">
         <div class="auth-field">
           <label for="registerName" data-i18n="auth.full_name">Nom complet</label>
@@ -2590,6 +2607,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.close': 'Fermer',
       'auth.tab_login': 'Connexion',
       'auth.tab_register': 'Inscription',
+      'auth.or_divider': 'ou',
+      'auth.google_error': 'Connexion Google impossible — réessaie.',
+      'auth.google_connecting': 'Connexion avec Google…',
       'auth.login_title': 'Content de te revoir',
       'auth.login_sub': 'Connecte-toi pour accéder à tes analyses et à ton historique.',
       'auth.email': 'E-mail',
@@ -3030,6 +3050,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.close': 'Cerrar',
       'auth.tab_login': 'Iniciar sesión',
       'auth.tab_register': 'Registrarse',
+      'auth.or_divider': 'o',
+      'auth.google_error': 'No se pudo iniciar sesión con Google — inténtalo de nuevo.',
+      'auth.google_connecting': 'Conectando con Google…',
       'auth.login_title': 'Nos alegra verte de nuevo',
       'auth.login_sub': 'Inicia sesión para acceder a tus análisis y a tu historial.',
       'auth.email': 'Correo electrónico',
@@ -3470,6 +3493,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.close': 'Close',
       'auth.tab_login': 'Log in',
       'auth.tab_register': 'Sign up',
+      'auth.or_divider': 'or',
+      'auth.google_error': 'Google sign-in failed — please try again.',
+      'auth.google_connecting': 'Signing in with Google…',
       'auth.login_title': 'Welcome back',
       'auth.login_sub': 'Log in to access your analyses and your history.',
       'auth.email': 'Email',
@@ -3846,6 +3872,57 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       if(after) after();
     }, 400);
   }
+
+  // ---------- Google Identity Services ("Se connecter avec Google") ----------
+  // Remplace REMPLACE_PAR_TON_CLIENT_ID.apps.googleusercontent.com par le
+  // Client ID OAuth 2.0 ("Application Web") créé sur
+  // https://console.cloud.google.com/apis/credentials -- le même identifiant
+  // doit être renseigné côté backend (variable d'env GOOGLE_CLIENT_ID sur
+  // Railway), sinon /auth/google refuse la requête.
+  const GOOGLE_CLIENT_ID = '582419684809-ahpq630h0dqcb0ciq2hupjegn3eqmug2.apps.googleusercontent.com';
+
+  async function handleGoogleCredential(response){
+    const msgLogin = document.getElementById('loginMsg');
+    const msgRegister = document.getElementById('registerMsg');
+    const activePanel = document.getElementById('authPanelRegister').classList.contains('active') ? 'register' : 'login';
+    const msg = activePanel === 'register' ? msgRegister : msgLogin;
+    setAuthMsg(msg, '', t('auth.google_connecting'));
+    try {
+      const res = await fetch(API_BASE + '/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: response.credential, ref_code: getPendingRefCode() }),
+      });
+      const data = await res.json().catch(()=> ({}));
+      if(!res.ok) throw new Error(data.detail || t('auth.google_error'));
+      if(activePanel === 'register') localStorage.removeItem('acepredict_ref_code');
+      onAuthSuccess(data.access_token, msg, t('auth.connected'));
+    } catch(err){
+      setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
+    }
+  }
+
+  function initGoogleSignIn(){
+    if(!window.google || !window.google.accounts || !window.google.accounts.id) return false;
+    if(GOOGLE_CLIENT_ID.indexOf('REMPLACE_PAR_TON_CLIENT_ID') === 0) return false; // pas encore configuré
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+    ['googleBtnLogin', 'googleBtnRegister'].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el && !el.dataset.rendered){
+        google.accounts.id.renderButton(el, { theme: 'filled_black', size: 'large', shape: 'pill', width: 320 });
+        el.dataset.rendered = '1';
+      }
+    });
+    return true;
+  }
+  // Le script Google (chargé en <script async defer> dans le <head>) peut
+  // finir de charger après ce point -- on retente plusieurs fois avant
+  // d'abandonner silencieusement (bouton Google simplement absent, le reste
+  // de l'auth classique continue de marcher normalement).
+  (function tryInitGoogleSignIn(attemptsLeft){
+    if(initGoogleSignIn() || attemptsLeft <= 0) return;
+    setTimeout(()=> tryInitGoogleSignIn(attemptsLeft - 1), 400);
+  })(15);
 
   document.getElementById('loginForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
