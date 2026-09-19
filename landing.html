@@ -457,7 +457,16 @@
   .auth-msg.success{ display:block; background: var(--accent-dim); color: var(--accent); border:1px solid var(--line-strong); }
   .auth-panel{ display:none; }
   .auth-panel.active{ display:block; }
+  /* "Se connecter / S'inscrire avec Google" -- même bloc que visitennis_1.html */
+  .auth-google-btn{ display:flex; justify-content:center; min-height:40px; }
+  .auth-divider{
+    display:flex; align-items:center; gap:12px; margin:18px 0;
+    font-size:12px; font-weight:600; color: var(--text-sec); text-transform:uppercase; letter-spacing:.05em;
+  }
+  .auth-divider::before, .auth-divider::after{ content:''; flex:1; height:1px; background: var(--line); }
 </style>
+<!-- "Se connecter / S'inscrire avec Google" -- cf. JS plus bas -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -753,6 +762,8 @@
     <div class="auth-panel active" id="authPanelLogin">
       <div class="auth-title" data-i18n="auth_title_login">Content de te revoir</div>
       <div class="auth-sub" data-i18n="auth_sub_login">Connecte-toi pour accéder à tes analyses et à ton historique.</div>
+      <div class="auth-google-btn" id="googleBtnLogin"></div>
+      <div class="auth-divider" data-i18n="auth_or_divider">ou</div>
       <form class="auth-form" id="loginForm">
         <div class="auth-field">
           <label for="loginEmail" data-i18n="auth_label_email">E-mail</label>
@@ -771,6 +782,8 @@
     <div class="auth-panel" id="authPanelRegister">
       <div class="auth-title" data-i18n="auth_title_register">Créer un compte</div>
       <div class="auth-sub" data-i18n="auth_sub_register">Rejoins AcePredict et commence à analyser tes premiers matchs.</div>
+      <div class="auth-google-btn" id="googleBtnRegister"></div>
+      <div class="auth-divider" data-i18n="auth_or_divider">ou</div>
       <form class="auth-form" id="registerForm">
         <div class="auth-field">
           <label for="registerName" data-i18n="auth_label_name">Nom complet</label>
@@ -797,6 +810,9 @@
   const TR = {
   "fr": {
     "nav_login": "Connexion",
+    "auth_or_divider": "ou",
+    "auth_google_error": "Connexion Google impossible — réessaie.",
+    "auth_google_connecting": "Connexion avec Google…",
     "hero_title": "Prédit chaque match avant qu'il ne<br><span class=\"lime\">commence.</span>",
     "hero_sub": "Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.",
     "hero_search_ph": "Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)",
@@ -863,6 +879,9 @@
   },
   "en": {
     "nav_login": "Log in",
+    "auth_or_divider": "or",
+    "auth_google_error": "Google sign-in failed — please try again.",
+    "auth_google_connecting": "Signing in with Google…",
     "hero_title": "Predicts every match before it<br><span class=\"lime\">even begins.</span>",
     "hero_sub": "AI analysis, advanced stats and match scenarios to anticipate results and better understand the game.",
     "hero_search_ph": "Search for a player (e.g. Alcaraz, Sinner...)",
@@ -929,6 +948,9 @@
   },
   "es": {
     "nav_login": "Iniciar sesión",
+    "auth_or_divider": "o",
+    "auth_google_error": "No se pudo iniciar sesión con Google — inténtalo de nuevo.",
+    "auth_google_connecting": "Conectando con Google…",
     "hero_title": "Predice cada partido antes de que<br><span class=\"lime\">empiece.</span>",
     "hero_sub": "Análisis con IA, estadísticas avanzadas y escenarios de partido para anticipar resultados y entender mejor el juego.",
     "hero_search_ph": "Busca un jugador (ej: Alcaraz, Sinner...)",
@@ -995,6 +1017,9 @@
   },
   "de": {
     "nav_login": "Anmelden",
+    "auth_or_divider": "oder",
+    "auth_google_error": "Google-Anmeldung fehlgeschlagen — bitte erneut versuchen.",
+    "auth_google_connecting": "Anmeldung mit Google…",
     "hero_title": "Sagt jedes Match voraus, bevor es<br><span class=\"lime\">überhaupt beginnt.</span>",
     "hero_sub": "KI-Analysen, fortschrittliche Statistiken und Spielszenarien, um Ergebnisse vorherzusehen und das Spiel besser zu verstehen.",
     "hero_search_ph": "Spieler suchen (z. B. Alcaraz, Sinner...)",
@@ -1061,6 +1086,9 @@
   },
   "it": {
     "nav_login": "Accedi",
+    "auth_or_divider": "o",
+    "auth_google_error": "Accesso con Google non riuscito — riprova.",
+    "auth_google_connecting": "Accesso con Google…",
     "hero_title": "Prevede ogni partita prima ancora<br><span class=\"lime\">che inizi.</span>",
     "hero_sub": "Analisi IA, statistiche avanzate e scenari di partita per anticipare i risultati e capire meglio il gioco.",
     "hero_search_ph": "Cerca un giocatore (es: Alcaraz, Sinner...)",
@@ -1227,6 +1255,48 @@
     }
     return res.json();
   }
+
+  // ---------- Google Identity Services ("Se connecter avec Google") ----------
+  // Même Client ID que visitennis_1.html -- ils partagent le même backend/la
+  // même base de comptes, donc le même Client ID OAuth fonctionne pour les deux.
+  const GOOGLE_CLIENT_ID = '582419684809-ahpq630h0dqcb0ciq2hupjegn3eqmug2.apps.googleusercontent.com';
+
+  async function handleGoogleCredential(response){
+    const activePanel = document.getElementById('authPanelRegister').classList.contains('active') ? 'register' : 'login';
+    const msg = document.getElementById(activePanel === 'register' ? 'registerMsg' : 'loginMsg');
+    setAuthMsg(msg, '', 'Connexion avec Google…');
+    try {
+      const res = await fetch(API_BASE + '/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_token: response.credential }),
+      });
+      const data = await res.json().catch(()=> ({}));
+      if(!res.ok) throw new Error(data.detail || 'Connexion Google impossible — réessaie.');
+      localStorage.setItem('acepredict_token', data.access_token);
+      setAuthMsg(msg, 'success', 'Connecté, redirection...');
+      window.location.href = 'visitennis_1.html';
+    } catch(err){
+      setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
+    }
+  }
+
+  function initGoogleSignIn(){
+    if(!window.google || !window.google.accounts || !window.google.accounts.id) return false;
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+    ['googleBtnLogin', 'googleBtnRegister'].forEach(function(id){
+      const el = document.getElementById(id);
+      if(el && !el.dataset.rendered){
+        google.accounts.id.renderButton(el, { theme: 'filled_black', size: 'large', shape: 'pill', width: 320 });
+        el.dataset.rendered = '1';
+      }
+    });
+    return true;
+  }
+  (function tryInitGoogleSignIn(attemptsLeft){
+    if(initGoogleSignIn() || attemptsLeft <= 0) return;
+    setTimeout(()=> tryInitGoogleSignIn(attemptsLeft - 1), 400);
+  })(15);
 
   document.getElementById('loginForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
