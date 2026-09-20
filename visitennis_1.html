@@ -752,12 +752,16 @@
     display:none;
     position:absolute; inset:0; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:22px 20px;
-    background: linear-gradient(180deg, rgba(11,14,11,0.25) 0%, rgba(11,14,11,0.94) 60%);
+    /* Fond plat (pas de dégradé) : le dégradé faisait apparaître un flou de
+       transition qui donnait l'impression que le panneau débordait sur le
+       teaser au-dessus -- juste une couleur unie + le blur() sur le contenu
+       en dessous suffisent à masquer/isoler la zone verrouillée. */
+    background: rgba(11,14,11,0.92);
   }
   .locked-wrap.is-locked .locked-overlay{ display:flex; }
   .locked-overlay-title{ font-size:14.5px; font-weight:800; margin-bottom:11px; }
   .locked-progress{ width:150px; height:5px; border-radius:999px; background: rgba(255,255,255,0.1); overflow:hidden; margin-bottom:13px; }
-  .locked-progress-fill{ height:100%; width:20%; background: var(--accent); border-radius:999px; }
+  .locked-progress-fill{ height:100%; width:15%; background: var(--accent); border-radius:999px; }
   .locked-overlay-sub{ font-size:12px; color: var(--text-sec); max-width:280px; line-height:1.5; margin-bottom:17px; }
   .locked-unlock-btn{
     background: var(--accent); color:#14180a; border:none; border-radius:10px;
@@ -2766,8 +2770,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.probability_note': 'Ce résultat est une <strong>probabilité</strong> calculée par notre modèle (niveau des joueurs, forme, historique, conditions du match) — pas une certitude. Le tennis reste un sport avec sa part d\'aléa : un résultat n\'est jamais garanti à 100%, quel que soit l\'écart affiché.',
       'analysis.gagnant_probable': 'gagnant probable',
       'analysis.face_a': 'Face à',
-      'analysis.locked_title': "Tu n'as accès qu'à une partie de l'analyse",
-      'analysis.locked_sub': "L'analyse complète contient la probabilité exacte, le détail du niveau des deux joueurs et l'impact chiffré de la météo.",
+      'analysis.locked_title': "Tu n'as accès qu'à 15 % de cette analyse",
+      'analysis.locked_sub': "L'analyse complète contient la probabilité exacte, le détail du niveau des deux joueurs, les scénarios restants et les analyses avancées réservées aux abonnés.",
       'analysis.locked_btn': "🔓 Débloquer l'analyse complète",
       'analysis.historique_indisponible': 'Historique récent indisponible',
       'analysis.record_matches': '{wins}V - {losses}D sur les {n} derniers matchs',
@@ -3210,8 +3214,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.probability_note': 'Este resultado es una <strong>probabilidad</strong> calculada por nuestro modelo (nivel de los jugadores, forma, historial, condiciones del partido) — no una certeza. El tenis sigue siendo un deporte con su parte de azar: un resultado nunca está garantizado al 100%, sea cual sea la diferencia mostrada.',
       'analysis.gagnant_probable': 'ganador probable',
       'analysis.face_a': 'Frente a',
-      'analysis.locked_title': 'Solo tienes acceso a una parte del análisis',
-      'analysis.locked_sub': 'El análisis completo incluye la probabilidad exacta, el detalle del nivel de ambos jugadores y el impacto numérico del clima.',
+      'analysis.locked_title': 'Solo tienes acceso al 15 % de este análisis',
+      'analysis.locked_sub': 'El análisis completo incluye la probabilidad exacta, el detalle del nivel de ambos jugadores, los escenarios restantes y los análisis avanzados reservados a los suscriptores.',
       'analysis.locked_btn': '🔓 Desbloquear el análisis completo',
       'analysis.historique_indisponible': 'Historial reciente no disponible',
       'analysis.record_matches': '{wins}V - {losses}D en los últimos {n} partidos',
@@ -3654,8 +3658,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.probability_note': 'This result is a <strong>probability</strong> calculated by our model (player level, form, history, match conditions) — not a certainty. Tennis remains a sport with its share of unpredictability: a result is never 100% guaranteed, whatever the gap shown.',
       'analysis.gagnant_probable': 'likely winner',
       'analysis.face_a': 'Against',
-      'analysis.locked_title': 'You only have access to part of the analysis',
-      'analysis.locked_sub': "The full analysis includes the exact probability, the detailed level of both players, and the numerical impact of the weather.",
+      'analysis.locked_title': 'You only have access to 15% of this analysis',
+      'analysis.locked_sub': "The full analysis includes the exact probability, the detailed level of both players, the remaining scenarios, and the advanced insights reserved for subscribers.",
       'analysis.locked_btn': '🔓 Unlock the full analysis',
       'analysis.historique_indisponible': 'Recent history unavailable',
       'analysis.record_matches': '{wins}W - {losses}L over the last {n} matches',
