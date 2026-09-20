@@ -744,7 +744,14 @@
   /* Paywall réactivé (plan gratuit uniquement) : classe ajoutée en JS via
      isFreePlan() -- cf. renderAnalysisResult / loadPlayerProfilePage. Les
      comptes payants (starter/pro/lifetime) gardent .locked-content sans
-     cette classe donc tout reste net et cliquable pour eux. */
+     cette classe donc tout reste net et cliquable pour eux.
+     max-height ICI (pas seulement sur .locked-content) : sans ça, le bloc
+     verrouillé (comparatifs + facteurs + scénarios + météo + etc., souvent
+     >2000px) s'affichait en entier flouté, avec le bouton "Débloquer" centré
+     tout seul au milieu d'un immense rectangle sombre -- l'effet "voile noir
+     qui bug" remonté par un utilisateur. On force un simple aperçu compact
+     à la place, comme un vrai paywall (cf. overflow:hidden déjà en place). */
+  .locked-wrap.is-locked{ max-height: 260px; }
   .locked-wrap.is-locked .locked-content{
     filter: blur(7px); user-select:none; pointer-events:none;
   }
