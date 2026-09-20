@@ -25,19 +25,27 @@ class Settings(BaseSettings):
     # doit être renseigné côté frontend (GOOGLE_CLIENT_ID dans visitennis_1.html).
     google_client_id: str = ""
 
-    # Stripe
+    # Stripe -- clé secrète et webhook secret restent des variables d'env
+    # PURES (jamais de défaut en dur ici : ce sont de vraies clés d'accès).
+    # Les Price ID en revanche sont de simples identifiants publics (comme un
+    # ID de produit), sans risque à committer -- mis en dur ci-dessous comme
+    # défauts pour ne pas dépendre de 6 variables Railway supplémentaires ;
+    # un Price ID différent (ex: pour rebasculer en mode Test) peut toujours
+    # être fourni via une variable d'env du même nom, qui prime sur ce défaut.
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
-    stripe_price_starter: str = ""
-    stripe_price_pro: str = ""
-    stripe_price_lifetime: str = ""
-    # Variantes "facturation annuelle" (tarif dégressif, cf. page Pricing) —
-    # des Price ID Stripe distincts, à créer côté Stripe Dashboard (mensuel
-    # vs annuel = deux Price différents pour un même Product).
-    stripe_price_starter_annual: str = ""
-    stripe_price_pro_annual: str = ""
+    # Compte Stripe "AcePredict" (production, live) -- créés via
+    # scripts/create_stripe_products.py le 2026-09-20. Starter/Pro facturés
+    # tous les 28 jours (pas un mois calendaire), Starter_annual/Pro_annual
+    # facturés une fois par an, Lifetime et Pack5 en paiement unique.
+    stripe_price_starter: str = "price_1UHhBqPYpMDqCRPpIYtvHJKr"
+    stripe_price_pro: str = "price_1UHhBrPYpMDqCRPpVIkvwQ1a"
+    stripe_price_lifetime: str = "price_1UHhBsPYpMDqCRPpyenE5Owb"
+    # Variantes "facturation annuelle" (tarif dégressif, cf. page Pricing).
+    stripe_price_starter_annual: str = "price_1UHhBqPYpMDqCRPpsmGxQ4c7"
+    stripe_price_pro_annual: str = "price_1UHhBrPYpMDqCRPpEuVKCnrz"
     # Pack ponctuel (paiement unique, pas d'abonnement) — cf. page Pricing.
-    stripe_price_pack5: str = ""
+    stripe_price_pack5: str = "price_1UHhBsPYpMDqCRPpV9njfbgU"
 
     # Live data (calendrier des prochains matchs — cf. services/livetennis_client.py)
     livetennisapi_key: str = ""

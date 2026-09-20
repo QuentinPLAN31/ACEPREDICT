@@ -1,4 +1,4 @@
-﻿"""
+"""
 Stripe Checkout + webhook (page "Pricing" du frontend : Starter/Pro/Lifetime,
 mensuel ou annuel) + résiliation depuis la page "Compte".
 """
