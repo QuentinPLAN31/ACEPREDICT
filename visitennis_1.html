@@ -21,6 +21,14 @@
     --text-dim: #6C7A6C;
     --danger: #EF6B5D;
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    /* Code couleur "surface" cohérent sur tout le site (fiches joueurs,
+       pastilles de match, résultat d'analyse...) : terre battue = orange,
+       gazon = vert, dur = bleu -- des couleurs franches, pas les teintes
+       verdâtres discrètes utilisées ailleurs pour le "niveau". */
+    --surf-hard: #3AA0FF;
+    --surf-clay: #FF8A3D;
+    --surf-grass: #3ED66B;
+    --surf-carpet: #B8B8B8;
   }
 
   *{ box-sizing: border-box; }
@@ -355,10 +363,10 @@
     display:inline-flex; align-items:center; gap:5px; margin-top:3px;
     font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px;
   }
-  .upr-surface-pill.surf-hard{ background: rgba(78,168,222,0.16); color:#7fc4f2; }
-  .upr-surface-pill.surf-clay{ background: rgba(201,123,74,0.18); color:#e5a878; }
-  .upr-surface-pill.surf-grass{ background: rgba(95,191,107,0.16); color:#8fdd9b; }
-  .upr-surface-pill.surf-carpet{ background: rgba(180,180,180,0.16); color:#c9c9c9; }
+  .upr-surface-pill.surf-hard{ background: rgba(58,160,255,0.18); color: var(--surf-hard); }
+  .upr-surface-pill.surf-clay{ background: rgba(255,138,61,0.18); color: var(--surf-clay); }
+  .upr-surface-pill.surf-grass{ background: rgba(62,214,107,0.18); color: var(--surf-grass); }
+  .upr-surface-pill.surf-carpet{ background: rgba(184,184,184,0.18); color: var(--surf-carpet); }
   .upr-surface-pill.surf-unknown{ background: rgba(255,255,255,0.06); color: var(--text-dim); }
   .upr-date{ font-size:12px; color: var(--accent); font-weight:700; text-align:right; min-width:90px; }
   .upr-btn{
@@ -467,6 +475,15 @@
   .pj-bio-source{ margin-top:10px; font-size:11px; color: var(--text-dim); }
   .pj-bio-source a{ color: var(--accent); text-decoration:none; }
   .pj-bio-source a:hover{ text-decoration:underline; }
+  /* "Style de jeu" mérite plus de présence que la bio Wikipédia générique
+     juste en dessous : fond teinté accent, filet gauche épais, texte plus
+     grand -- trop timide/identique à .pj-bio avant (retour utilisateur). */
+  .pj-style-box{
+    margin-top:6px; padding:18px 20px; text-align:left;
+    background: linear-gradient(135deg, rgba(215,242,44,0.10), rgba(215,242,44,0.03));
+    border:1px solid var(--line-strong); border-left:4px solid var(--accent); border-radius:12px;
+    font-size:15px; font-weight:600; line-height:1.7; color: var(--text);
+  }
   .pj-empty-note{ font-size:12.5px; color: var(--text-dim); line-height:1.5; }
   .pj-winrate-card{
     display:flex; align-items:center; gap:18px; flex-wrap:wrap;
@@ -677,11 +694,20 @@
     display:inline-block; background: var(--accent-dim); color: var(--accent);
     font-size:11px; font-weight:700; padding:4px 11px; border-radius:999px; margin-bottom:10px;
   }
-  .confidence-wrap{ margin:16px 0 4px; }
-  .confidence-label-row{ display:flex; justify-content:space-between; font-size:12px; color: var(--text-sec); margin-bottom:7px; }
+  /* Jauge circulaire de probabilité -- même dégradé chaud que le bouton
+     "Nouvelle analyse" (nav-item-primary), pourcentage au centre. Remplace
+     l'ancienne barre linéaire, jugée trop discrète pour l'info la plus
+     importante de la page (retour utilisateur). */
+  .confidence-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; margin:20px 0 4px; }
+  .confidence-gauge{
+    position:relative; width:132px; height:132px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .confidence-gauge::before{ content:''; position:absolute; inset:11px; border-radius:50%; background: var(--card-bottom); }
+  .confidence-gauge-value{ position:relative; font-size:30px; font-weight:800; color: var(--text); }
+  .confidence-gauge-sub{ position:relative; font-size:11px; font-weight:700; color: var(--text-sec); margin-top:2px; }
+  .confidence-label-row{ display:flex; align-items:center; gap:6px; font-size:12.5px; color: var(--text-sec); }
   .confidence-label-row b{ color: var(--text); }
-  .confidence-bar{ height:7px; border-radius:999px; background: rgba(255,255,255,0.06); overflow:hidden; }
-  .confidence-bar-fill{ height:100%; background: linear-gradient(90deg, var(--accent), #8fe600); border-radius:999px; }
 
   .form-row{ display:flex; gap:14px; margin-top:12px; }
   .form-card{ flex:1; min-width:0; background: rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
@@ -707,18 +733,20 @@
      d'afficher son texte + bouton en entier (overflow:hidden sur le wrap sinon
      ça les coupe au lieu de les cacher). */
   .locked-wrap{ position:relative; margin-top:20px; border-radius:14px; overflow:hidden; min-height:230px; }
-  /* TEMPORAIRE : paywall désactivé à la demande de Victor pour relecture du
-     contenu complet — remettre filter: blur(7px), user-select:none et
-     pointer-events:none ci-dessous, et display:flex sur .locked-overlay,
-     quand il redemande le flou. */
   .locked-content{
-    /* Cadre retiré volontairement (2025) : avec le paywall désactivé
-       ci-dessus, ce wrapper ne faisait qu'ajouter une boîte visuelle
-       redondante autour de sections qui ont déjà chacune leur propre
-       présentation -- source du rendu "cadres imbriqués" remonté par un
-       utilisateur. Il ne sert plus que d'espacement/structure DOM. */
+    /* Cadre retiré volontairement (2025) : ce wrapper ne faisait qu'ajouter
+       une boîte visuelle redondante autour de sections qui ont déjà chacune
+       leur propre présentation -- source du rendu "cadres imbriqués" remonté
+       par un utilisateur. Il ne sert plus que d'espacement/structure DOM. */
     filter: none; user-select:auto; pointer-events:auto;
     padding:4px 2px 0; min-height:230px; box-sizing:border-box;
+  }
+  /* Paywall réactivé (plan gratuit uniquement) : classe ajoutée en JS via
+     isFreePlan() -- cf. renderAnalysisResult / loadPlayerProfilePage. Les
+     comptes payants (starter/pro/lifetime) gardent .locked-content sans
+     cette classe donc tout reste net et cliquable pour eux. */
+  .locked-wrap.is-locked .locked-content{
+    filter: blur(7px); user-select:none; pointer-events:none;
   }
   .locked-overlay{
     display:none;
@@ -726,6 +754,7 @@
     text-align:center; padding:22px 20px;
     background: linear-gradient(180deg, rgba(11,14,11,0.25) 0%, rgba(11,14,11,0.94) 60%);
   }
+  .locked-wrap.is-locked .locked-overlay{ display:flex; }
   .locked-overlay-title{ font-size:14.5px; font-weight:800; margin-bottom:11px; }
   .locked-progress{ width:150px; height:5px; border-radius:999px; background: rgba(255,255,255,0.1); overflow:hidden; margin-bottom:13px; }
   .locked-progress-fill{ height:100%; width:20%; background: var(--accent); border-radius:999px; }
@@ -2824,6 +2853,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_win': '✓ Dernière victoire',
       'pj.last_loss': '✕ Dernière défaite',
       'pj.vs': 'vs',
+      'pj.stats_service': 'Stats de service',
       'pj.aces_avg': 'Aces / match (moy.)',
       'pj.df_avg': 'Double fautes / match (moy.)',
       'pj.first_serve_in': '1ères balles au service dans le carré',
@@ -3267,6 +3297,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_win': '✓ Última victoria',
       'pj.last_loss': '✕ Última derrota',
       'pj.vs': 'vs',
+      'pj.stats_service': 'Estadísticas de saque',
       'pj.aces_avg': 'Aces / partido (prom.)',
       'pj.df_avg': 'Dobles faltas / partido (prom.)',
       'pj.first_serve_in': 'Primeros saques dentro',
@@ -3710,6 +3741,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_win': '✓ Last win',
       'pj.last_loss': '✕ Last loss',
       'pj.vs': 'vs',
+      'pj.stats_service': 'Serve stats',
       'pj.aces_avg': 'Aces / match (avg.)',
       'pj.df_avg': 'Double faults / match (avg.)',
       'pj.first_serve_in': 'First serves in',
@@ -3785,6 +3817,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   let authToken = localStorage.getItem('acepredict_token');
   let currentUser = null;
   let pendingAction = null;
+  // Plan gratuit = pas connecté OU currentUser.plan absent/"free" -- utilisé
+  // pour flouter les sections premium (résultat d'analyse, fiche joueur).
+  function isFreePlan(){ return !currentUser || !currentUser.plan || currentUser.plan === 'free'; }
 
   // ---------- Parrainage : capture du ?ref=CODE dans l'URL du lien partage ----------
   (function captureReferralCode(){
@@ -4486,7 +4521,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="upcoming-card' + (idx === 0 ? ' selected' : '') + '" data-idx="' + idx + '">' +
           '<div class="upcoming-card-main">' +
             '<div class="upcoming-card-tournament">' + (m.tournament || t('label.tournament_default')) + (m.round ? ' · ' + m.round : '') + '</div>' +
-            '<div class="upcoming-card-meta">' + (m.surface || t('surface.unknown')) + (m.city ? ' · ' + m.city : '') + '</div>' +
+            '<div class="upcoming-card-meta">' + surfacePillHtml(m.surface) + (m.city ? ' · ' + m.city : '') + '</div>' +
           '</div>' +
           '<div class="upcoming-card-date">' + formatMatchDate(m.scheduled_time) + '</div>' +
         '</div>'
@@ -5003,7 +5038,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const loserName = p1IsWinner ? p2Name : p1Name;
     const pct = Math.round(data.win_probability * 1000) / 10;
     const hasSurface = data.detail && data.detail.surface_used && data.detail.surface_used !== 'overall';
-    const surfaceTag = hasSurface ? ' · surface ' + data.detail.surface_used : '';
+    const surfaceTag = hasSurface ? ' · ' + surfacePillHtml(data.detail.surface_used) : '';
     const surfaceNote = hasSurface ? ' sur ' + data.detail.surface_used : '';
     const box = document.getElementById('analyseResult');
     const narrative = parseNarrative(data.detail.ai_narrative);
@@ -5024,8 +5059,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="field-label" style="margin-top:28px;">' + t('analysis.resume_rapide') + '</div>' +
       '<div class="result-summary">' + buildSummaryText(data.detail, p1Name, p2Name, winnerName, loserName, surfaceNote) + '</div>' +
       '<div class="confidence-wrap">' +
-        '<div class="confidence-label-row"><span>' + t('analysis.niveau_confiance') + '</span><b>' + confidenceLabel(pct) + '</b></div>' +
-        '<div class="confidence-bar"><div class="confidence-bar-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="confidence-gauge" style="background: conic-gradient(from -90deg, #ff7a45 0%, #ffb020 ' + (pct*0.25) + '%, #ff5f6d ' + (pct*0.5) + '%, #ffb020 ' + (pct*0.75) + '%, #ff7a45 ' + pct + '%, rgba(255,255,255,0.08) 0);">' +
+          '<div><div class="confidence-gauge-value">' + pct + '%</div><div class="confidence-gauge-sub">' + confidenceLabel(pct) + '</div></div>' +
+        '</div>' +
+        '<div class="confidence-label-row"><span>' + t('analysis.niveau_confiance') + '</span></div>' +
       '</div>';
 
     const lockedInner =
@@ -5050,7 +5087,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const annotatedLockedInner = annotateJargon(lockedInner, jargonFound);
 
     box.innerHTML = annotatedTeaser +
-      '<div class="locked-wrap">' +
+      '<div class="locked-wrap' + (isFreePlan() ? ' is-locked' : '') + '">' +
         '<div class="locked-content">' + annotatedLockedInner + '</div>' +
         '<div class="locked-overlay">' +
           '<div class="locked-overlay-title">' + t('analysis.locked_title') + '</div>' +
@@ -6063,6 +6100,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     return '<span class="upr-surface-pill ' + cls + '">' + label + '</span>';
   }
 
+  // Code couleur "surface" partagé par toutes les sections qui affichent
+  // une surface (fiches joueurs, résultat d'analyse, pastilles de match) --
+  // cf. variables --surf-hard/--surf-clay/--surf-grass dans :root.
+  function surfaceColor(key){
+    const map = { hard: 'var(--surf-hard)', clay: 'var(--surf-clay)', grass: 'var(--surf-grass)', carpet: 'var(--surf-carpet)' };
+    return map[(key || '').toLowerCase()] || 'var(--text-dim)';
+  }
+
   // ---------- Profil joueur : fusion base locale (Elo) + Wikipédia (photo,
   // bio) — un joueur hors de notre base ATP/WTA (Challenger/ITF) a quand
   // même un profil dès qu'il a une page Wikipédia, ce qui couvre la grande
@@ -6264,6 +6309,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // winrate, série en cours, forme récente en pastilles, cartes dernière
   // victoire/défaite, titres en badges, ace/DF) plutôt qu'un pavé de texte —
   // dégrade en douceur si l'historique de matchs est vide (joueur hors base).
+  // Historique (bilan V/D, forme récente, derniers matchs, titres) : plan
+  // gratuit uniquement -- flouté via .locked-wrap.is-locked (cf. isFreePlan()
+  // dans loadPlayerProfilePage). Séparé de renderServeStatsBlock ci-dessous
+  // (aces/double fautes/%services), qui lui reste visible pour tout le monde.
   function renderPerformanceBlock(stats){
     let html = '<div class="pj-section-label">' + t('pj.performances') + '</div>';
     if(!stats || !stats.matches_played){
@@ -6321,11 +6370,20 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '</div>';
     }
 
-    if(stats.serve_stats){
-      const ss = stats.serve_stats;
-      const statCard = (val, label, suffix) => val == null ? '' :
-        '<div class="pj-stat-card"><div class="pj-stat-value">' + val + (suffix || '') + '</div><div class="pj-stat-label">' + label + '</div></div>';
-      html += '<div class="pj-stats-grid">' +
+    return html;
+  }
+
+  // Stats de service (aces, doubles fautes, % au service...) -- toujours
+  // visibles, m\u00EAme en plan gratuit (cf. renderPerformanceBlock ci-dessus,
+  // s\u00E9par\u00E9 expr\u00E8s). Affiche toutes les stats fournies par l'API, d\u00E9gradation
+  // gracieuse (statCard renvoie '' si une valeur est absente).
+  function renderServeStatsBlock(stats){
+    if(!stats || !stats.serve_stats) return '';
+    const ss = stats.serve_stats;
+    const statCard = (val, label, suffix) => val == null ? '' :
+      '<div class="pj-stat-card"><div class="pj-stat-value">' + val + (suffix || '') + '</div><div class="pj-stat-label">' + label + '</div></div>';
+    return '<div class="pj-section-label">' + t('pj.stats_service') + '</div>' +
+      '<div class="pj-stats-grid">' +
         statCard(ss.avg_aces_per_match, t('pj.aces_avg')) +
         statCard(ss.avg_double_faults_per_match, t('pj.df_avg')) +
         statCard(ss.first_serve_in_pct, t('pj.first_serve_in'), '%') +
@@ -6333,9 +6391,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         statCard(ss.second_serve_won_pct, t('pj.second_serve_won'), '%') +
         statCard(ss.break_points_saved_pct, t('pj.bp_saved'), '%') +
       '</div>';
-    }
-
-    return html;
   }
 
   // ---------- Page profil joueur (clic sur un nom) ----------
@@ -6400,11 +6455,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       statsHtml += surfaces.map(s=>{
         const pct = eloToLevelPct(s.elo);
         if(pct == null) return '';
-        const color = levelColor(pct);
+        // Barre colorée par SURFACE (pas par niveau) : c'est ce champ précis
+        // qui liste les surfaces, donc le code couleur terre/gazon/dur doit
+        // s'appliquer ici en priorité -- le mot ("Excellent"...) reste
+        // coloré par niveau, lui, pour ne pas perdre cette info.
+        const surfCol = surfaceColor(s.key);
+        const lvlColor = levelColor(pct);
         return '<div class="pj-level-row">' +
           '<span class="pj-level-name">' + s.label + (s.key === best.key ? '<span class="pj-level-best">' + t('pj.meilleure') + '</span>' : '') + '</span>' +
-          '<span class="pj-level-track"><span class="pj-level-fill" style="width:' + pct + '%; background:' + color + ';"></span></span>' +
-          '<span class="pj-level-word" style="color:' + color + ';">' + levelWord(pct) + '</span>' +
+          '<span class="pj-level-track"><span class="pj-level-fill" style="width:' + pct + '%; background:' + surfCol + ';"></span></span>' +
+          '<span class="pj-level-word" style="color:' + lvlColor + ';">' + levelWord(pct) + '</span>' +
         '</div>';
       }).join('');
     } else {
@@ -6412,6 +6472,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     }
 
     const perfHtml = renderPerformanceBlock(info.stats);
+    const serveStatsHtml = renderServeStatsBlock(info.stats);
 
     let styleHtml = '';
     if(info.local && info.local.playing_style){
@@ -6420,7 +6481,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         (lowConfidence
           ? '<div class="pj-empty-note" style="margin-bottom:6px;">' + t('pj.style_low_confidence') + '</div>'
           : '') +
-        '<div class="pj-bio">' + info.local.playing_style + '</div>';
+        '<div class="pj-style-box">' + info.local.playing_style + '</div>';
     }
 
     let bioHtml = '<div class="pj-section-label">' + t('pj.en_bref') + '</div>';
@@ -6445,9 +6506,21 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '</div>' +
       '</div>' +
       statsHtml +
-      perfHtml +
+      serveStatsHtml +
       styleHtml +
-      bioHtml;
+      // Historique (bilan V/D, forme, derniers matchs, titres) + bio Wikipédia :
+      // flouté derrière le paywall en plan gratuit (cf. isFreePlan()), visible
+      // pour tout compte payant -- le reste ci-dessus (niveau, surfaces, stats
+      // de service, style de jeu) reste toujours visible pour tout le monde.
+      '<div class="locked-wrap' + (isFreePlan() ? ' is-locked' : '') + '">' +
+        '<div class="locked-content">' + perfHtml + bioHtml + '</div>' +
+        '<div class="locked-overlay">' +
+          '<div class="locked-overlay-title">' + t('analysis.locked_title') + '</div>' +
+          '<div class="locked-progress"><div class="locked-progress-fill"></div></div>' +
+          '<div class="locked-overlay-sub">' + t('analysis.locked_sub') + '</div>' +
+          '<button class="locked-unlock-btn" type="button" onclick="openUnlockModal()">' + t('analysis.locked_btn') + '</button>' +
+        '</div>' +
+      '</div>';
   }
 
   document.getElementById('upcomingSearchInput').addEventListener('input', ()=> renderUpcomingPageList());
