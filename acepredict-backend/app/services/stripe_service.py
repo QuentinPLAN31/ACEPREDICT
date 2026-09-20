@@ -40,6 +40,10 @@ def create_checkout_session(user_email: str, plan: str, success_url: str, cancel
         success_url=success_url,
         cancel_url=cancel_url,
         metadata={"plan": base_plan},
+        # Sans ce flag, Stripe Checkout n'affiche jamais le champ "code promo"
+        # -- il faut l'activer explicitement pour pouvoir créer des coupons
+        # (Stripe Dashboard -> Produits -> Coupons) et les faire apparaître.
+        allow_promotion_codes=True,
     )
     return session.url
 
