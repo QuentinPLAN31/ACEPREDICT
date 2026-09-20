@@ -1,4 +1,4 @@
-"""
+﻿"""
 Stripe Checkout + webhook (page "Pricing" du frontend : Starter/Pro/Lifetime,
 mensuel ou annuel) + résiliation depuis la page "Compte".
 """
@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.config import settings
 from app.database import get_db
 from app.deps import get_current_user
 from app.deps import PLAN_QUOTAS
@@ -34,11 +35,16 @@ def create_checkout(
         raise HTTPException(status_code=400, detail="Plan invalide")
 
     try:
+        # BUG corrigé : ces URLs pointaient en dur sur localhost:5500 (utile
+        # seulement en dev local) -- en prod, Stripe redirigeait donc
+        # l'utilisateur vers son PROPRE ordinateur après paiement, jamais vers
+        # le vrai site. On réutilise settings.frontend_base_url, déjà utilisé
+        # pour le lien de réinitialisation de mot de passe.
         url = stripe_service.create_checkout_session(
             user_email=current_user.email,
             plan=payload.plan,
-            success_url="http://localhost:5500/visitennis_1.html?checkout=success",
-            cancel_url="http://localhost:5500/visitennis_1.html?checkout=cancel",
+            success_url=f"{settings.frontend_base_url}/visitennis_1.html?checkout=success",
+            cancel_url=f"{settings.frontend_base_url}/visitennis_1.html?checkout=cancel",
         )
     except ValueError:
         # STRIPE_PRICE_* absent/vide dans .env : détecté avant le moindre appel réseau.
