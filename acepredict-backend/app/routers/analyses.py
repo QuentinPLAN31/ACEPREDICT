@@ -137,7 +137,7 @@ def create_analysis(
     # (sinon un pack "5 analyses" resterait utilisable à l'infini : avant ce
     # correctif bonus_analyses n'était jamais décrémenté nulle part).
     quota = current_user.quota
-    used_bonus_credit = quota.analyses_used >= quota.analyses_limit and (quota.bonus_analyses or 0) > 0
+    used_bonus_credit = (quota.bonus_analyses or 0) > 0
     if used_bonus_credit:
         quota.bonus_analyses = max(0, (quota.bonus_analyses or 0) - 1)
     quota.analyses_used += 1
