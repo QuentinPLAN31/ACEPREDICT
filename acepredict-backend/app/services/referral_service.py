@@ -11,6 +11,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app import models
+from app.deps import PLAN_QUOTAS
 
 _ALPHABET = string.ascii_uppercase + string.digits
 _LENGTH = 8
@@ -70,7 +71,7 @@ def grant_subscription_reward(db: Session, referred_user: models.User, plan: str
     referral.subscribed_at = datetime.utcnow()
 
     if not referrer.quota:
-        referrer.quota = models.UsageQuota(user_id=referrer.id, analyses_limit=5)
+        referrer.quota = models.UsageQuota(user_id=referrer.id, analyses_limit=PLAN_QUOTAS["free"])
         db.add(referrer.quota)
     referrer.quota.analyses_limit += bonus
 

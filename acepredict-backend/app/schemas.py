@@ -145,6 +145,11 @@ class AnalysisOut(BaseModel):
     # de bloquer l'analyse (cf. README "Synchronisation des données").
     player1_data_confidence: Optional[str] = None
     player2_data_confidence: Optional[str] = None
+    # True si CETTE analyse précise a été payée (plan payant, ou consommée sur
+    # un pack ponctuel "pack5" déjà acheté) -- le frontend s'en sert pour lever
+    # le paywall (blur) sur le résultat, indépendamment du plan de base de
+    # l'utilisateur qui peut rester "free" après un achat de pack ponctuel.
+    full_access: bool = False
 
 
 class AnalysisHistoryOut(BaseModel):

@@ -44,7 +44,7 @@ def get_current_user(
 # réelle : period_start existait déjà sur UsageQuota mais n'était encore
 # jamais relu/réinitialisé nulle part).
 PLAN_QUOTAS = {
-    "free": 5,
+    "free": 3,
     "starter": 2,
     "pro": 500,
     "lifetime": 10_000,

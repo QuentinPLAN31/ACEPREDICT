@@ -50,4 +50,8 @@ def my_subscription(
         "current_period_end": sub.current_period_end if sub else None,
         "analyses_used": quota.analyses_used if quota else 0,
         "analyses_limit": quota.analyses_limit if quota else 0,
+        # Solde restant de pack(s) ponctuel(s) acheté(s) (cf. billing.py) --
+        # affiché en plus du quota de base sur la page Compte pour que
+        # l'utilisateur voie bien que son achat a été pris en compte.
+        "bonus_analyses": quota.bonus_analyses if quota else 0,
     }

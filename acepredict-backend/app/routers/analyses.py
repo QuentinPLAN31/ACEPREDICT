@@ -129,8 +129,19 @@ def create_analysis(
     )
     db.add(analysis)
 
-    # Décrément du quota (point 4 : gating par plan)
-    current_user.quota.analyses_used += 1
+    # Décrément du quota (point 4 : gating par plan). Si l'utilisateur a déjà
+    # consommé son quota de base (analyses_limit) et dispose d'un solde de
+    # pack ponctuel (bonus_analyses, cf. billing.py::stripe_webhook), CETTE
+    # analyse est payée sur ce solde -- on la marque full_access=True pour
+    # que le frontend lève le paywall dessus, et on décrémente le solde
+    # (sinon un pack "5 analyses" resterait utilisable à l'infini : avant ce
+    # correctif bonus_analyses n'était jamais décrémenté nulle part).
+    quota = current_user.quota
+    used_bonus_credit = quota.analyses_used >= quota.analyses_limit and (quota.bonus_analyses or 0) > 0
+    if used_bonus_credit:
+        quota.bonus_analyses = max(0, (quota.bonus_analyses or 0) - 1)
+    quota.analyses_used += 1
+    full_access = current_user.plan.value != "free" or used_bonus_credit
 
     db.commit()
     db.refresh(analysis)
@@ -150,6 +161,7 @@ def create_analysis(
         "created_at": analysis.created_at,
         "player1_data_confidence": data_confidence.label(p1.data_confidence),
         "player2_data_confidence": data_confidence.label(p2.data_confidence),
+        "full_access": full_access,
     }
 
 
