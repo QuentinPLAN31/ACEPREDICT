@@ -36,27 +36,28 @@ def get_current_user(
     return user
 
 
-# Nombre d'analyses par plan (point 4 : gating des plans). Le plan Starter
-# est désormais un quota JOURNALIER (2/jour, cf. PLAN_PERIODS ci-dessous et
-# la page pricing) -- changement du 2026-09-15, avant lui était un quota
-# mensuel de 50 jamais vraiment appliqué comme "1 analyse/jour" (le texte
-# affiché sur la page pricing ne correspondait à aucune logique de reset
-# réelle : period_start existait déjà sur UsageQuota mais n'était encore
-# jamais relu/réinitialisé nulle part).
+# Nombre d'analyses par plan (point 4 : gating des plans). TOUS les plans
+# payants sont désormais des quotas JOURNALIERS (cf. PLAN_PERIODS ci-dessous
+# et la page pricing) -- changement du 2026-09-21 : Starter 3/jour, Pro
+# 6/jour. Lifetime = "abonnement Pro à vie" payé en une fois (99€) : mêmes
+# 6 analyses complètes/jour que Pro, permanent, jamais unlimited (avant ce
+# correctif la page pricing annonçait "analyses illimitées" pour Pro/Lifetime
+# alors que le quota réel restait fini -- texte et code étaient incohérents).
+# Seul le plan free reste sur un quota MENSUEL (3/mois).
 PLAN_QUOTAS = {
     "free": 3,
-    "starter": 2,
-    "pro": 500,
-    "lifetime": 10_000,
+    "starter": 3,
+    "pro": 6,
+    "lifetime": 6,
 }
 
-# Durée de la période de reset par plan -- "day" pour Starter (2 analyses
-# rechargées chaque jour), "month" pour les autres (comportement historique).
+# Durée de la période de reset par plan -- "day" pour tous les plans payants
+# (rechargés chaque jour), "month" pour le plan gratuit uniquement.
 PLAN_PERIODS = {
     "free": "month",
     "starter": "day",
-    "pro": "month",
-    "lifetime": "month",
+    "pro": "day",
+    "lifetime": "day",
 }
 
 
