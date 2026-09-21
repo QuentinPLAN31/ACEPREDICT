@@ -114,21 +114,39 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             # Pack ponctuel : +5 analyses ajoutées au quota actuel, pas un
             # abonnement — ne touche ni user.plan ni la table Subscription
             # (aucun stripe_subscription_id, mode "payment" côté Stripe).
+            was_free = user.plan == models.PlanEnum.free
             if not user.quota:
                 user.quota = models.UsageQuota(
                     user_id=user.id,
                     analyses_limit=PLAN_QUOTAS.get(user.plan.value, 5),
                 )
                 db.add(user.quota)
+            # Passage gratuit -> payant (ici : premier achat d'un pack alors
+            # qu'on était encore free) : on repart sur un compteur tout neuf,
+            # comme demandé -- les analyses gratuites déjà consommées ne
+            # doivent pas rester comptées contre le pack qu'on vient de payer.
+            # Si l'utilisateur était DEJA payant (abonnement actif ou pack
+            # précédent), on NE reset PAS : les packs/quotas se cumulent.
+            if was_free:
+                user.quota.analyses_used = 0
+                user.quota.period_start = datetime.utcnow()
             # bonus_analyses (pas analyses_limit) : survit au reset
             # périodique du quota de base (cf. deps.py require_quota).
             user.quota.bonus_analyses = (user.quota.bonus_analyses or 0) + 5
             db.commit()
         elif user and plan:
+            was_free = user.plan == models.PlanEnum.free
             user.plan = models.PlanEnum(plan)
             user.stripe_customer_id = data.get("customer")
             if user.quota:
                 user.quota.analyses_limit = PLAN_QUOTAS.get(plan, user.quota.analyses_limit)
+                # Même règle que pour le pack ponctuel ci-dessus : nouveau
+                # compteur uniquement si on VENAIT du plan gratuit. Un
+                # changement entre deux plans payants (ex: Starter -> Pro)
+                # garde le compteur en cours.
+                if was_free:
+                    user.quota.analyses_used = 0
+                    user.quota.period_start = datetime.utcnow()
 
             sub = models.Subscription(
                 user_id=user.id,
