@@ -726,7 +726,6 @@
     margin:12px 0 0; padding:12px 14px; border-left:3px solid var(--accent);
     background: rgba(215,242,44,0.06); border-radius:0 8px 8px 0; text-align:left;
   }
-}
 
   /* min-height : la partie floutée (probabilité/Elo/météo) peut être courte
      (ex: sans météo), mais l'overlay par-dessus doit toujours avoir la place
@@ -1663,6 +1662,18 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     margin-top:16px; padding-top:14px; border-top:1px dashed var(--line-strong);
     font-size:11.5px; color: var(--text-dim); text-align:left; line-height:1.5;
   }
+  /* Bandeau d'info sous le titre des pages "Matchs à venir" / "Compétitions" :
+     prévient que les données proviennent d'une API tierce (donc pas toujours
+     à jour) et redirige vers "Nouvelle analyse" pour saisir les joueurs à la
+     main si un match manque -- évite que l'utilisateur pense le site cassé. */
+  .info-banner{
+    display:flex; align-items:flex-start; gap:10px;
+    background: var(--accent2-dim); border:1px solid rgba(79,195,247,0.3); border-radius:10px;
+    padding:11px 14px; margin:2px 0 16px; font-size:12.5px; color: var(--text-sec); line-height:1.5; text-align:left;
+  }
+  .info-banner svg{ width:16px; height:16px; flex-shrink:0; margin-top:1px; color: var(--accent2); }
+  .info-banner a{ color: var(--accent2); font-weight:700; text-decoration:none; cursor:pointer; }
+  .info-banner a:hover{ text-decoration:underline; }
 
   /* ---------- Toast ---------- */
   .app-toast{
@@ -1847,6 +1858,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         <h1 data-i18n="page.upcoming.title">Matchs à venir</h1>
         <p data-i18n="page.upcoming.sub1">Tous les prochains matchs programmés, mis à jour en direct à chaque visite</p>
       </div>
+      <div class="info-banner">ℹ️ <span data-i18n="banner.upcoming" data-i18n-html>Ces matchs viennent d'une source externe et peuvent parfois être en retard ou incomplets. Tu ne trouves pas le match que tu cherches ? Va directement dans <a onclick="go('matchs')">Nouvelle analyse</a> et entre les deux joueurs à la main.</span></div>
       <input class="search-bar" id="upcomingSearchInput" placeholder="Rechercher un joueur ou un tournoi..." data-i18n-placeholder="placeholder.search_upcoming">
       <div class="upr-gender-switch-row">
                 <span class="upr-gender-switch-label" id="upcomingGenderLabelMen"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="10" cy="14" r="7"></circle><line x1="15" y1="9" x2="21" y2="3"></line><polyline points="15 3 21 3 21 9"></polyline></svg> <span data-i18n="gender.men">Hommes</span></span>
@@ -1870,6 +1882,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         <p data-i18n="page.competitions.sub1">Découvre les compétitions en cours</p>
         <p data-i18n="page.competitions.sub2">Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.</p>
       </div>
+      <div class="info-banner">ℹ️ <span data-i18n="banner.competitions" data-i18n-html>La liste des tournois vient d'une source externe et peut parfois être en retard ou incomplète. Tu ne trouves pas le tournoi que tu cherches ? Va directement dans <a onclick="go('matchs')">Nouvelle analyse</a> et entre les deux joueurs à la main.</span></div>
       <input class="search-bar" id="compSearchInput" placeholder="Rechercher une compétition..." data-i18n-placeholder="placeholder.search_competition">
       <div id="compListContainer"><div class="upcoming-loading" data-i18n="loading.competitions">Chargement des compétitions...</div></div>
     </section>
@@ -2412,6 +2425,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       <p data-i18n="unlock.modal_sub">Accède à l'analyse complète et aux pronostics détaillés</p>
     </div>
     <div class="plans" id="pricingModalPlans"></div>
+    <div class="pack-box" id="pricingModalPackBox" style="margin-top:18px;">
+      <div class="pack-box-info">
+        <span class="pack-box-label" data-i18n="pack.label">Découverte — Pack ponctuel</span>
+        <div class="pack-box-price">4,99€ <span data-i18n="pack.desc">5 analyses complètes, sans engagement</span></div>
+      </div>
+      <button class="pack-box-btn" id="pricingModalPackBtn" type="button" data-i18n="pack.btn">Débloquer 5 analyses</button>
+    </div>
   </div>
 </div>
 
@@ -2478,6 +2498,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
       'page.upcoming.title': 'Matchs à venir',
       'page.upcoming.sub1': 'Tous les prochains matchs programmés, mis à jour en direct à chaque visite',
+      'banner.upcoming': "Ces matchs viennent d'une source externe et peuvent parfois être en retard ou incomplets. Tu ne trouves pas le match que tu cherches ? Va directement dans <a onclick=\"go('matchs')\">Nouvelle analyse</a> et entre les deux joueurs à la main.",
       'placeholder.search_upcoming': 'Rechercher un joueur ou un tournoi...',
       'gender.men': 'Hommes',
       'gender.women': 'Femmes',
@@ -2489,6 +2510,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'page.competitions.title': 'Compétitions',
       'page.competitions.sub1': 'Découvre les compétitions en cours',
       'page.competitions.sub2': "Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.",
+      'banner.competitions': "La liste des tournois vient d'une source externe et peut parfois être en retard ou incomplète. Tu ne trouves pas le tournoi que tu cherches ? Va directement dans <a onclick=\"go('matchs')\">Nouvelle analyse</a> et entre les deux joueurs à la main.",
       'placeholder.search_competition': 'Rechercher une compétition...',
       'loading.competitions': 'Chargement des compétitions...',
 
@@ -2922,6 +2944,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
       'page.upcoming.title': 'Próximos partidos',
       'page.upcoming.sub1': 'Todos los próximos partidos programados, actualizados en directo en cada visita',
+      'banner.upcoming': 'Estos partidos vienen de una fuente externa y a veces pueden tener retraso o estar incompletos. ¿No encuentras el partido que buscas? Ve directamente a <a onclick="go(\'matchs\')">Nuevo análisis</a> e introduce los dos jugadores manualmente.',
       'placeholder.search_upcoming': 'Buscar un jugador o un torneo...',
       'gender.men': 'Hombres',
       'gender.women': 'Mujeres',
@@ -2933,6 +2956,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'page.competitions.title': 'Competiciones',
       'page.competitions.sub1': 'Descubre las competiciones en curso',
       'page.competitions.sub2': 'Nuestra IA analiza los torneos y te ofrece información sobre los jugadores, las clasificaciones y los próximos partidos.',
+      'banner.competitions': 'La lista de torneos viene de una fuente externa y a veces puede tener retraso o estar incompleta. ¿No encuentras el torneo que buscas? Ve directamente a <a onclick="go(\'matchs\')">Nuevo análisis</a> e introduce los dos jugadores manualmente.',
       'placeholder.search_competition': 'Buscar una competición...',
       'loading.competitions': 'Cargando competiciones...',
 
@@ -3366,6 +3390,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
       'page.upcoming.title': 'Upcoming matches',
       'page.upcoming.sub1': 'All upcoming scheduled matches, updated live on every visit',
+      'banner.upcoming': 'These matches come from an external source and can sometimes be delayed or incomplete. Can\'t find the match you\'re looking for? Go straight to <a onclick="go(\'matchs\')">New analysis</a> and enter both players manually.',
       'placeholder.search_upcoming': 'Search for a player or a tournament...',
       'gender.men': 'Men',
       'gender.women': 'Women',
@@ -3377,6 +3402,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'page.competitions.title': 'Competitions',
       'page.competitions.sub1': 'Discover the ongoing competitions',
       'page.competitions.sub2': 'Our AI analyzes tournaments and gives you insights on players, rankings and upcoming matches.',
+      'banner.competitions': 'This tournament list comes from an external source and can sometimes be delayed or incomplete. Can\'t find the tournament you\'re looking for? Go straight to <a onclick="go(\'matchs\')">New analysis</a> and enter both players manually.',
       'placeholder.search_competition': 'Search for a competition...',
       'loading.competitions': 'Loading competitions...',
 
@@ -4523,11 +4549,25 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     try {
       const res = await fetch(API_BASE + '/matches/upcoming?player1_id=' + encodeURIComponent(id1) + '&player2_id=' + encodeURIComponent(id2));
       if(!res.ok) throw new Error('bad status');
-      const matches = await res.json();
+      let matches = await res.json();
       if(!matches.length){
         list.innerHTML = '<div class="upcoming-empty">' + t('msg.no_upcoming_match') + '</div>';
         return;
       }
+      // Dédoublonnage (tournoi + round) : la source externe republie parfois
+      // le même match plusieurs fois avec un horaire légèrement différent à
+      // chaque resynchro (retard annoncé, changement de court...), ce qui
+      // créait 2-3 cartes quasi identiques pour UN SEUL vrai match -- on ne
+      // garde que la plus récente (le dernier horaire connu). Rappel : même
+      // après ça, l'horaire affiché reste celui de la source externe et peut
+      // avoir du retard (cf. bandeau d'avertissement sur "Matchs à venir").
+      const seen = new Map();
+      matches.forEach(m => {
+        const key = (m.tournament || '') + '|' + (m.round || '');
+        const prev = seen.get(key);
+        if(!prev || new Date(m.scheduled_time) > new Date(prev.scheduled_time)) seen.set(key, m);
+      });
+      matches = [...seen.values()];
       list.innerHTML = matches.map((m, idx) =>
         '<div class="upcoming-card' + (idx === 0 ? ' selected' : '') + '" data-idx="' + idx + '">' +
           '<div class="upcoming-card-main">' +
@@ -5137,6 +5177,17 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     // Mensuel/Annuel actuel de la page Pricing.
     document.getElementById('pricingModalPlans').innerHTML = document.querySelector('#page-pricing .plans').innerHTML;
     document.querySelectorAll('#pricingModalPlans .plan-btn').forEach((btn, idx)=> wireCheckoutButton(btn, PLAN_KEYS[idx]));
+    // Pack ponctuel (pack5) : absent de .plans (c'est un bloc séparé sur la
+    // page Pricing, cf. #packBtn), donc pas copié par la ligne ci-dessus --
+    // on le câble explicitement pour qu'il soit dispo aussi dans la modale
+    // de déblocage, pas seulement sur la page Pricing complète. Le bouton
+    // (contrairement à #pricingModalPlans) n'est jamais recréé via innerHTML,
+    // donc on le clone à chaque ouverture pour repartir sans les anciens
+    // listeners -- sinon un 2e clic ouvrirait 2 checkouts, un 3e, 3, etc.
+    const oldPackBtn = document.getElementById('pricingModalPackBtn');
+    const newPackBtn = oldPackBtn.cloneNode(true);
+    oldPackBtn.replaceWith(newPackBtn);
+    wireCheckoutButton(newPackBtn, 'pack5');
     pricingOverlay.classList.add('open');
   }
   function closePricingModal(){ pricingOverlay.classList.remove('open'); }
