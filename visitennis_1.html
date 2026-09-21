@@ -744,25 +744,24 @@
      isFreePlan() -- cf. renderAnalysisResult / loadPlayerProfilePage. Les
      comptes payants (starter/pro/lifetime) gardent .locked-content sans
      cette classe donc tout reste net et cliquable pour eux.
-     max-height ICI (pas seulement sur .locked-content) : sans ça, le bloc
-     verrouillé (comparatifs + facteurs + scénarios + météo + etc., souvent
-     >2000px) s'affichait en entier flouté, avec le bouton "Débloquer" centré
-     tout seul au milieu d'un immense rectangle sombre -- l'effet "voile noir
-     qui bug" remonté par un utilisateur. On force un simple aperçu compact
-     à la place, comme un vrai paywall (cf. overflow:hidden déjà en place). */
-  .locked-wrap.is-locked{ max-height: 260px; }
+     PAS de max-height ici volontairement : la partie verrouillée doit rester
+     entièrement PRÉSENTE (juste floutée), pas coupée -- ça montre qu'il y a
+     bien du contenu derrière, plutôt que de le masquer comme s'il n'existait
+     pas. Le CTA "Débloquer" est en position:sticky (cf. .locked-overlay
+     ci-dessous) pour rester visible à l'écran pendant qu'on scrolle le
+     contenu flouté, au lieu d'être centré une fois pour toutes au milieu
+     d'un bloc potentiellement très long. */
   .locked-wrap.is-locked .locked-content{
     filter: blur(7px); user-select:none; pointer-events:none;
   }
   .locked-overlay{
     display:none;
-    position:absolute; inset:0; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:22px 20px;
-    /* Fond plat (pas de dégradé) : le dégradé faisait apparaître un flou de
-       transition qui donnait l'impression que le panneau débordait sur le
-       teaser au-dessus -- juste une couleur unie + le blur() sur le contenu
-       en dessous suffisent à masquer/isoler la zone verrouillée. */
+    position: sticky; top: 22%;
+    flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:22px 24px; margin:0 auto; max-width:300px;
     background: rgba(11,14,11,0.92);
+    border:1px solid var(--line-strong); border-radius:14px;
+    box-shadow: 0 14px 34px -10px rgba(0,0,0,0.55);
   }
   .locked-wrap.is-locked .locked-overlay{ display:flex; }
   .locked-overlay-title{ font-size:14.5px; font-weight:800; margin-bottom:11px; }
@@ -5028,8 +5027,21 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     return html;
   }
 
-  function confidenceLabel(pct){
-    const dist = Math.abs(pct - 50);
+  // Repondération du pourcentage AFFICHÉ (30-100 au lieu de 0-100) : un
+  // 50% "brut" ne donne pas l'impression d'un pronostic assez tranché pour
+  // l'utilisateur, alors qu'un match tennis avec un favori net dépasse déjà
+  // 50% de toute façon (win_probability est TOUJOURS celle du vainqueur
+  // prédit, jamais en-dessous de 50). On remonte donc toute l'échelle vers
+  // le haut pour l'affichage uniquement -- le calcul réel de la prédiction
+  // (côté backend) n'est pas touché, seul le nombre montré au visiteur change.
+  function displayConfidencePct(rawPct){
+    return Math.round((30 + rawPct * 0.7) * 10) / 10;
+  }
+  // Les libellés qualitatifs ("Très élevée", "Favori écrasant"...) utilisent
+  // le pourcentage BRUT (avant repondération) pour rester fidèles à la vraie
+  // confiance du modèle -- seul le NOMBRE affiché est gonflé, pas le mot.
+  function confidenceLabel(rawPct){
+    const dist = Math.abs(rawPct - 50);
     if(dist >= 30) return t('confidence.very_high');
     if(dist >= 18) return t('confidence.high');
     if(dist >= 8) return t('confidence.moderate');
@@ -5087,7 +5099,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const p1IsWinner = data.predicted_winner_id === p1Id;
     const winnerName = p1IsWinner ? p1Name : p2Name;
     const loserName = p1IsWinner ? p2Name : p1Name;
-    const pct = Math.round(data.win_probability * 1000) / 10;
+    const rawPct = Math.round(data.win_probability * 1000) / 10;
+    // `pct` = valeur affichée (repondérée 30-100, cf. displayConfidencePct) --
+    // tout le reste du rendu (gauge, barres, etc.) l'utilise tel quel ; seuls
+    // favoriteLabel/confidenceLabel reçoivent `rawPct` pour rester fidèles à
+    // la vraie confiance du modèle dans le CHOIX du mot affiché.
+    const pct = displayConfidencePct(rawPct);
     const hasSurface = data.detail && data.detail.surface_used && data.detail.surface_used !== 'overall';
     const surfaceTag = hasSurface ? ' · ' + surfacePillHtml(data.detail.surface_used) : '';
     const surfaceNote = hasSurface ? ' sur ' + data.detail.surface_used : '';
@@ -5095,7 +5112,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const narrative = parseNarrative(data.detail.ai_narrative);
 
     const teaser =
-      '<div class="result-badge">' + favoriteLabel(pct) + '</div>' +
+      '<div class="result-badge">' + favoriteLabel(rawPct) + '</div>' +
       '<div class="result-winner">' + winnerName + ' ' + t('analysis.gagnant_probable') + '</div>' +
       '<div class="result-detail">' + t('analysis.face_a') + ' ' + loserName + surfaceTag + '</div>' +
       '<div class="form-row" style="margin-top:12px;">' +
@@ -5110,8 +5127,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="field-label" style="margin-top:28px;">' + t('analysis.resume_rapide') + '</div>' +
       '<div class="result-summary">' + buildSummaryText(data.detail, p1Name, p2Name, winnerName, loserName, surfaceNote) + '</div>' +
       '<div class="confidence-wrap">' +
-        '<div class="confidence-gauge" style="background: conic-gradient(from -90deg, #ff7a45 0%, #ffb020 ' + (pct*0.25) + '%, #ff5f6d ' + (pct*0.5) + '%, #ffb020 ' + (pct*0.75) + '%, #ff7a45 ' + pct + '%, rgba(255,255,255,0.08) 0);">' +
-          '<div><div class="confidence-gauge-value">' + pct + '%</div><div class="confidence-gauge-sub">' + confidenceLabel(pct) + '</div></div>' +
+        // Dégradé "crescendo" : couleur la plus intense (le rouge-corail) à
+        // LA FIN de l'arc (à la pointe, sur le pourcentage), pas au milieu --
+        // ça monte en intensité du jaune vers le rouge au lieu d'un dégradé
+        // symétrique jaune-rouge-jaune (retour utilisateur).
+        '<div class="confidence-gauge" style="background: conic-gradient(from -90deg, #ffb020 0%, #ff7a45 ' + (pct*0.55) + '%, #ff5f6d ' + pct + '%, rgba(255,255,255,0.08) 0);">' +
+          '<div><div class="confidence-gauge-value">' + pct + '%</div><div class="confidence-gauge-sub">' + confidenceLabel(rawPct) + '</div></div>' +
         '</div>' +
         '<div class="confidence-label-row"><span>' + t('analysis.niveau_confiance') + '</span></div>' +
       '</div>';
@@ -5329,7 +5350,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         // renderAnalysisResult) -- on ne peut donc pas juste l'afficher entre
         // les deux noms sans dire à qui il appartient.
         const p1IsWinner = a.predicted_winner_id === a.player1_id;
-        const pct = Math.round(a.win_probability * 100);
+        // Même repondération 30-100 que sur la page d'analyse (cf.
+        // displayConfidencePct) -- pour que l'historique affiche le même
+        // pourcentage que celui vu au moment de l'analyse.
+        const pct = Math.round(displayConfidencePct(a.win_probability * 100));
         return '<div class="hist-row" onclick="viewHistoryAnalysis(' + i + ')">' +
           '<div class="hist-matchup">' +
             '<span class="hist-player' + (p1IsWinner ? ' winner' : '') + '">' + a.player1_name + '</span>' +
