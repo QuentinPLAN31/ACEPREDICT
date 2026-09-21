@@ -4233,16 +4233,21 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const planLabels = { free:t('user.plan_free'), starter:t('user.plan_starter'), pro:t('user.plan_pro'), lifetime:t('user.plan_lifetime') };
       document.getElementById('userPlanLabel').textContent = planLabels[sub.plan] || sub.plan;
       updateAccountSubscriptionCard(sub, planLabels);
-      document.getElementById('quotaNum').textContent = sub.analyses_used + ' / ' + sub.analyses_limit;
+      // Le total affiché inclut le solde de pack(s) ponctuel(s) acheté(s)
+      // (bonus_analyses) en plus du quota de base -- sinon un achat de pack5
+      // n'apparaissait jamais nulle part sur la page Compte (bug remonté).
+      const bonusN = sub.bonus_analyses || 0;
+      const totalLimit = sub.analyses_limit + bonusN;
+      document.getElementById('quotaNum').textContent = sub.analyses_used + ' / ' + totalLimit;
       const quotaFill = document.querySelector('.quota-fill');
-      if(quotaFill && sub.analyses_limit > 0){
-        const pct = Math.min(100, Math.round(100 * sub.analyses_used / sub.analyses_limit));
+      if(quotaFill && totalLimit > 0){
+        const pct = Math.min(100, Math.round(100 * sub.analyses_used / totalLimit));
         quotaFill.style.width = pct + '%';
       }
       const quotaNote = document.getElementById('quotaNote');
-      quotaNote.textContent = sub.analyses_used >= sub.analyses_limit
+      quotaNote.textContent = sub.analyses_used >= totalLimit
         ? t('quota.limit_reached')
-        : tf('quota.remaining', { n: sub.analyses_limit - sub.analyses_used });
+        : tf('quota.remaining', { n: totalLimit - sub.analyses_used });
     } catch(err){
       // Backend injoignable : pas de blocage de la navigation.
     }
@@ -5168,8 +5173,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const annotatedTeaser = annotateJargon(teaser, jargonFound);
     const annotatedLockedInner = annotateJargon(lockedInner, jargonFound);
 
+    // data.full_access (renvoyé par POST /analyses) : true si CETTE analyse a
+    // été payée (plan payant, ou consommée sur un pack ponctuel déjà acheté)
+    // -- prime sur isFreePlan() qui ne reflète que le plan de base, sinon un
+    // achat de pack5 ne débloquait jamais rien (bug remonté par un utilisateur).
+    const isLockedNow = isFreePlan() && !data.full_access;
     box.innerHTML = annotatedTeaser +
-      '<div class="locked-wrap' + (isFreePlan() ? ' is-locked' : '') + '">' +
+      '<div class="locked-wrap' + (isLockedNow ? ' is-locked' : '') + '">' +
         '<div class="locked-overlay">' +
           '<div class="locked-overlay-title">' + t('analysis.locked_title') + '</div>' +
           '<div class="locked-progress"><div class="locked-progress-fill"></div></div>' +
