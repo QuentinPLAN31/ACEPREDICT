@@ -747,17 +747,19 @@
      PAS de max-height ici volontairement : la partie verrouillée doit rester
      entièrement PRÉSENTE (juste floutée), pas coupée -- ça montre qu'il y a
      bien du contenu derrière, plutôt que de le masquer comme s'il n'existait
-     pas. Le CTA "Débloquer" (.locked-overlay) est en flux normal, EN HAUT du
-     bloc flouté (juste avant .locked-content dans le HTML, cf.
-     renderAnalysisResult / loadPlayerProfilePage) -- pas en sticky/flottant :
-     retour utilisateur, il doit rester en haut, pas suivre le scroll. */
+     pas. Le CTA "Débloquer" (.locked-overlay) est en position absolute et
+     RECOUVRE le haut du bloc flouté (retour utilisateur : le cadre doit être
+     devant/par-dessus le contenu flouté, pas au-dessus en flux normal, ni en
+     sticky qui suit le scroll -- il reste fixe un peu plus bas que le tout
+     début du bloc). */
   .locked-wrap.is-locked .locked-content{
     filter: blur(7px); user-select:none; pointer-events:none;
   }
   .locked-overlay{
     display:none;
     flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:22px 24px; margin:0 auto 16px; max-width:300px;
+    text-align:center; padding:22px 24px; max-width:300px;
+    position:absolute; top:60px; left:50%; transform:translateX(-50%); z-index:2;
     background: rgba(11,14,11,0.92);
     border:1px solid var(--line-strong); border-radius:14px;
     box-shadow: 0 14px 34px -10px rgba(0,0,0,0.55);
