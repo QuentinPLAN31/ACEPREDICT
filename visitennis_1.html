@@ -747,18 +747,17 @@
      PAS de max-height ici volontairement : la partie verrouillée doit rester
      entièrement PRÉSENTE (juste floutée), pas coupée -- ça montre qu'il y a
      bien du contenu derrière, plutôt que de le masquer comme s'il n'existait
-     pas. Le CTA "Débloquer" est en position:sticky (cf. .locked-overlay
-     ci-dessous) pour rester visible à l'écran pendant qu'on scrolle le
-     contenu flouté, au lieu d'être centré une fois pour toutes au milieu
-     d'un bloc potentiellement très long. */
+     pas. Le CTA "Débloquer" (.locked-overlay) est en flux normal, EN HAUT du
+     bloc flouté (juste avant .locked-content dans le HTML, cf.
+     renderAnalysisResult / loadPlayerProfilePage) -- pas en sticky/flottant :
+     retour utilisateur, il doit rester en haut, pas suivre le scroll. */
   .locked-wrap.is-locked .locked-content{
     filter: blur(7px); user-select:none; pointer-events:none;
   }
   .locked-overlay{
     display:none;
-    position: sticky; top: 22%;
     flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; padding:22px 24px; margin:0 auto; max-width:300px;
+    text-align:center; padding:22px 24px; margin:0 auto 16px; max-width:300px;
     background: rgba(11,14,11,0.92);
     border:1px solid var(--line-strong); border-radius:14px;
     box-shadow: 0 14px 34px -10px rgba(0,0,0,0.55);
@@ -2801,6 +2800,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.locked_title': "Tu n'as accès qu'à 15 % de cette analyse",
       'analysis.locked_sub': "L'analyse complète contient la probabilité exacte, le détail du niveau des deux joueurs, les scénarios restants et les analyses avancées réservées aux abonnés.",
       'analysis.locked_btn': "🔓 Débloquer l'analyse complète",
+      'player.locked_title': "Tu n'as accès qu'à un aperçu de cette fiche",
+      'player.locked_sub': "L'historique complet contient le bilan victoires/défaites détaillé, la forme sur les derniers matchs, le palmarès des titres et la biographie complète du joueur.",
+      'player.locked_btn': "🔓 Débloquer la fiche complète",
       'analysis.historique_indisponible': 'Historique récent indisponible',
       'analysis.record_matches': '{wins}V - {losses}D sur les {n} derniers matchs',
       'stat.win_probability': 'Probabilité de victoire',
@@ -3247,6 +3249,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.locked_title': 'Solo tienes acceso al 15 % de este análisis',
       'analysis.locked_sub': 'El análisis completo incluye la probabilidad exacta, el detalle del nivel de ambos jugadores, los escenarios restantes y los análisis avanzados reservados a los suscriptores.',
       'analysis.locked_btn': '🔓 Desbloquear el análisis completo',
+      'player.locked_title': 'Solo tienes acceso a una vista previa de esta ficha',
+      'player.locked_sub': 'El historial completo incluye el balance detallado de victorias/derrotas, la forma en los últimos partidos, el palmarés de títulos y la biografía completa del jugador.',
+      'player.locked_btn': '🔓 Desbloquear la ficha completa',
       'analysis.historique_indisponible': 'Historial reciente no disponible',
       'analysis.record_matches': '{wins}V - {losses}D en los últimos {n} partidos',
       'stat.win_probability': 'Probabilidad de victoria',
@@ -3693,6 +3698,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.locked_title': 'You only have access to 15% of this analysis',
       'analysis.locked_sub': "The full analysis includes the exact probability, the detailed level of both players, the remaining scenarios, and the advanced insights reserved for subscribers.",
       'analysis.locked_btn': '🔓 Unlock the full analysis',
+      'player.locked_title': 'You only have access to a preview of this profile',
+      'player.locked_sub': "The full history includes the detailed win/loss record, recent match form, title record, and the player's full biography.",
+      'player.locked_btn': "🔓 Unlock the full profile",
       'analysis.historique_indisponible': 'Recent history unavailable',
       'analysis.record_matches': '{wins}W - {losses}L over the last {n} matches',
       'stat.win_probability': 'Win probability',
@@ -5160,13 +5168,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     box.innerHTML = annotatedTeaser +
       '<div class="locked-wrap' + (isFreePlan() ? ' is-locked' : '') + '">' +
-        '<div class="locked-content">' + annotatedLockedInner + '</div>' +
         '<div class="locked-overlay">' +
           '<div class="locked-overlay-title">' + t('analysis.locked_title') + '</div>' +
           '<div class="locked-progress"><div class="locked-progress-fill"></div></div>' +
           '<div class="locked-overlay-sub">' + t('analysis.locked_sub') + '</div>' +
           '<button class="locked-unlock-btn" type="button" onclick="openUnlockModal()">' + t('analysis.locked_btn') + '</button>' +
         '</div>' +
+        '<div class="locked-content">' + annotatedLockedInner + '</div>' +
       '</div>' +
       '<div class="result-probability-note">ℹ️ ' + t('analysis.probability_note') + '</div>' +
       renderLexiqueBlock(jargonFound);
@@ -6599,13 +6607,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       // pour tout compte payant -- le reste ci-dessus (niveau, surfaces, stats
       // de service, style de jeu) reste toujours visible pour tout le monde.
       '<div class="locked-wrap' + (isFreePlan() ? ' is-locked' : '') + '">' +
-        '<div class="locked-content">' + perfHtml + bioHtml + '</div>' +
         '<div class="locked-overlay">' +
-          '<div class="locked-overlay-title">' + t('analysis.locked_title') + '</div>' +
+          '<div class="locked-overlay-title">' + t('player.locked_title') + '</div>' +
           '<div class="locked-progress"><div class="locked-progress-fill"></div></div>' +
-          '<div class="locked-overlay-sub">' + t('analysis.locked_sub') + '</div>' +
-          '<button class="locked-unlock-btn" type="button" onclick="openUnlockModal()">' + t('analysis.locked_btn') + '</button>' +
+          '<div class="locked-overlay-sub">' + t('player.locked_sub') + '</div>' +
+          '<button class="locked-unlock-btn" type="button" onclick="openUnlockModal()">' + t('player.locked_btn') + '</button>' +
         '</div>' +
+        '<div class="locked-content">' + perfHtml + bioHtml + '</div>' +
       '</div>';
   }
 
