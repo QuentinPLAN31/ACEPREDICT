@@ -129,19 +129,47 @@ def create_analysis(
     )
     db.add(analysis)
 
-    # Décrément du quota (point 4 : gating par plan). Si l'utilisateur a déjà
-    # consommé son quota de base (analyses_limit) et dispose d'un solde de
-    # pack ponctuel (bonus_analyses, cf. billing.py::stripe_webhook), CETTE
-    # analyse est payée sur ce solde -- on la marque full_access=True pour
-    # que le frontend lève le paywall dessus, et on décrémente le solde
-    # (sinon un pack "5 analyses" resterait utilisable à l'infini : avant ce
-    # correctif bonus_analyses n'était jamais décrémenté nulle part).
+    # Décrément du quota (point 4 : gating par plan). Deux pools SEPARES,
+    # affichés comme deux jauges distinctes sur la page Compte ("curseur
+    # abonnement/gratuit" + "curseur ponctuel") :
+    #   - analyses_used / analyses_limit : quota du plan (mensuel si free,
+    #     journalier si starter/pro/lifetime, cf. deps.py PLAN_PERIODS).
+    #   - bonus_analyses : solde du/des pack(s) ponctuel(s) acheté(s), jamais
+    #     mélangé au premier compteur.
+    # Priorité de consommation différente selon le plan :
+    #   - FREE : le pack est consommé EN PRIORITE (dès qu'un solde existe),
+    #     car c'est le seul moyen pour un compte free de voir une analyse en
+    #     accès complet (non flouté) -- sinon un utilisateur qui vient de
+    #     payer un pack continuerait de voir du contenu flouté tant que son
+    #     quota gratuit du mois n'est pas épuisé (bug remonté).
+    #   - Plan PAYANT (starter/pro/lifetime) : déjà en accès complet quel que
+    #     soit le pack, donc le quota du plan est consommé D'ABORD, le pack
+    #     ne sert qu'une fois ce quota journalier épuisé -- comme un
+    #     complément, pas une priorité (sinon les deux jauges se
+    #     décrémenteraient en même temps sur une seule analyse, ce qui n'a
+    #     pas de sens pour un affichage en deux jauges indépendantes).
     quota = current_user.quota
-    used_bonus_credit = (quota.bonus_analyses or 0) > 0
-    if used_bonus_credit:
-        quota.bonus_analyses = max(0, (quota.bonus_analyses or 0) - 1)
-    quota.analyses_used += 1
-    full_access = current_user.plan.value != "free" or used_bonus_credit
+    is_free = current_user.plan.value == "free"
+    used_bonus_credit = False
+
+    if is_free:
+        if (quota.bonus_analyses or 0) > 0:
+            quota.bonus_analyses = max(0, (quota.bonus_analyses or 0) - 1)
+            used_bonus_credit = True
+        else:
+            quota.analyses_used += 1
+    else:
+        if quota.analyses_used < quota.analyses_limit:
+            quota.analyses_used += 1
+        elif (quota.bonus_analyses or 0) > 0:
+            quota.bonus_analyses = max(0, (quota.bonus_analyses or 0) - 1)
+        else:
+            # Ne devrait pas arriver : require_quota (dépendance de cet
+            # endpoint) bloque déjà avant d'arriver ici si les deux pools
+            # sont épuisés. Filet de sécurité pour ne pas perdre le comptage.
+            quota.analyses_used += 1
+
+    full_access = (not is_free) or used_bonus_credit
 
     db.commit()
     db.refresh(analysis)

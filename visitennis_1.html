@@ -175,6 +175,13 @@
   }
   .quota-fill{ height:100%; width:100%; background: var(--danger); border-radius:999px; }
   .quota-note{ font-size: 11.5px; color: var(--danger); opacity: 0.85; }
+  /* Curseur ponctuel (pack) : jauge SEPAREE du quota principal (gratuit ou
+     abonnement), cf. loadAccount() -- couleur accent pour la distinguer
+     visuellement du curseur principal (rouge/danger). */
+  .quota-pack{ margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line); }
+  .quota-pack .quota-num{ color: var(--accent); }
+  .quota-pack .quota-fill{ background: var(--accent); }
+  .quota-pack .quota-note{ color: var(--accent); }
 
   .user-row{
     display:flex; align-items:center; gap:10px;
@@ -1783,14 +1790,28 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     <div class="sidebar-spacer"></div>
 
-    <div class="quota">
+    <div class="quota" id="quotaMain">
       <div class="quota-head">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
-        <span data-i18n="quota.title">Analyses du jour</span>
+        <span id="quotaTitle" data-i18n="quota.title">Analyses du jour</span>
       </div>
       <div class="quota-num" id="quotaNum">0 / 0</div>
-      <div class="quota-track"><div class="quota-fill"></div></div>
+      <div class="quota-track"><div class="quota-fill" id="quotaFillMain"></div></div>
       <div class="quota-note" id="quotaNote" data-i18n="quota.limit_reached">Limite atteinte • Upgrade pour plus</div>
+    </div>
+    <!-- Curseur ponctuel (pack) : jauge à part, jamais mélangée au quota
+         principal ci-dessus -- remplace le curseur gratuit tant qu'un solde
+         de pack existe pour un compte free, ou s'affiche EN PLUS du curseur
+         abonnement pour un compte payant qui a aussi acheté un pack (cf.
+         loadAccount() dans le script, qui gère l'affichage/masquage). -->
+    <div class="quota quota-pack" id="quotaPack" style="display:none;">
+      <div class="quota-head">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg>
+        <span data-i18n="quota.pack_title">Pack ponctuel</span>
+      </div>
+      <div class="quota-num" id="quotaPackNum">0 / 0</div>
+      <div class="quota-track"><div class="quota-fill" id="quotaFillPack"></div></div>
+      <div class="quota-note" id="quotaPackNote" data-i18n="quota.pack_remaining">Analyses restantes</div>
     </div>
 
     <button class="user-row nav-item" data-page="compte" style="cursor:pointer;">
@@ -2465,8 +2486,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nav.referral': 'Parrainage',
       'nav.creator': 'Monétisation TikTok',
       'quota.title': 'Analyses du jour',
+      'quota.title_month': 'Analyses du mois',
       'quota.limit_reached': 'Limite atteinte • Upgrade pour plus',
       'quota.login_to_see': 'Connecte-toi pour voir ton quota',
+      'quota.pack_title': 'Pack ponctuel',
+      'quota.pack_remaining': '{n} analyses restantes',
+      'quota.pack_done': 'Pack épuisé',
       'quota.remaining_month': '{n} analyses restantes ce mois-ci',
       'quota.remaining_day': '{n} analyses restantes aujourd\'hui',
       'quota.remaining_generic': '{n} analyses restantes',
@@ -2912,8 +2937,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nav.referral': 'Referidos',
       'nav.creator': 'Monetización TikTok',
       'quota.title': 'Análisis del día',
+      'quota.title_month': 'Análisis del mes',
       'quota.limit_reached': 'Límite alcanzado • Mejora tu plan para más',
       'quota.login_to_see': 'Inicia sesión para ver tu cuota',
+      'quota.pack_title': 'Pack puntual',
+      'quota.pack_remaining': '{n} análisis restantes',
+      'quota.pack_done': 'Pack agotado',
       'quota.remaining_month': '{n} análisis restantes este mes',
       'quota.remaining_day': '{n} análisis restantes hoy',
       'quota.remaining_generic': '{n} análisis restantes',
@@ -3359,8 +3388,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nav.referral': 'Referrals',
       'nav.creator': 'TikTok Monetization',
       'quota.title': "Today's analyses",
+      'quota.title_month': "This month's analyses",
       'quota.limit_reached': 'Limit reached • Upgrade for more',
       'quota.login_to_see': 'Log in to see your quota',
+      'quota.pack_title': 'One-time pack',
+      'quota.pack_remaining': '{n} analyses left',
+      'quota.pack_done': 'Pack used up',
       'quota.remaining_month': '{n} analyses left this month',
       'quota.remaining_day': '{n} analyses left today',
       'quota.remaining_generic': '{n} analyses left',
@@ -4186,8 +4219,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       document.getElementById('userPlanLabel').textContent = t('user.not_logged_in');
       document.getElementById('quotaNum').textContent = '-- / --';
       document.getElementById('quotaNote').textContent = t('quota.login_to_see');
-      const fill = document.querySelector('.quota-fill');
+      const fill = document.getElementById('quotaFillMain');
       if(fill) fill.style.width = '0%';
+      const packWrap = document.getElementById('quotaPack');
+      if(packWrap) packWrap.style.display = 'none';
       document.getElementById('accLoggedOut').style.display = '';
       document.getElementById('accLoggedIn').style.display = 'none';
       const parrIn = document.getElementById('parrLoggedIn'), parrOut = document.getElementById('parrLoggedOut');
@@ -4223,33 +4258,54 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const planLabels = { free:t('user.plan_free'), starter:t('user.plan_starter'), pro:t('user.plan_pro'), lifetime:t('user.plan_lifetime') };
       document.getElementById('userPlanLabel').textContent = planLabels[sub.plan] || sub.plan;
       updateAccountSubscriptionCard(sub, planLabels);
-      // Le total affiché inclut le solde de pack(s) ponctuel(s) acheté(s)
-      // (bonus_analyses) en plus du quota de base -- sinon un achat de pack5
-      // n'apparaissait jamais nulle part sur la page Compte (bug remonté).
-      const bonusN = sub.bonus_analyses || 0;
-      const totalLimit = sub.analyses_limit + bonusN;
-      document.getElementById('quotaNum').textContent = sub.analyses_used + ' / ' + totalLimit;
-      const quotaFill = document.querySelector('.quota-fill');
-      if(quotaFill && totalLimit > 0){
-        const pct = Math.min(100, Math.round(100 * sub.analyses_used / totalLimit));
-        quotaFill.style.width = pct + '%';
+
+      // Deux jauges INDEPENDANTES (cf. app/routers/analyses.py côté backend,
+      // qui consomme les deux pools séparément) :
+      //  - curseur principal : quota du plan (gratuit/mensuel OU
+      //    abonnement/journalier) -- jamais mélangé au pack.
+      //  - curseur ponctuel : solde du/des pack(s) achetés, affiché à part.
+      // Règle demandée : pour un compte FREE avec un pack actif (solde > 0),
+      // le curseur ponctuel REMPLACE le curseur principal (celui-ci masqué).
+      // Pour un compte payant (starter/pro/lifetime) avec un pack actif, le
+      // curseur ponctuel s'affiche EN PLUS du curseur principal (les deux
+      // visibles). Sans pack actif, seul le curseur principal est visible,
+      // quel que soit le plan.
+      const bonusRemaining = sub.bonus_analyses || 0;
+      const bonusTotal = sub.bonus_analyses_total || 0;
+      const isFreeAccount = sub.plan === 'free';
+      const packActive = bonusRemaining > 0;
+
+      const quotaMainEl = document.getElementById('quotaMain');
+      const quotaPackEl = document.getElementById('quotaPack');
+
+      const hideMain = isFreeAccount && packActive;
+      quotaMainEl.style.display = hideMain ? 'none' : '';
+      if(!hideMain){
+        document.getElementById('quotaTitle').textContent = isFreeAccount ? t('quota.title_month') : t('quota.title');
+        document.getElementById('quotaNum').textContent = sub.analyses_used + ' / ' + sub.analyses_limit;
+        const quotaFillMain = document.getElementById('quotaFillMain');
+        if(quotaFillMain && sub.analyses_limit > 0){
+          const pctMain = Math.min(100, Math.round(100 * sub.analyses_used / sub.analyses_limit));
+          quotaFillMain.style.width = pctMain + '%';
+        }
+        const quotaNote = document.getElementById('quotaNote');
+        const remainingKeyMain = isFreeAccount ? 'quota.remaining_month' : 'quota.remaining_day';
+        quotaNote.textContent = sub.analyses_used >= sub.analyses_limit
+          ? t('quota.limit_reached')
+          : tf(remainingKeyMain, { n: sub.analyses_limit - sub.analyses_used });
       }
-      const quotaNote = document.getElementById('quotaNote');
-      // Le plan free se recharge une fois par mois, tous les plans payants
-      // (starter/pro/lifetime) sont desormais rechargés chaque jour (cf.
-      // deps.py PLAN_PERIODS) -- le libellé doit refléter la bonne période.
-      // Si un pack ponctuel est en cours (bonus_analyses > 0), le total
-      // mélange quota périodique + solde "sans engagement" : annoncer une
-      // période ("ce mois-ci"/"aujourd'hui") serait trompeur, donc libellé
-      // neutre dans ce cas (bug remonté : "8 analyses restantes ce mois-ci"
-      // affiché alors que 5 des 8 venaient d'un pack ponctuel, pas d'un
-      // renouvellement mensuel).
-      const remainingKey = bonusN > 0
-        ? 'quota.remaining_generic'
-        : (sub.plan === 'free' ? 'quota.remaining_month' : 'quota.remaining_day');
-      quotaNote.textContent = sub.analyses_used >= totalLimit
-        ? t('quota.limit_reached')
-        : tf(remainingKey, { n: totalLimit - sub.analyses_used });
+
+      quotaPackEl.style.display = packActive ? '' : 'none';
+      if(packActive){
+        const packUsed = Math.max(0, bonusTotal - bonusRemaining);
+        document.getElementById('quotaPackNum').textContent = packUsed + ' / ' + bonusTotal;
+        const quotaFillPack = document.getElementById('quotaFillPack');
+        if(quotaFillPack && bonusTotal > 0){
+          const pctPack = Math.min(100, Math.round(100 * packUsed / bonusTotal));
+          quotaFillPack.style.width = pctPack + '%';
+        }
+        document.getElementById('quotaPackNote').textContent = tf('quota.pack_remaining', { n: bonusRemaining });
+      }
     } catch(err){
       // Backend injoignable : pas de blocage de la navigation.
     }

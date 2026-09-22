@@ -132,7 +132,11 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
                 user.quota.period_start = datetime.utcnow()
             # bonus_analyses (pas analyses_limit) : survit au reset
             # périodique du quota de base (cf. deps.py require_quota).
+            # bonus_analyses_total : cumul jamais décrémenté, pour afficher
+            # une jauge "consommé / acheté" sur le curseur ponctuel (page
+            # Compte) plutôt qu'un simple solde sans référence.
             user.quota.bonus_analyses = (user.quota.bonus_analyses or 0) + 5
+            user.quota.bonus_analyses_total = (user.quota.bonus_analyses_total or 0) + 5
             db.commit()
         elif user and plan:
             was_free = user.plan == models.PlanEnum.free

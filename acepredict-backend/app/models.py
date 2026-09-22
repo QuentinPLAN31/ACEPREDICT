@@ -161,6 +161,11 @@ class UsageQuota(Base):
     # require_quota, qui réinitialise analyses_limit à la valeur de base du
     # plan à chaque nouvelle période -- un pack acheté doit survivre à ça).
     bonus_analyses = Column(Integer, default=0)
+    # Total CUMULE de packs ponctuels achetés (jamais décrémenté, contrairement
+    # à bonus_analyses qui est le solde restant) -- sert à afficher une vraie
+    # jauge de progression "curseur ponctuel" (consommé / acheté) sur la page
+    # Compte plutôt qu'un simple solde sans dénominateur.
+    bonus_analyses_total = Column(Integer, default=0)
 
     user = relationship("User", back_populates="quota")
 

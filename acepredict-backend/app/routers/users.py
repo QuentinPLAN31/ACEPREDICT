@@ -54,4 +54,7 @@ def my_subscription(
         # affiché en plus du quota de base sur la page Compte pour que
         # l'utilisateur voie bien que son achat a été pris en compte.
         "bonus_analyses": quota.bonus_analyses if quota else 0,
+        # Total cumulé jamais acheté (jamais décrémenté) -- sert de
+        # dénominateur pour la jauge "curseur ponctuel" côté frontend.
+        "bonus_analyses_total": quota.bonus_analyses_total if quota else 0,
     }
