@@ -4271,7 +4271,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       // visibles). Sans pack actif, seul le curseur principal est visible,
       // quel que soit le plan.
       const bonusRemaining = sub.bonus_analyses || 0;
-      const bonusTotal = sub.bonus_analyses_total || 0;
+      // Garde-fou : bonus_analyses_total (compteur cumulé, cf. migration
+      // c3f8a5d21b7e) peut être à 0 alors qu'un solde existe déjà -- soit un
+      // pack acheté juste avant le déploiement de cette colonne (backfill
+      // au moment de la migration seulement), soit un décalage de déploiement
+      // backend. Dans ce cas on affiche au moins le solde comme total plutôt
+      // qu'un "0 / 0" absurde avec une barre pleine à tort.
+      const bonusTotal = Math.max(sub.bonus_analyses_total || 0, bonusRemaining);
       const isFreeAccount = sub.plan === 'free';
       const packActive = bonusRemaining > 0;
 
