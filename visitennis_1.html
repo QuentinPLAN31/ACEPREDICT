@@ -2469,6 +2469,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'quota.login_to_see': 'Connecte-toi pour voir ton quota',
       'quota.remaining_month': '{n} analyses restantes ce mois-ci',
       'quota.remaining_day': '{n} analyses restantes aujourd\'hui',
+      'quota.remaining_generic': '{n} analyses restantes',
       'sidebar.logout': 'Déconnexion',
       'sidebar.support': 'Support',
       'sidebar.lang_fr': 'Français',
@@ -2915,6 +2916,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'quota.login_to_see': 'Inicia sesión para ver tu cuota',
       'quota.remaining_month': '{n} análisis restantes este mes',
       'quota.remaining_day': '{n} análisis restantes hoy',
+      'quota.remaining_generic': '{n} análisis restantes',
       'sidebar.logout': 'Cerrar sesión',
       'sidebar.support': 'Soporte',
       'sidebar.lang_fr': 'Français',
@@ -3361,6 +3363,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'quota.login_to_see': 'Log in to see your quota',
       'quota.remaining_month': '{n} analyses left this month',
       'quota.remaining_day': '{n} analyses left today',
+      'quota.remaining_generic': '{n} analyses left',
       'sidebar.logout': 'Log out',
       'sidebar.support': 'Support',
       'sidebar.lang_fr': 'Français',
@@ -4234,10 +4237,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const quotaNote = document.getElementById('quotaNote');
       // Le plan free se recharge une fois par mois, tous les plans payants
       // (starter/pro/lifetime) sont desormais rechargés chaque jour (cf.
-      // deps.py PLAN_PERIODS) -- le libellé doit refléter la bonne période,
-      // sinon "restantes ce mois-ci" était affiché à tort pour des quotas
-      // en fait journaliers.
-      const remainingKey = sub.plan === 'free' ? 'quota.remaining_month' : 'quota.remaining_day';
+      // deps.py PLAN_PERIODS) -- le libellé doit refléter la bonne période.
+      // Si un pack ponctuel est en cours (bonus_analyses > 0), le total
+      // mélange quota périodique + solde "sans engagement" : annoncer une
+      // période ("ce mois-ci"/"aujourd'hui") serait trompeur, donc libellé
+      // neutre dans ce cas (bug remonté : "8 analyses restantes ce mois-ci"
+      // affiché alors que 5 des 8 venaient d'un pack ponctuel, pas d'un
+      // renouvellement mensuel).
+      const remainingKey = bonusN > 0
+        ? 'quota.remaining_generic'
+        : (sub.plan === 'free' ? 'quota.remaining_month' : 'quota.remaining_day');
       quotaNote.textContent = sub.analyses_used >= totalLimit
         ? t('quota.limit_reached')
         : tf(remainingKey, { n: totalLimit - sub.analyses_used });
