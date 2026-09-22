@@ -235,14 +235,32 @@
 
   .page-head.left{ text-align:left; margin-bottom: 30px; }
 
-  /* Matchs / analyse form */
+  /* Matchs / analyse form -- page "Nouvelle analyse" : reprend le dégradé
+     chaud déjà utilisé pour le bouton nav "Nouvelle analyse"/la jauge de
+     confiance (#ff7a45/#ffb020/#ff5f6d), pour casser le mono-accent lime
+     répété sur tout le reste du site (retour utilisateur : page trop
+     répétitive en style/couleur). Halo ambiant discret + fine bordure
+     dégradée en haut de carte, jamais sur le fond entier (reste lisible). */
+  #page-matchs .page-head{ position:relative; }
+  #page-matchs .page-head::before{
+    content:''; position:absolute; left:50%; top:-40px; width:520px; height:220px;
+    transform: translateX(-50%); pointer-events:none; z-index:-1;
+    background: radial-gradient(ellipse at center, rgba(255,122,69,0.16), rgba(255,95,109,0.07) 45%, transparent 72%);
+    filter: blur(6px);
+  }
   .analyse-card{
     max-width: 620px;
     margin: 0 auto;
+    position: relative;
     background: linear-gradient(160deg, var(--card-top), var(--card-bottom));
     border: 1px solid var(--line);
     border-radius: 16px;
-    padding: 26px;
+    padding: 28px 26px 26px;
+    overflow: hidden;
+  }
+  .analyse-card::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, #ff7a45, #ffb020, #ff5f6d);
   }
   /* Titres de section (SCÉNARIOS POSSIBLES, INTERPRÉTATION, ANALYSE
      APPROFONDIE, etc.) : étaient en --text-dim (couleur la plus discrète du
@@ -253,6 +271,16 @@
     font-size: 12px; letter-spacing: 0.09em; color: var(--accent);
     font-weight: 800; margin-bottom: 14px; padding-bottom: 8px;
     border-bottom: 1px solid var(--line-strong);
+  }
+  /* Label de la carte "Nouvelle analyse" : suit le dégradé chaud de la page
+     plutôt que l'accent lime générique utilisé partout ailleurs. */
+  .analyse-card > .field-label{
+    color: #ffb020; border-bottom-color: rgba(255,176,32,0.25);
+    display:flex; align-items:center; gap:8px;
+  }
+  .analyse-card > .field-label::before{
+    content:''; width:7px; height:7px; border-radius:50%; flex-shrink:0;
+    background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d);
   }
   .jargon-star{ color: var(--accent); font-weight: 700; cursor: help; }
   .clickable-name{ cursor: pointer; }
@@ -270,9 +298,23 @@
   }
   .team-input::placeholder{ color: var(--text-dim); }
   .team-input:focus{ border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  /* Badge "VS" -- remplace le texte gris plat par un rond en dégradé chaud
+     avec des traits de part et d'autre, plus dynamique et cohérent avec
+     l'identité de la page "Nouvelle analyse". Le texte "VS" est dans
+     .vs-badge (span interne, cf. HTML) pour pouvoir le styler en cercle --
+     data-i18n reste dessus pour la traduction. */
   .vs-divider{
-    text-align:center; color: var(--text-dim); font-size: 12px; font-weight:700;
-    letter-spacing:0.05em; margin: 12px 0;
+    display:flex; align-items:center; gap:10px;
+    margin: 14px 0;
+  }
+  .vs-divider::before, .vs-divider::after{
+    content:''; flex:1; height:1px; background: var(--line-strong);
+  }
+  .vs-badge{
+    flex: 0 0 auto; width:30px; height:30px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d);
+    color:#1a1204; font-size:10px; font-weight:800; letter-spacing:0.02em;
   }
   .btn-primary{
     width:100%;
@@ -288,6 +330,14 @@
     font-family: inherit;
   }
   .btn-primary:hover{ filter: brightness(1.06); }
+  /* Bouton "Analyser" -- dégradé chaud (cohérent avec le badge VS et la
+     bordure de carte ci-dessus), scopé à cette carte uniquement pour ne
+     pas changer .btn-primary ailleurs sur le site. */
+  #analyseBtn{
+    background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d);
+    color: #1a1204;
+    box-shadow: 0 4px 14px rgba(255,122,69,0.28);
+  }
   .btn-outline{
     background: var(--accent-dim);
     color: var(--accent);
@@ -1421,11 +1471,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   }
   .upcoming-card{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
-    background: rgba(255,255,255,0.03); border:1px solid var(--line-strong); border-radius:10px;
+    background: rgba(255,255,255,0.03); border:1px solid var(--line-strong);
+    border-left: 3px solid var(--upcoming-surf, var(--line-strong));
+    border-radius:10px;
     padding:12px 14px; margin-bottom:8px; cursor:pointer;
+    transition: border-color .15s, background .15s;
   }
-  .upcoming-card:hover{ border-color: var(--accent); }
-  .upcoming-card.selected{ border-color: var(--accent); background: var(--accent-dim); }
+  .upcoming-card:hover{ border-color: var(--accent); border-left-color: var(--upcoming-surf, var(--accent)); }
+  .upcoming-card.selected{ border-color: var(--accent); border-left-color: var(--upcoming-surf, var(--accent)); background: var(--accent-dim); }
   .upcoming-card-main{ display:flex; flex-direction:column; gap:2px; min-width:0; }
   .upcoming-card-tournament{ font-size:13.5px; font-weight:700; }
   .upcoming-card-meta{ font-size:11.5px; color: var(--text-sec); }
@@ -1858,7 +1911,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <input class="team-input" id="matchP1Input" placeholder="Cherche un joueur (ex: Alcaraz, Djokovic...)" data-i18n-placeholder="placeholder.search_player1" autocomplete="off">
           <div class="player-suggestions" id="matchP1Suggestions"></div>
         </div>
-        <div class="vs-divider" data-i18n="vs">VS</div>
+        <div class="vs-divider"><span class="vs-badge" data-i18n="vs">VS</span></div>
         <div class="player-search-wrap">
           <input class="team-input" id="matchP2Input" placeholder="Cherche un joueur (ex: Sinner, Zverev...)" data-i18n-placeholder="placeholder.search_player2" autocomplete="off">
           <div class="player-suggestions" id="matchP2Suggestions"></div>
@@ -4647,7 +4700,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       });
       matches = [...seen.values()];
       list.innerHTML = matches.map((m, idx) =>
-        '<div class="upcoming-card' + (idx === 0 ? ' selected' : '') + '" data-idx="' + idx + '">' +
+        '<div class="upcoming-card' + (idx === 0 ? ' selected' : '') + '" data-idx="' + idx + '" style="--upcoming-surf:' + surfaceColor(m.surface) + '">' +
           '<div class="upcoming-card-main">' +
             '<div class="upcoming-card-tournament">' + (m.tournament || t('label.tournament_default')) + (m.round ? ' · ' + m.round : '') + '</div>' +
             '<div class="upcoming-card-meta">' + surfacePillHtml(m.surface) + (m.city ? ' · ' + m.city : '') + '</div>' +
