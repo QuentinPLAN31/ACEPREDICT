@@ -241,7 +241,7 @@
      répété sur tout le reste du site (retour utilisateur : page trop
      répétitive en style/couleur). Halo ambiant discret + fine bordure
      dégradée en haut de carte, jamais sur le fond entier (reste lisible). */
-  #page-matchs .page-head{ position:relative; }
+  #page-matchs .page-head{ position:relative; margin-top:28px; }
   #page-matchs .page-head::before{
     content:''; position:absolute; left:50%; top:-40px; width:520px; height:220px;
     transform: translateX(-50%); pointer-events:none; z-index:-1;
@@ -1778,7 +1778,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         </div>
       </div>
       <button type="button" class="mobile-auth-btn" id="mobileAuthBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg>
         <span id="mobileAuthBtnLabel" data-i18n="mobile.login">Connexion</span>
       </button>
     </div>
@@ -1859,7 +1859,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     <button class="user-row nav-item" data-page="compte" style="cursor:pointer;">
       <span class="user-avatar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg>
       </span>
       <span style="display:flex; flex-direction:column; align-items:flex-start;">
         <span class="user-name" id="userNameLabel">quentinplan.31</span>
@@ -1919,7 +1919,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <section class="page" id="page-upcoming">
       <div class="page-head">
         <h1 data-i18n="page.upcoming.title">Matchs à venir</h1>
-        <p data-i18n="page.upcoming.sub1">Tous les prochains matchs programmés, mis à jour en direct à chaque visite</p>
+        <p data-i18n="page.upcoming.sub1">Retrouve les prochains matchs programmés</p>
       </div>
       <div class="info-banner">ℹ️ <span data-i18n="banner.upcoming" data-i18n-html>Ces matchs viennent d'une source externe et peuvent parfois être en retard ou incomplets. Tu ne trouves pas le match que tu cherches ? Va directement dans <a onclick="go('matchs')">Nouvelle analyse</a> et entre les deux joueurs à la main.</span></div>
       <input class="search-bar" id="upcomingSearchInput" placeholder="Rechercher un joueur ou un tournoi..." data-i18n-placeholder="placeholder.search_upcoming">
@@ -1972,7 +1972,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
       <div class="empty-card" id="historiqueLoggedOut">
         <div class="empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg>
         </div>
         <h3 data-i18n="historique.login_title">Connecte-toi pour voir ton historique</h3>
         <p data-i18n="historique.login_sub">Crée un compte gratuit pour retrouver toutes tes analyses ici</p>
@@ -2093,7 +2093,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
         <div class="parr-stats">
           <div class="parr-stat-card">
-            <div class="parr-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
+            <div class="parr-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg></div>
             <div class="parr-stat-num" id="parrSubscribed">0</div>
             <div class="parr-stat-label" data-i18n="parr.stat_subscribed">Filleuls abonnés</div>
           </div>
@@ -2149,7 +2149,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
       <div class="empty-card guest-cta" id="parrLoggedOut" style="display:none;">
         <div class="empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg>
         </div>
         <h3 data-i18n="parr.not_logged_title">Tu n'es pas connecté</h3>
         <p data-i18n="parr.not_logged_sub">Connecte-toi pour obtenir ton lien de parrainage et suivre tes gains</p>
@@ -2217,7 +2217,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
       <div class="empty-card guest-cta" id="createurLoggedOut" style="display:none;">
         <div class="empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg>
         </div>
         <h3 data-i18n="parr.not_logged_title">Tu n'es pas connecté</h3>
         <p data-i18n="creator.not_logged_sub">Connecte-toi pour rejoindre le programme de monétisation TikTok et obtenir ton lien</p>
@@ -2234,7 +2234,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       <div class="acc-grid" id="accLoggedIn">
         <div class="acc-card">
           <div class="acc-card-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg>
             <span data-i18n="acc.personal_info">Informations personnelles</span>
           </div>
           <div class="field">
@@ -2292,7 +2292,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
       <div class="empty-card guest-cta" id="accLoggedOut" style="display:none;">
         <div class="empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.4"/><path d="M5 20.3c0-3.8 3-6.3 7-6.3s7 2.5 7 6.3" stroke-linecap="round"/></svg>
         </div>
         <h3 data-i18n="parr.not_logged_title">Tu n'es pas connecté</h3>
         <p data-i18n="acc.not_logged_sub">Connecte-toi pour voir et gérer tes informations personnelles</p>
@@ -2565,7 +2565,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'btn.analyzing': 'Analyse en cours...',
 
       'page.upcoming.title': 'Matchs à venir',
-      'page.upcoming.sub1': 'Tous les prochains matchs programmés, mis à jour en direct à chaque visite',
+      'page.upcoming.sub1': 'Retrouve les prochains matchs programmés',
       'banner.upcoming': "Ces matchs viennent d'une source externe et peuvent parfois être en retard ou incomplets. Tu ne trouves pas le match que tu cherches ? Va directement dans <a onclick=\"go('matchs')\">Nouvelle analyse</a> et entre les deux joueurs à la main.",
       'placeholder.search_upcoming': 'Rechercher un joueur ou un tournoi...',
       'gender.men': 'Hommes',
@@ -3019,7 +3019,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'btn.analyzing': 'Analizando...',
 
       'page.upcoming.title': 'Próximos partidos',
-      'page.upcoming.sub1': 'Todos los próximos partidos programados, actualizados en directo en cada visita',
+      'page.upcoming.sub1': 'Encuentra los próximos partidos programados',
       'banner.upcoming': 'Estos partidos vienen de una fuente externa y a veces pueden tener retraso o estar incompletos. ¿No encuentras el partido que buscas? Ve directamente a <a onclick="go(\'matchs\')">Nuevo análisis</a> e introduce los dos jugadores manualmente.',
       'placeholder.search_upcoming': 'Buscar un jugador o un torneo...',
       'gender.men': 'Hombres',
@@ -3473,7 +3473,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'btn.analyzing': 'Analyzing...',
 
       'page.upcoming.title': 'Upcoming matches',
-      'page.upcoming.sub1': 'All upcoming scheduled matches, updated live on every visit',
+      'page.upcoming.sub1': 'Find the upcoming scheduled matches',
       'banner.upcoming': 'These matches come from an external source and can sometimes be delayed or incomplete. Can\'t find the match you\'re looking for? Go straight to <a onclick="go(\'matchs\')">New analysis</a> and enter both players manually.',
       'placeholder.search_upcoming': 'Search for a player or a tournament...',
       'gender.men': 'Men',
@@ -4699,7 +4699,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         const prev = seen.get(key);
         if(!prev || new Date(m.scheduled_time) > new Date(prev.scheduled_time)) seen.set(key, m);
       });
-      matches = [...seen.values()];
+      matches = [...seen.values()].sort((a, b) => new Date(a.scheduled_time) - new Date(b.scheduled_time));
       list.innerHTML = matches.map((m, idx) =>
         '<div class="upcoming-card' + (idx === 0 ? ' selected' : '') + '" data-idx="' + idx + '" style="--upcoming-surf:' + surfaceColor(m.surface) + '">' +
           '<div class="upcoming-card-main">' +
