@@ -272,16 +272,6 @@
     font-weight: 800; margin-bottom: 14px; padding-bottom: 8px;
     border-bottom: 1px solid var(--line-strong);
   }
-  /* Label de la carte "Nouvelle analyse" : suit le dégradé chaud de la page
-     plutôt que l'accent lime générique utilisé partout ailleurs. */
-  .analyse-card > .field-label{
-    color: #ffb020; border-bottom-color: rgba(255,176,32,0.25);
-    display:flex; align-items:center; gap:8px;
-  }
-  .analyse-card > .field-label::before{
-    content:''; width:7px; height:7px; border-radius:50%; flex-shrink:0;
-    background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d);
-  }
   .jargon-star{ color: var(--accent); font-weight: 700; cursor: help; }
   .clickable-name{ cursor: pointer; }
   .clickable-name:hover{ text-decoration: underline; color: var(--accent); }
@@ -313,8 +303,8 @@
   .vs-badge{
     flex: 0 0 auto; width:30px; height:30px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d);
-    color:#1a1204; font-size:10px; font-weight:800; letter-spacing:0.02em;
+    background: var(--accent);
+    color:#14180a; font-size:10px; font-weight:800; letter-spacing:0.02em;
   }
   .btn-primary{
     width:100%;
@@ -1903,7 +1893,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       <div class="page-head">
         <h1 data-i18n="page.matchs.title">Analyse de match</h1>
         <p data-i18n="page.matchs.sub1">Entre les joueurs que tu veux analyser</p>
-        <p data-i18n="page.matchs.sub2">Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.</p>
       </div>
       <div class="analyse-card">
         <div class="field-label" data-i18n="field.match_to_analyze">MATCH À ANALYSER</div>
