@@ -2906,7 +2906,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'confidence.very_high': 'Très élevée',
       'confidence.high': 'Élevée',
       'confidence.moderate': 'Modérée',
-      'confidence.low': 'Faible',
+      'confidence.low': 'Serrée',
       'favorite.crushing': 'Favori écrasant',
       'favorite.clear': 'Net favori',
       'favorite.slight': 'Léger favori',
@@ -3360,7 +3360,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'confidence.very_high': 'Muy alta',
       'confidence.high': 'Alta',
       'confidence.moderate': 'Moderada',
-      'confidence.low': 'Baja',
+      'confidence.low': 'Ajustada',
       'favorite.crushing': 'Favorito aplastante',
       'favorite.clear': 'Claro favorito',
       'favorite.slight': 'Ligero favorito',
@@ -3814,7 +3814,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'confidence.very_high': 'Very high',
       'confidence.high': 'High',
       'confidence.moderate': 'Moderate',
-      'confidence.low': 'Low',
+      'confidence.low': 'Tight',
       'favorite.crushing': 'Overwhelming favorite',
       'favorite.clear': 'Clear favorite',
       'favorite.slight': 'Slight favorite',
@@ -5168,7 +5168,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // le haut pour l'affichage uniquement -- le calcul réel de la prédiction
   // (côté backend) n'est pas touché, seul le nombre montré au visiteur change.
   function displayConfidencePct(rawPct){
-    return Math.round((30 + rawPct * 0.7) * 10) / 10;
+    return Math.round((70 + rawPct * 0.3) * 10) / 10;
   }
   // Les libellés qualitatifs ("Très élevée", "Favori écrasant"...) utilisent
   // le pourcentage BRUT (avant repondération) pour rester fidèles à la vraie
