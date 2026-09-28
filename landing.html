@@ -187,8 +187,17 @@
   /* ---------- PHONE MOCK ---------- */
   .phone-stage{
     position:relative;
-    max-width: 420px; margin: 56px auto 0;
+    max-width: 520px; margin: 56px auto 0;
     padding-bottom: 40px;
+  }
+  /* Mockup iPhone genere (shots.so) : remplace l'ancien faux telephone
+     HTML/CSS -- une seule image deja cadree, pas besoin de refaire le
+     bezel/notch en CSS. Agrandie par rapport a l'ancien .phone (420px ->
+     520px sur .phone-stage) pour rester lisible avec le rendu shots.so. */
+  .phone-mockup{
+    position:relative; z-index:2;
+    width:100%; display:block;
+    filter: drop-shadow(0 40px 70px rgba(0,0,0,0.6));
   }
   .float-badge{
     position:absolute; z-index:3;
@@ -519,33 +528,7 @@
     <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
     <div class="float-badge b3"><img src="assets/players/player-w.jpg" alt="Joueuse WTA" loading="lazy"></div>
     <div class="float-badge b4"><img src="assets/players/djokovic.jpg" alt="Novak Djokovic" loading="lazy"></div>
-    <div class="phone">
-      <div class="phone-notch"></div>
-      <div class="phone-screen">
-        <div class="p-brand">
-          <span class="brand-name" style="font-size:14px;">TennisMind</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA69A" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-        </div>
-        <div class="p-h1" data-i18n="p_h1_analyse">Analyse de match</div>
-        <div class="p-sub" data-i18n="p_sub1">Entre les joueurs que tu veux analyser</div>
-        <div class="p-sub accent" data-i18n="p_sub_accent1">Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.</div>
-        <div class="p-card">
-          <div class="p-label" data-i18n="p_label_match">MATCH À ANALYSER</div>
-          <div class="p-vs-badge">🇪🇸</div>
-          <input class="p-input ok" value="Carlos Alcaraz" readonly>
-          <div class="p-vs">VS</div>
-          <input class="p-input" placeholder="Cherche un joueur (ex: Sinner, Zverev...)" data-i18n-placeholder="p_search_ph">
-          <button class="p-btn" onclick="window.location.href='visitennis_1.html'" data-i18n="p_analyse_btn">Analyser le match avec l'IA</button>
-        </div>
-        <div class="p-card p-next">
-          <div class="p-next-title" data-i18n="p_next_title">Prochains matchs</div>
-          <div class="p-match"><span class="p-date">03/04<br>20:45</span><b>Alcaraz</b> 🇪🇸 <span class="vs-mini">vs</span> 🇮🇹 Sinner</div>
-          <div class="p-match"><span class="p-date">08/04<br>21:00</span><b>Alcaraz</b> 🇪🇸 <span class="vs-mini">vs</span> 🇬🇷 Tsitsipas</div>
-          <div class="p-match"><span class="p-date">11/04<br>17:00</span>Zverev 🇩🇪 <span class="vs-mini">vs</span> 🇪🇸 <b>Alcaraz</b></div>
-          <div class="p-match"><span class="p-date">14/04<br>21:00</span>Djokovic 🇷🇸 <span class="vs-mini">vs</span> 🇪🇸 <b>Alcaraz</b></div>
-        </div>
-      </div>
-    </div>
+    <img class="phone-mockup" src="assets/mockups/hero-analyse.png" alt="TennisMind - Analyse de match" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
   </div>
 </section>
 
@@ -676,25 +659,7 @@
     <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
 
     <div class="phone-stage reveal" style="margin-top:50px;">
-      <div class="phone">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div class="p-brand">
-            <span class="brand-name" style="font-size:14px;">TennisMind</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA69A" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-          </div>
-          <div class="p-h1" data-i18n="p_h1_comp">Compétitions</div>
-          <div class="p-sub" data-i18n="p_sub2">Découvre les compétitions en cours</div>
-          <div class="p-sub accent" data-i18n="p_sub_accent2">Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.</div>
-          <div class="p-search"><span data-i18n="p_search_comp">🔍&nbsp; Rechercher une compétition...</span></div>
-          <div class="p-comp-label" data-i18n="p_label_slam">GRAND CHELEM</div>
-          <div class="p-comp-row"><span class="p-comp-icon">🇦🇺</span><div><div class="p-comp-name">Australian Open</div><div class="p-comp-meta">Melbourne • 2026</div></div><span class="p-comp-chev">›</span></div>
-          <div class="p-comp-row"><span class="p-comp-icon">🇫🇷</span><div><div class="p-comp-name">Roland-Garros</div><div class="p-comp-meta">Paris • 2026</div></div><span class="p-comp-chev">›</span></div>
-          <div class="p-comp-label" data-i18n="p_label_circuits">CIRCUITS</div>
-          <div class="p-comp-row"><span class="p-comp-icon">🎾</span><div><div class="p-comp-name">ATP Tour</div><div class="p-comp-meta">Monde • 2026</div></div><span class="p-comp-chev">›</span></div>
-          <div class="p-comp-row"><span class="p-comp-icon">🏆</span><div><div class="p-comp-name">Masters 1000</div><div class="p-comp-meta">Monde • 2026</div></div><span class="p-comp-chev">›</span></div>
-        </div>
-      </div>
+      <img class="phone-mockup" src="assets/mockups/hero-competitions.png" alt="TennisMind - Compétitions" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
     </div>
   </div>
 </section>
