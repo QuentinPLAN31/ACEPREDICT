@@ -4682,22 +4682,33 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const res = await fetch(API_BASE + '/matches/upcoming?player1_id=' + encodeURIComponent(id1) + '&player2_id=' + encodeURIComponent(id2));
       if(!res.ok) throw new Error('bad status');
       let matches = await res.json();
+      // Retire les matchs déjà passés -- la source externe garde parfois un
+      // match affiché un moment après son heure prévue (retard de sync), ce
+      // qui le faisait apparaître à tort dans "Matchs à venir".
+      matches = matches.filter(m => new Date(m.scheduled_time) >= new Date());
       if(!matches.length){
         list.innerHTML = '<div class="upcoming-empty">' + t('msg.no_upcoming_match') + '</div>';
         return;
       }
-      // Dédoublonnage (tournoi + round) : la source externe republie parfois
-      // le même match plusieurs fois avec un horaire légèrement différent à
-      // chaque resynchro (retard annoncé, changement de court...), ce qui
-      // créait 2-3 cartes quasi identiques pour UN SEUL vrai match -- on ne
-      // garde que la plus récente (le dernier horaire connu). Rappel : même
-      // après ça, l'horaire affiché reste celui de la source externe et peut
-      // avoir du retard (cf. bandeau d'avertissement sur "Matchs à venir").
+      // Dédoublonnage : ces deux joueurs ne jouent jamais deux vrais matchs
+      // le même jour -- donc peu importe que le tournoi/round diffère d'une
+      // carte à l'autre (la source externe republie parfois le même match
+      // avec un intitulé légèrement différent à chaque resynchro, ex. round
+      // ajouté/modifié), on regroupe par JOUR et on ne garde que la carte la
+      // plus complète (round renseigné) et la plus récemment synchronisée.
       const seen = new Map();
       matches.forEach(m => {
-        const key = (m.tournament || '') + '|' + (m.round || '');
+        const key = new Date(m.scheduled_time).toISOString().slice(0, 10);
         const prev = seen.get(key);
-        if(!prev || new Date(m.scheduled_time) > new Date(prev.scheduled_time)) seen.set(key, m);
+        if(!prev){
+          seen.set(key, m);
+          return;
+        }
+        const mScore = (m.round ? 1 : 0);
+        const prevScore = (prev.round ? 1 : 0);
+        if(mScore > prevScore || (mScore === prevScore && new Date(m.scheduled_time) > new Date(prev.scheduled_time))){
+          seen.set(key, m);
+        }
       });
       matches = [...seen.values()].sort((a, b) => new Date(a.scheduled_time) - new Date(b.scheduled_time));
       list.innerHTML = matches.map((m, idx) =>
