@@ -273,18 +273,23 @@
   .wordmark.col-active{ transform: translateY(-8px); color: #ff8fb0 !important; opacity:1 !important; }
 
   /* ---------- FACTEURS PRIS EN COMPTE (section 220 sources) ---------- */
+  /* Grille sur 4 bandes (3 colonnes x 4 lignes pour 12 facteurs), pleine
+     largeur ; le texte peut etre tronque plutot que de retourner a la
+     ligne (chips a hauteur fixe). */
   .factors-row{
-    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
-    gap: 10px 12px; width: 75%; margin: 46px auto 0;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 12px;
+    width: 100%; margin: 46px auto 0;
   }
   .factor-chip{
-    display:inline-flex; align-items:center;
+    display:flex; align-items:center; justify-content:center;
     background: rgba(255,255,255,0.04);
     border: 1px solid var(--line-strong);
     border-radius: 999px;
-    padding: 9px 18px;
+    padding: 9px 14px;
     font-size: 13px; font-weight:600; color: var(--text-sec);
-    white-space: nowrap;
+    white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
   }
 
   /* ---------- SCORE / COURT SECTION ---------- */
@@ -434,8 +439,8 @@
     /* Facteurs pris en compte : sur mobile on utilise toute la largeur
        dispo (pas seulement 75%) pour que les puces se repartissent sur
        plusieurs colonnes au lieu de s'empiler une par ligne. */
-    .factors-row{ width: 100%; gap: 8px; }
-    .factor-chip{ font-size: 12px; padding: 7px 14px; }
+    .factors-row{ gap: 8px; }
+    .factor-chip{ font-size: 11px; padding: 7px 10px; }
 
     /* Videos : on force les 3 cartes sur une seule ligne (au lieu de les
        laisser passer a la ligne et s'empiler) en les retrecissant. */
@@ -622,7 +627,7 @@
       <span class="ready-text" data-i18n="live_update">Données mises à jour toutes les 15 minutes</span>
       <span class="live-dot"></span>
     </div>
-    <div class="dl-line reveal" data-i18n-html="dl_line">Télécharger l'app pour obtenir toutes les<br>analyses du match</div>
+    <div class="dl-line reveal" data-i18n="court_p">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</div>
   </div>
 </section>
 
