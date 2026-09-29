@@ -272,6 +272,21 @@
   .wordmark{ transition: transform .35s cubic-bezier(.2,.8,.2,1), color .35s ease, opacity .35s ease; will-change: transform; display:inline-block; }
   .wordmark.col-active{ transform: translateY(-8px); color: #ff8fb0 !important; opacity:1 !important; }
 
+  /* ---------- FACTEURS PRIS EN COMPTE (section 220 sources) ---------- */
+  .factors-row{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap: 10px 12px; width: 75%; margin: 46px auto 0;
+  }
+  .factor-chip{
+    display:inline-flex; align-items:center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 13px; font-weight:600; color: var(--text-sec);
+    white-space: nowrap;
+  }
+
   /* ---------- SCORE / COURT SECTION ---------- */
   .court-section{
     position:relative; padding: 70px 32px 90px; text-align:center; overflow:hidden;
@@ -415,6 +430,17 @@
     .sources-section{ padding: 64px 18px; }
     .faq-section{ padding: 64px 18px 90px; }
     footer{ padding: 34px 18px; }
+
+    /* Facteurs pris en compte : sur mobile on utilise toute la largeur
+       dispo (pas seulement 75%) pour que les puces se repartissent sur
+       plusieurs colonnes au lieu de s'empiler une par ligne. */
+    .factors-row{ width: 100%; gap: 8px; }
+    .factor-chip{ font-size: 12px; padding: 7px 14px; }
+
+    /* Videos : on force les 3 cartes sur une seule ligne (au lieu de les
+       laisser passer a la ligne et s'empiler) en les retrecissant. */
+    .video-strip{ flex-wrap: nowrap; gap: 8px; }
+    .video-card{ width: auto; flex: 1 1 0; min-width: 0; height: 180px; }
   }
 
   /* ---------- Auth modal ---------- */
@@ -551,11 +577,19 @@
     <span class="sources-pill reveal" data-i18n="sources_pill">+1M de sources de données</span>
     <h2 class="reveal" data-i18n-html="sources_h2">Nous analysons +220 <span class="lime">sources</span></h2>
     <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
-    <div class="logos-row reveal" style="margin-top:46px;">
-      <span class="wordmark">ATP TOUR</span>
-      <span class="wordmark dim">ROLAND-GARROS</span>
-      <span class="wordmark">WIMBLEDON</span>
-      <span class="wordmark dim">WTA TOUR</span>
+    <div class="factors-row reveal">
+      <span class="factor-chip">Historique face-a-face</span>
+      <span class="factor-chip">Surface de jeu</span>
+      <span class="factor-chip">Forme des 10 derniers matchs</span>
+      <span class="factor-chip">Classement ATP/WTA en direct</span>
+      <span class="factor-chip">Vitesse moyenne de service</span>
+      <span class="factor-chip">Conversion des balles de break</span>
+      <span class="factor-chip">Indice de fatigue physique</span>
+      <span class="factor-chip">Ratio de victoires par surface</span>
+      <span class="factor-chip">Conditions meteo du match</span>
+      <span class="factor-chip">Analyse biomecanique du service</span>
+      <span class="factor-chip">Historique des blessures</span>
+      <span class="factor-chip">Indice de confiance psychologique</span>
     </div>
   </div>
 </section>
