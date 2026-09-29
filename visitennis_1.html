@@ -4000,6 +4000,15 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     el.addEventListener('click', (e)=>{ e.preventDefault(); setAuthTab(el.dataset.authTab); });
   });
   if(pendingResetToken){ openAuth('reset'); }
+  // Arrivee depuis la landing page (bouton recherche) : ouvre directement l'inscription
+  (function openAuthFromUrl(){
+    const authParam = new URLSearchParams(window.location.search).get('auth');
+    if(authParam === 'register' || authParam === 'login'){
+      if(!isLoggedIn()) openAuth(authParam);
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  })();
   function setAuthMsg(el, type, text){ el.textContent = text; el.className = 'auth-msg ' + (type || ''); }
 
   async function apiLogin(email, password){

@@ -402,6 +402,28 @@
   @media (max-width: 640px){
     .float-badge{ display:none; }
     .score-stats{ gap: 40px; }
+
+    /* Mobile : reduit les marges laterales fixes (32px) pour que le
+       contenu utilise davantage la largeur de l'ecran, sans coller aux
+       bords non plus. */
+    .wrap{ padding: 0 18px; }
+    .hero{ padding: 64px 18px 0; }
+    .logos-section{ padding: 64px 18px; }
+    .court-section{ padding: 56px 18px 70px; }
+    .testi-section{ padding: 64px 18px; }
+    .feature-section{ padding: 70px 18px; }
+    .sources-section{ padding: 64px 18px; }
+    .faq-section{ padding: 64px 18px 90px; }
+    footer{ padding: 34px 18px; }
+
+    /* Court-lines : l'illustration du terrain etait en largeur fixe
+       (640px) et debordait/se faisait couper sur mobile. On la fait
+       suivre la largeur disponible tout en gardant ses proportions. */
+    .court-lines{
+      width: min(640px, 94vw);
+      height: auto;
+      top: 26%;
+    }
   }
 
   /* ---------- Auth modal ---------- */
@@ -518,7 +540,7 @@
 
   <div class="search-hero reveal">
     <input type="text" placeholder="Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)" data-i18n-placeholder="hero_search_ph">
-    <button data-i18n="btn_analyser">Analyser</button>
+    <button data-i18n="btn_analyser" onclick="window.location.href='visitennis_1.html?auth=register'">Analyser</button>
   </div>
 
   <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs analysés la semaine dernière</span></div>
@@ -532,15 +554,17 @@
   </div>
 </section>
 
-<section class="logos-section">
+<section class="sources-section">
+  <div class="court-visual"></div>
   <div class="wrap">
-    <h2 class="reveal" data-i18n-html="logos_h2">Plus de 60 tournois <span class="lime">couverts</span></h2>
-    <div class="logos-row reveal">
+    <span class="sources-pill reveal" data-i18n="sources_pill">+1M de sources de données</span>
+    <h2 class="reveal" data-i18n-html="sources_h2">Nous analysons +220 <span class="lime">sources</span></h2>
+    <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
+    <div class="logos-row reveal" style="margin-top:46px;">
       <span class="wordmark">ATP TOUR</span>
+      <span class="wordmark dim">ROLAND-GARROS</span>
+      <span class="wordmark">WIMBLEDON</span>
       <span class="wordmark dim">WTA TOUR</span>
-      <span class="wordmark">ROLAND-GARROS</span>
-      <span class="wordmark dim">WIMBLEDON</span>
-      <span class="wordmark">GRAND CHELEM</span>
     </div>
   </div>
 </section>
@@ -664,17 +688,15 @@
   </div>
 </section>
 
-<section class="sources-section">
-  <div class="court-visual"></div>
+<section class="logos-section">
   <div class="wrap">
-    <span class="sources-pill reveal" data-i18n="sources_pill">+1M de sources de données</span>
-    <h2 class="reveal" data-i18n-html="sources_h2">Nous analysons +220 <span class="lime">sources</span></h2>
-    <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
-    <div class="logos-row reveal" style="margin-top:46px;">
+    <h2 class="reveal" data-i18n-html="logos_h2">Plus de 60 tournois <span class="lime">couverts</span></h2>
+    <div class="logos-row reveal">
       <span class="wordmark">ATP TOUR</span>
-      <span class="wordmark dim">ROLAND-GARROS</span>
-      <span class="wordmark">WIMBLEDON</span>
       <span class="wordmark dim">WTA TOUR</span>
+      <span class="wordmark">ROLAND-GARROS</span>
+      <span class="wordmark dim">WIMBLEDON</span>
+      <span class="wordmark">GRAND CHELEM</span>
     </div>
   </div>
 </section>
