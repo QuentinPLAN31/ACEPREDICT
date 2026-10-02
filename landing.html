@@ -423,7 +423,7 @@
   .foot-copy{ color: var(--text-dim); font-size:12.5px; }
 
   @media (max-width: 640px){
-    .float-badge{ display:none; }
+    .float-badge{ width: 64px; height: 64px; }
     .score-stats{ gap: 40px; }
 
     /* Mobile : reduit les marges laterales fixes (32px) pour que le
@@ -432,12 +432,32 @@
     .wrap{ padding: 0 18px; }
     .hero{ padding: 64px 18px 0; }
     .logos-section{ padding: 36px 18px 64px; }
-    .court-section{ padding: 56px 18px 70px; }
+    .court-section{ padding: 56px 18px 110px; }
     .testi-section{ padding: 64px 18px; }
     .feature-section{ padding: 70px 18px 36px; }
     .sources-section{ padding: 64px 18px; }
     .faq-section{ padding: 64px 18px 90px; }
     footer{ padding: 34px 18px; }
+
+    /* Hero : le mockup de telephone est trop grand sur mobile, on le reduit. */
+    .hero .phone-stage{ max-width: 70%; }
+
+    /* Eventail (feature-section) : on l'agrandit au-dela de son conteneur
+       pour mieux voir les 3 telephones sur mobile. */
+    .feature-section .phone-fan-stage{
+      max-width: none;
+      width: 130%;
+      margin-left: -15%;
+      margin-right: -15%;
+    }
+
+    /* Terrain de tennis : rend le dessin responsive pour qu'il s'affiche
+       en entier avec un peu de marge. */
+    .court-lines{
+      width: min(640px, 94vw);
+      height: auto;
+      top: 22%;
+    }
 
     /* Facteurs pris en compte : sur mobile on utilise toute la largeur
        dispo (pas seulement 75%) pour que les puces se repartissent sur
@@ -632,6 +652,17 @@
   </div>
 </section>
 
+<section class="feature-section">
+  <div class="wrap">
+    <h2 class="reveal" data-i18n-html="feature_h2">Des analyses IA pour anticiper <span class="lime">chaque match.</span></h2>
+    <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
+
+    <div class="phone-stage phone-fan-stage reveal" style="margin-top:50px;">
+      <img class="phone-mockup phone-fan" src="assets/mockups/hero-fan.png" alt="TennisMind - Liste des joueurs, fiche joueur et compétitions" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
+    </div>
+  </div>
+</section>
+
 <section class="testi-section">
   <div class="wrap">
     <div class="avatar-row reveal">
@@ -705,17 +736,6 @@
       </div>
     </div>
     <button class="voir-tous reveal" id="voirTous" data-i18n="voir_tous">Voir tous</button>
-  </div>
-</section>
-
-<section class="feature-section">
-  <div class="wrap">
-    <h2 class="reveal" data-i18n-html="feature_h2">Des analyses IA pour anticiper <span class="lime">chaque match.</span></h2>
-    <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
-
-    <div class="phone-stage phone-fan-stage reveal" style="margin-top:50px;">
-      <img class="phone-mockup phone-fan" src="assets/mockups/hero-fan.png" alt="TennisMind - Liste des joueurs, fiche joueur et compétitions" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
-    </div>
   </div>
 </section>
 
