@@ -43,12 +43,31 @@ def register(payload: schemas.UserCreate, db: Session = Depends(get_db)):
     if existing:
         raise HTTPException(status_code=400, detail="Cet e-mail est déjà utilisé")
 
+    # Anti-abus "un compte par appareil" : device_id généré et persisté côté
+    # navigateur (localStorage, cf. visitennis_1.html). Un compte existant
+    # avec le même device_id bloque une nouvelle inscription depuis le même
+    # appareil (contournable par un utilisateur motivé -- navigation privée,
+    # autre navigateur -- mais suffisant contre l'abus de quota gratuit non
+    # intentionnel).
+    if payload.device_id:
+        device_existing = (
+            db.query(models.User)
+            .filter(models.User.device_id == payload.device_id)
+            .first()
+        )
+        if device_existing:
+            raise HTTPException(
+                status_code=400,
+                detail="Un compte a déjà été créé sur cet appareil",
+            )
+
     user = models.User(
         email=payload.email,
         hashed_password=hash_password(payload.password),
         full_name=payload.full_name,
         plan=models.PlanEnum.free,
         referral_code=generate_referral_code(db),
+        device_id=payload.device_id,
     )
     db.add(user)
     db.commit()
@@ -130,6 +149,18 @@ def google_auth(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
             db.commit()
             db.refresh(user)
         else:
+            if payload.device_id:
+                device_existing = (
+                    db.query(models.User)
+                    .filter(models.User.device_id == payload.device_id)
+                    .first()
+                )
+                if device_existing:
+                    raise HTTPException(
+                        status_code=400,
+                        detail="Un compte a déjà été créé sur cet appareil",
+                    )
+
             user = models.User(
                 email=email,
                 hashed_password=None,
@@ -137,6 +168,7 @@ def google_auth(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
                 google_id=google_sub,
                 plan=models.PlanEnum.free,
                 referral_code=generate_referral_code(db),
+                device_id=payload.device_id,
             )
             db.add(user)
             db.commit()

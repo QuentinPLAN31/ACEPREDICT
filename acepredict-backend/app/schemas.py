@@ -14,6 +14,7 @@ class UserCreate(BaseModel):
     password: str = Field(min_length=8)
     full_name: Optional[str] = None
     ref_code: Optional[str] = None  # code de parrainage de l'inviteur, si venu par un lien ?ref=
+    device_id: Optional[str] = None  # anti-abus "un compte par appareil", cf. models.User.device_id
 
 
 class UserLogin(BaseModel):
@@ -28,6 +29,7 @@ class GoogleAuthRequest(BaseModel):
     qui vient du navigateur."""
     id_token: str
     ref_code: Optional[str] = None
+    device_id: Optional[str] = None  # anti-abus "un compte par appareil", cf. models.User.device_id
 
 
 class Token(BaseModel):

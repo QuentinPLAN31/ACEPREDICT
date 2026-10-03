@@ -3972,6 +3972,21 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   })();
   function getPendingRefCode(){ return localStorage.getItem('tennismind_ref_code') || null; }
 
+  // Anti-abus "un compte par appareil" : identifiant persistant genere une
+  // fois par navigateur et stocke en localStorage. Envoye a l'inscription
+  // (classique et Google) pour que le backend refuse une 2e creation de
+  // compte depuis le meme appareil (cf. acepredict-backend/app/routers/auth.py).
+  function getDeviceId(){
+    try {
+      let id = localStorage.getItem('tennismind_device_id');
+      if(!id){
+        id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('dev-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+        localStorage.setItem('tennismind_device_id', id);
+      }
+      return id;
+    } catch(e){ return null; }
+  }
+
   // ---------- Réinitialisation de mot de passe : capture du ?reset_token= dans l'URL du lien reçu par e-mail ----------
   let pendingResetToken = null;
   (function captureResetToken(){
@@ -4089,7 +4104,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const res = await fetch(API_BASE + '/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: response.credential, ref_code: getPendingRefCode() }),
+        body: JSON.stringify({ id_token: response.credential, ref_code: getPendingRefCode(), device_id: getDeviceId() }),
       });
       const data = await res.json().catch(()=> ({}));
       if(!res.ok) throw new Error(data.detail || t('auth.google_error'));
@@ -4153,7 +4168,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const res = await fetch(API_BASE + '/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, full_name: full_name || null, ref_code: getPendingRefCode() }),
+        body: JSON.stringify({ email, password, full_name: full_name || null, ref_code: getPendingRefCode(), device_id: getDeviceId() }),
       });
       if(!res.ok){
         const errBody = await res.json().catch(()=> ({}));

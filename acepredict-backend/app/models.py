@@ -78,6 +78,14 @@ class User(Base):
     # sont créés par e-mail/mot de passe classique.
     google_id = Column(String, nullable=True, unique=True, index=True)
 
+    # Anti-abus "un compte par appareil" -- identifiant généré côté client
+    # (localStorage) et envoyé à l'inscription (classique ou Google), cf.
+    # routers/auth.py /auth/register et /auth/google. Nullable : les comptes
+    # créés avant cette fonctionnalité n'en ont pas. Non-unique en base (un
+    # appareil change parfois d'IP/navigateur) -- le contrôle d'unicité est
+    # fait applicativement à l'inscription pour renvoyer un message clair.
+    device_id = Column(String, nullable=True, index=True)
+
     plan = Column(Enum(PlanEnum), nullable=False, default=PlanEnum.free)
     stripe_customer_id = Column(String, nullable=True, unique=True)
 
