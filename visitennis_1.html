@@ -1396,6 +1396,14 @@
   .auth-forgot-link{ text-align:right; margin-top:-4px; }
   .auth-forgot-link a{ color: var(--text-sec); font-size:12.5px; text-decoration:none; cursor:pointer; }
   .auth-forgot-link a:hover{ color: var(--accent); }
+  .auth-checkbox-label{
+    display:flex; align-items:flex-start; gap:9px; cursor:pointer;
+    font-size:12px; line-height:1.5; color: var(--text-sec);
+  }
+  .auth-checkbox-label input[type="checkbox"]{
+    flex-shrink:0; width:16px; height:16px; margin-top:1px; accent-color: var(--accent); cursor:pointer;
+  }
+  .auth-checkbox-label a{ color: var(--accent); text-decoration:underline; }
   .auth-msg{ font-size:12.5px; border-radius:8px; padding:10px 12px; margin-top:2px; display:none; }
   .auth-msg.error{ display:block; background: rgba(255,90,90,0.1); color:#ff8a8a; border:1px solid rgba(255,90,90,0.25); }
   .auth-msg.success{ display:block; background: var(--accent-dim); color: var(--accent); border:1px solid var(--line-strong); }
@@ -2423,6 +2431,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <label for="registerPassword" data-i18n="auth.password">Mot de passe</label>
           <input type="password" id="registerPassword" required minlength="8" autocomplete="new-password">
         </div>
+        <div class="auth-field">
+          <label class="auth-checkbox-label">
+            <input type="checkbox" id="registerAcceptTerms" required>
+            <span data-i18n-html="auth.accept_terms">J'accepte les <a href="legal/cgu-cgv.html" target="_blank" rel="noopener">CGU/CGV</a> et la <a href="legal/politique-confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>, et je reconnais renoncer à mon droit de rétractation de 14 jours dès qu'une analyse est générée.</span>
+          </label>
+        </div>
         <div class="auth-msg" id="registerMsg"></div>
         <button class="auth-submit" type="submit" id="registerSubmit" data-i18n="auth.submit_register">Créer mon compte</button>
       </form>
@@ -2738,6 +2752,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.tab_login': 'Connexion',
       'auth.tab_register': 'Inscription',
       'auth.or_divider': 'ou',
+      'auth.accept_terms_required': 'Coche la case pour accepter les CGU/CGV et la politique de confidentialité avant de créer ton compte.',
       'auth.google_error': 'Connexion Google impossible — réessaie.',
       'auth.google_connecting': 'Connexion avec Google…',
       'auth.login_title': 'Content de te revoir',
@@ -2751,6 +2766,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.register_title': 'Créer un compte',
       'auth.register_sub': 'Rejoins TennisMind et commence à analyser tes premiers matchs.',
       'auth.full_name': 'Nom complet',
+      'auth.accept_terms': "J'accepte les <a href=\"legal/cgu-cgv.html\" target=\"_blank\" rel=\"noopener\">CGU/CGV</a> et la <a href=\"legal/politique-confidentialite.html\" target=\"_blank\" rel=\"noopener\">politique de confidentialité</a>, et je reconnais renoncer à mon droit de rétractation de 14 jours dès qu'une analyse est générée.",
       'auth.submit_register': 'Créer mon compte',
       'auth.already_account': 'Déjà inscrit ?',
       'auth.login_link': 'Connecte-toi',
@@ -3192,6 +3208,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.tab_login': 'Iniciar sesión',
       'auth.tab_register': 'Registrarse',
       'auth.or_divider': 'o',
+      'auth.accept_terms_required': 'Marca la casilla para aceptar los Términos y la política de privacidad antes de crear tu cuenta.',
       'auth.google_error': 'No se pudo iniciar sesión con Google — inténtalo de nuevo.',
       'auth.google_connecting': 'Conectando con Google…',
       'auth.login_title': 'Nos alegra verte de nuevo',
@@ -3205,6 +3222,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.register_title': 'Crear una cuenta',
       'auth.register_sub': 'Únete a TennisMind y empieza a analizar tus primeros partidos.',
       'auth.full_name': 'Nombre completo',
+      'auth.accept_terms': 'Acepto los <a href="legal/cgu-cgv.html" target="_blank" rel="noopener">Términos y condiciones</a> y la <a href="legal/politique-confidentialite.html" target="_blank" rel="noopener">política de privacidad</a>, y reconozco que renuncio a mi derecho de desistimiento de 14 días en cuanto se genera un análisis.',
       'auth.submit_register': 'Crear mi cuenta',
       'auth.already_account': '¿Ya tienes cuenta?',
       'auth.login_link': 'Inicia sesión',
@@ -3646,6 +3664,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.tab_login': 'Log in',
       'auth.tab_register': 'Sign up',
       'auth.or_divider': 'or',
+      'auth.accept_terms_required': 'Check the box to accept the Terms and Privacy Policy before creating your account.',
       'auth.google_error': 'Google sign-in failed — please try again.',
       'auth.google_connecting': 'Signing in with Google…',
       'auth.login_title': 'Welcome back',
@@ -3659,6 +3678,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.register_title': 'Create an account',
       'auth.register_sub': 'Join TennisMind and start analyzing your first matches.',
       'auth.full_name': 'Full name',
+      'auth.accept_terms': 'I accept the <a href="legal/cgu-cgv.html" target="_blank" rel="noopener">Terms of Service</a> and the <a href="legal/politique-confidentialite.html" target="_blank" rel="noopener">Privacy Policy</a>, and I acknowledge that I waive my 14-day withdrawal right as soon as an analysis is generated.',
       'auth.submit_register': 'Create my account',
       'auth.already_account': 'Already have an account?',
       'auth.login_link': 'Log in',
@@ -4054,6 +4074,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const msgRegister = document.getElementById('registerMsg');
     const activePanel = document.getElementById('authPanelRegister').classList.contains('active') ? 'register' : 'login';
     const msg = activePanel === 'register' ? msgRegister : msgLogin;
+    // Meme regle que l'inscription classique : impossible de creer un compte
+    // via Google sans avoir accepte les CGU/CGV et la politique de
+    // confidentialite (case a cocher du panneau Inscription).
+    if(activePanel === 'register'){
+      const acceptBox = document.getElementById('registerAcceptTerms');
+      if(acceptBox && !acceptBox.checked){
+        setAuthMsg(msg, 'error', t('auth.accept_terms_required'));
+        return;
+      }
+    }
     setAuthMsg(msg, '', t('auth.google_connecting'));
     try {
       const res = await fetch(API_BASE + '/auth/google', {
