@@ -353,7 +353,13 @@
   .video-card{
     width: 160px; height: 220px; border-radius: 16px; overflow:hidden; position:relative;
     background: linear-gradient(155deg, #1b2a1d, #0b100d);
+    background-size: cover; background-position: center;
     border: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .video-card::after{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%);
   }
   .video-card .vtag{
     position:absolute; top:8px; left:8px; right:8px;
@@ -364,9 +370,10 @@
   .video-card .vbar{ height:5px; border-radius:3px; background: rgba(255,255,255,0.12); overflow:hidden; }
   .video-card .vbar span{ display:block; height:100%; background: var(--accent); }
   .video-card .vplay{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center;
     font-size: 30px; color: rgba(255,255,255,0.5);
   }
+  .video-card .vtag{ z-index:1; }
 
   .testi-cards{ max-width: 560px; margin: 46px auto 0; display:flex; flex-direction:column; gap:16px; text-align:left; }
   .testi-card{
@@ -680,20 +687,17 @@
     <p class="reveal" data-i18n="testi_p">Des milliers de passionnés utilisent TennisMind pour analyser les matchs avec précision.</p>
 
     <div class="video-strip reveal">
-      <div class="video-card">
+      <div class="video-card" style="background-image:url('assets/social/social1.jpg');" onclick="window.open('https://www.tiktok.com/@tennismind','_blank')">
         <div class="vtag" data-i18n="vtag1">Analyse IA prête</div>
         <div class="vplay">▶</div>
-        <div class="vbars"><div class="vbar"><span style="width:70%"></span></div><div class="vbar"><span style="width:45%"></span></div></div>
       </div>
-      <div class="video-card">
+      <div class="video-card" style="background-image:url('assets/social/social2.jpg');" onclick="window.open('https://www.tiktok.com/@tennismind','_blank')">
         <div class="vtag" data-i18n="vtag2">L'IA avait prédit tout ✅</div>
         <div class="vplay">▶</div>
-        <div class="vbars"><div class="vbar"><span style="width:90%"></span></div><div class="vbar"><span style="width:30%"></span></div></div>
       </div>
-      <div class="video-card">
+      <div class="video-card" style="background-image:url('assets/social/social3.jpg');" onclick="window.open('https://www.tiktok.com/@tennismind','_blank')">
         <div class="vtag" data-i18n="vtag3">Confiance de l'IA</div>
         <div class="vplay">▶</div>
-        <div class="vbars"><div class="vbar"><span style="width:60%"></span></div><div class="vbar"><span style="width:80%"></span></div></div>
       </div>
     </div>
 
