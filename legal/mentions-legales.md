@@ -9,7 +9,7 @@
 ## Éditeur du site
 
 - Nom commercial : TennisMind
-- Exploité par : [Prénom NOM — personne physique]
+- Exploité par : Quentin Plan — personne physique
 - Statut : Micro-entreprise (en cours d'immatriculation)
 - SIRET : en cours d'attribution
 - Adresse : 59 allée Pierre Satre, 31840 Seilh, France
