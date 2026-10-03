@@ -26,11 +26,14 @@ artificielle, édité par TennisMind (voir mentions-legales.md).
 
 - Les prix sont affichés en euros, [TTC/HT à préciser selon ton statut].
 - Le paiement est traité par Stripe, prestataire de paiement tiers.
-- Remboursement possible sous 48h après l'achat, à condition qu'aucune
-  analyse n'ait été générée sur la période. ⚠️ Le droit de rétractation
-  légal UE (14 jours) reste applicable sauf renonciation explicite de
-  l'utilisateur au moment de l'achat (case à cocher dédiée) — à faire
-  valider par un professionnel.
+- Remboursement possible sous 14 jours après l'achat (droit de
+  rétractation UE), à condition qu'aucune analyse n'ait été générée sur la
+  période. Dès qu'une analyse est générée, l'utilisateur renonce à son
+  droit de rétractation pour cet achat (consommation immédiate d'un
+  service numérique, art. L221-28 du Code de la consommation) — la
+  renonciation doit être acceptée explicitement au moment de l'achat
+  (case à cocher dédiée) pour être opposable. À faire valider par un
+  professionnel.
 
 ## Article 4 — Nature du service (avertissement important)
 
