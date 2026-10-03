@@ -305,14 +305,22 @@
       linear-gradient(180deg, transparent 0%, rgba(19,26,22,0.2) 55%, var(--bg) 100%),
       radial-gradient(ellipse 900px 500px at 50% 40%, rgba(96,180,90,0.16), transparent 70%);
   }
-  .court-lines{
-    position:absolute; left:50%; top: 30%; transform: translateX(-50%);
-    width: 640px; height: 380px; z-index:0; opacity:.55;
-  }
-  .court-section > *:not(.court-visual):not(.court-lines){ position:relative; z-index:1; }
+  .court-section > *:not(.court-visual){ position:relative; z-index:1; }
   .court-h2{ font-size: clamp(28px,4.2vw,46px); font-weight:800; text-transform:uppercase; }
   .court-p{ max-width:560px; margin: 20px auto 0; color: var(--text-sec); font-size:15px; line-height:1.6; }
-  .score-stats{ display:flex; justify-content:center; gap: 70px; margin-top: 50px; flex-wrap:wrap; }
+  /* Conteneur dedie au terrain : seul le SVG et les pourcentages vivent
+     ici, pour que rien d'autre ne chevauche les lignes du terrain. */
+  .court-visual-wrap{
+    position:relative; width:100%; max-width:640px; margin: 44px auto 0;
+    aspect-ratio: 640 / 380;
+  }
+  .court-lines{
+    position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.55;
+  }
+  .score-stats{
+    position:relative; z-index:1; height:100%;
+    display:flex; align-items:center; justify-content:center; gap: 70px; flex-wrap:wrap;
+  }
   .score-stat{ min-width:140px; }
   .score-num{ font-family: var(--font-h); font-weight:800; font-size: clamp(40px,6vw,64px); font-variant-numeric: tabular-nums; }
   .score-cap{ color: var(--text-sec); font-size: 14px; margin-top:4px; }
@@ -432,7 +440,7 @@
     .wrap{ padding: 0 18px; }
     .hero{ padding: 64px 18px 0; }
     .logos-section{ padding: 36px 18px 64px; }
-    .court-section{ padding: 56px 18px 110px; }
+    .court-section{ padding: 56px 18px 80px; }
     .testi-section{ padding: 64px 18px; }
     .feature-section{ padding: 70px 18px 36px; }
     .sources-section{ padding: 64px 18px; }
@@ -449,14 +457,6 @@
       width: 130%;
       margin-left: -15%;
       margin-right: -15%;
-    }
-
-    /* Terrain de tennis : rend le dessin responsive pour qu'il s'affiche
-       en entier avec un peu de marge. */
-    .court-lines{
-      width: min(640px, 94vw);
-      height: auto;
-      top: 22%;
     }
 
     /* Facteurs pris en compte : sur mobile on utilise toute la largeur
@@ -623,26 +623,28 @@
 
 <section class="court-section">
   <div class="court-visual"></div>
-  <svg class="court-lines" viewBox="0 0 640 380" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
-    <rect x="40" y="20" width="560" height="340" rx="4"/>
-    <line x1="40" y1="70" x2="600" y2="70"/>
-    <line x1="40" y1="310" x2="600" y2="310"/>
-    <line x1="320" y1="20" x2="320" y2="360" stroke-dasharray="6 6" stroke-width="1.5"/>
-    <line x1="150" y1="70" x2="150" y2="310"/>
-    <line x1="490" y1="70" x2="490" y2="310"/>
-    <line x1="150" y1="190" x2="490" y2="190"/>
-  </svg>
   <div class="wrap">
     <h2 class="court-h2 reveal"><span class="lime">Alcaraz</span> 3 - 1 Sinner</h2>
     <p class="court-p reveal" data-i18n="court_p">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</p>
-    <div class="score-stats">
-      <div class="score-stat reveal">
-        <div class="score-num"><span class="counter" data-target="68" data-suffix="%">0%</span></div>
-        <div class="score-cap" data-i18n="score_cap1">Victoire Alcaraz</div>
-      </div>
-      <div class="score-stat reveal">
-        <div class="score-num"><span class="counter" data-target="32" data-suffix="%">0%</span></div>
-        <div class="score-cap" data-i18n="score_cap2">Victoire Sinner</div>
+    <div class="court-visual-wrap reveal">
+      <svg class="court-lines" viewBox="0 0 640 380" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
+        <rect x="40" y="20" width="560" height="340" rx="4"/>
+        <line x1="40" y1="70" x2="600" y2="70"/>
+        <line x1="40" y1="310" x2="600" y2="310"/>
+        <line x1="320" y1="20" x2="320" y2="360" stroke-dasharray="6 6" stroke-width="1.5"/>
+        <line x1="150" y1="70" x2="150" y2="310"/>
+        <line x1="490" y1="70" x2="490" y2="310"/>
+        <line x1="150" y1="190" x2="490" y2="190"/>
+      </svg>
+      <div class="score-stats">
+        <div class="score-stat reveal">
+          <div class="score-num"><span class="counter" data-target="68" data-suffix="%">0%</span></div>
+          <div class="score-cap" data-i18n="score_cap1">Victoire Alcaraz</div>
+        </div>
+        <div class="score-stat reveal">
+          <div class="score-num"><span class="counter" data-target="32" data-suffix="%">0%</span></div>
+          <div class="score-cap" data-i18n="score_cap2">Victoire Sinner</div>
+        </div>
       </div>
     </div>
     <div class="ready-pill reveal" style="padding-left:20px;">
