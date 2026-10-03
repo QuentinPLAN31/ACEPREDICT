@@ -5226,15 +5226,28 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     return html;
   }
 
-  // Repondération du pourcentage AFFICHÉ (30-100 au lieu de 0-100) : un
+  // Repondération du pourcentage AFFICHÉ (70-98 au lieu de 50-99) : un
   // 50% "brut" ne donne pas l'impression d'un pronostic assez tranché pour
   // l'utilisateur, alors qu'un match tennis avec un favori net dépasse déjà
   // 50% de toute façon (win_probability est TOUJOURS celle du vainqueur
-  // prédit, jamais en-dessous de 50). On remonte donc toute l'échelle vers
-  // le haut pour l'affichage uniquement -- le calcul réel de la prédiction
-  // (côté backend) n'est pas touché, seul le nombre montré au visiteur change.
+  // prédit, jamais en-dessous de 50, et jamais au-dessus de 99 cf.
+  // prediction.py). On ré-étire donc linéairement cette fourchette RÉELLE
+  // [50, 99] vers la fourchette affichée [70, 98] pour l'affichage
+  // uniquement -- le calcul réel de la prédiction (côté backend) n'est pas
+  // touché, seul le nombre montré au visiteur change. Toute la fourchette
+  // 70-98 est ainsi utilisée : un match serré (rawPct proche de 50) ressort
+  // proche de 70%, un très gros écart (rawPct proche de 99) ressort proche
+  // de 98% -- avant ce correctif, la formule précédente (70 + rawPct*0.3)
+  // supposait à tort un rawPct sur 0-100 et compressait tout entre 85 et
+  // 99.7, d'où des matchs serrés affichés à 85%+ au lieu de ~70%.
+  const RAW_PCT_FLOOR = 50;
+  const RAW_PCT_CEIL = 99;
+  const DISPLAY_PCT_FLOOR = 70;
+  const DISPLAY_PCT_CEIL = 98;
   function displayConfidencePct(rawPct){
-    return Math.round((70 + rawPct * 0.3) * 10) / 10;
+    const clamped = Math.min(RAW_PCT_CEIL, Math.max(RAW_PCT_FLOOR, rawPct));
+    const ratio = (clamped - RAW_PCT_FLOOR) / (RAW_PCT_CEIL - RAW_PCT_FLOOR);
+    return Math.round((DISPLAY_PCT_FLOOR + ratio * (DISPLAY_PCT_CEIL - DISPLAY_PCT_FLOOR)) * 10) / 10;
   }
   // Les libellés qualitatifs ("Très élevée", "Favori écrasant"...) utilisent
   // le pourcentage BRUT (avant repondération) pour rester fidèles à la vraie
