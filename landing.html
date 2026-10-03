@@ -351,20 +351,14 @@
 
   .video-strip{ display:flex; justify-content:center; gap:14px; margin: 46px auto 0; max-width: 620px; flex-wrap:wrap; }
   .video-card{
-    width: 160px; height: 220px; border-radius: 16px; overflow:hidden; position:relative;
+    width: 184px; height: 327px; border-radius: 16px; overflow:hidden; position:relative;
     background: linear-gradient(155deg, #1b2a1d, #0b100d);
     background-size: cover; background-position: center;
-    border: 1px solid var(--line);
     cursor: pointer;
   }
   .video-card::after{
     content:""; position:absolute; inset:0;
     background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%);
-  }
-  .video-card .vtag{
-    position:absolute; top:8px; left:8px; right:8px;
-    background:#fff; color:#0c110e; font-size:8.5px; font-weight:800;
-    padding:4px 6px; border-radius:5px; text-transform:uppercase; text-align:center;
   }
   .video-card .vbars{ position:absolute; bottom:14px; left:10px; right:10px; display:flex; flex-direction:column; gap:6px; }
   .video-card .vbar{ height:5px; border-radius:3px; background: rgba(255,255,255,0.12); overflow:hidden; }
@@ -373,7 +367,6 @@
     position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center;
     font-size: 30px; color: rgba(255,255,255,0.5);
   }
-  .video-card .vtag{ z-index:1; }
 
   .testi-cards{ max-width: 560px; margin: 46px auto 0; display:flex; flex-direction:column; gap:16px; text-align:left; }
   .testi-card{
@@ -477,7 +470,7 @@
     /* Videos : on force les 3 cartes sur une seule ligne (au lieu de les
        laisser passer a la ligne et s'empiler) en les retrecissant. */
     .video-strip{ flex-wrap: nowrap; gap: 8px; }
-    .video-card{ width: auto; flex: 1 1 0; min-width: 0; height: 180px; }
+    .video-card{ width: auto; flex: 1 1 0; min-width: 0; height: 260px; }
   }
 
   /* ---------- Auth modal ---------- */
@@ -688,15 +681,12 @@
 
     <div class="video-strip reveal">
       <div class="video-card" style="background-image:url('assets/social/social1.jpg');" onclick="window.open('https://www.tiktok.com/@tennismind','_blank')">
-        <div class="vtag" data-i18n="vtag1">Analyse IA prête</div>
         <div class="vplay">▶</div>
       </div>
       <div class="video-card" style="background-image:url('assets/social/social2.jpg');" onclick="window.open('https://www.tiktok.com/@tennismind','_blank')">
-        <div class="vtag" data-i18n="vtag2">L'IA avait prédit tout ✅</div>
         <div class="vplay">▶</div>
       </div>
       <div class="video-card" style="background-image:url('assets/social/social3.jpg');" onclick="window.open('https://www.tiktok.com/@tennismind','_blank')">
-        <div class="vtag" data-i18n="vtag3">Confiance de l'IA</div>
         <div class="vplay">▶</div>
       </div>
     </div>
