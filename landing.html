@@ -342,7 +342,9 @@
     width:46px; height:46px; border-radius:999px; border: 2px solid var(--bg-2);
     margin-left:-12px; display:flex; align-items:center; justify-content:center;
     font-family: var(--font-h); font-weight:700; font-size:14px; color:#14180a;
+    overflow:hidden;
   }
+  .avatar img, .testi-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .avatar:first-child{ margin-left:0; }
   .testi-section h2{ font-size: clamp(24px,3.6vw,38px); font-weight:800; text-transform:uppercase; }
   .testi-section > .wrap > p{ max-width:520px; margin:16px auto 0; color: var(--text-sec); font-size:15px; }
@@ -374,7 +376,7 @@
   .testi-card.hidden-extra{ display:none; }
   .testi-card p{ font-size: 15.5px; line-height:1.55; font-weight:600; margin-bottom:20px; }
   .testi-who{ display:flex; align-items:center; gap:12px; }
-  .testi-avatar{ width:42px; height:42px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-family:var(--font-h); font-weight:700; font-size:13px; color:#14180a; flex-shrink:0; }
+  .testi-avatar{ width:42px; height:42px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-family:var(--font-h); font-weight:700; font-size:13px; color:#14180a; flex-shrink:0; overflow:hidden; }
   .testi-name{ font-weight:700; font-size:13.5px; }
   .testi-role{ color: var(--accent); font-size:12.5px; opacity:.85; }
   .testi-x{ margin-left:auto; width:34px; height:34px; border-radius:999px; background:#fff; color:#0c110e; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; flex-shrink:0; }
@@ -668,10 +670,10 @@
 <section class="testi-section">
   <div class="wrap">
     <div class="avatar-row reveal">
-      <span class="avatar" style="background:#F7B267; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
-      <span class="avatar" style="background:#E8604C; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
-      <span class="avatar" style="background:#8CC0DE; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
-      <span class="avatar" style="background:#A78BFA; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
+      <span class="avatar" style="background:#F7B267;"><img src="assets/avatars/maya.jpg" alt="Maya Zong" loading="lazy"></span>
+      <span class="avatar" style="background:#E8604C;"><img src="assets/avatars/ethan.jpg" alt="Ethan Miller" loading="lazy"></span>
+      <span class="avatar" style="background:#8CC0DE;"><img src="assets/avatars/hannah.jpg" alt="Hannah Lee" loading="lazy"></span>
+      <span class="avatar" style="background:#A78BFA;"><img src="assets/avatars/daniel.jpg" alt="Daniel Perez" loading="lazy"></span>
       <span class="avatar" style="background:#D7F22C; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
     </div>
     <h2 class="reveal" data-i18n-html="testi_h2">Ce que pensent les utilisateurs de <span class="lime">TennisMind</span></h2>
@@ -699,7 +701,7 @@
       <div class="testi-card">
         <p>"Franchement bluffant. Les analyses sont claires et ça m'aide à vraiment comprendre les matchs, pas juste regarder le score."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#F7B267; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
+          <span class="testi-avatar" style="background:#F7B267;"><img src="assets/avatars/maya.jpg" alt="Maya Zong" loading="lazy"></span>
           <div><div class="testi-name">Maya Zong</div><div class="testi-role">Passionnée de tennis</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
@@ -707,7 +709,7 @@
       <div class="testi-card hidden-extra">
         <p>"Les scénarios IA sont super intéressants. On voit direct les points forts et faiblesses des joueurs."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#E8604C; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
+          <span class="testi-avatar" style="background:#E8604C;"><img src="assets/avatars/ethan.jpg" alt="Ethan Miller" loading="lazy"></span>
           <div><div class="testi-name">Ethan Miller</div><div class="testi-role">Analyste amateur</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
@@ -715,7 +717,7 @@
       <div class="testi-card hidden-extra">
         <p>"Enfin une app simple avec des vraies stats utiles. Tout est bien expliqué, c'est rapide à comprendre."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#8CC0DE; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
+          <span class="testi-avatar" style="background:#8CC0DE;"><img src="assets/avatars/hannah.jpg" alt="Hannah Lee" loading="lazy"></span>
           <div><div class="testi-name">Hannah Lee</div><div class="testi-role">Utilisatrice régulière</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
@@ -723,7 +725,7 @@
       <div class="testi-card hidden-extra">
         <p>"Je gagne un temps énorme. Plus besoin de chercher les infos partout, tout est déjà analysé."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#A78BFA; color:#14180a;"><svg viewBox="0 0 24 24" width="58%" height="58%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.3"/><path d="M5.3 20c0-3.6 3-6.2 6.7-6.2s6.7 2.6 6.7 6.2"/></svg></span>
+          <span class="testi-avatar" style="background:#A78BFA;"><img src="assets/avatars/daniel.jpg" alt="Daniel Perez" loading="lazy"></span>
           <div><div class="testi-name">Daniel Perez</div><div class="testi-role">Fan de tennis</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
