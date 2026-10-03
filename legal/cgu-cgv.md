@@ -10,22 +10,27 @@
 
 Les présentes CGU/CGV régissent l'utilisation du site AcePredict, service
 d'analyse et de prédiction de matchs de tennis par intelligence
-artificielle, édité par [ton nom / société].
+artificielle, édité par TennisMind (voir mentions-legales.md).
 
 ## Article 2 — Accès au service
 
 - Un compte gratuit permet un nombre limité d'analyses par mois (voir
   quotas affichés sur le site).
-- Les offres payantes (Starter / Pro / Lifetime) donnent accès à des
-  quotas supérieurs, décrits sur la page Pricing au moment de l'achat.
+- Les offres payantes donnent accès à des quotas supérieurs, décrits sur
+  la page Pricing au moment de l'achat : Starter 10€ / Pro 19€ (facturés
+  tous les 28 jours, pas mensuellement), formules annuelles à -20%
+  (Starter 96€/an, Pro 180€/an), Lifetime 99€ en paiement unique, et pack
+  ponctuel de 5 analyses à 4,99€.
 
 ## Article 3 — Prix et paiement
 
 - Les prix sont affichés en euros, [TTC/HT à préciser selon ton statut].
 - Le paiement est traité par Stripe, prestataire de paiement tiers.
-- [Préciser la politique de remboursement — obligatoire dans un cadre
-  légal de vente en ligne, notamment le droit de rétractation de 14 jours
-  pour les consommateurs en UE sauf exceptions à documenter].
+- Remboursement possible sous 48h après l'achat, à condition qu'aucune
+  analyse n'ait été générée sur la période. ⚠️ Le droit de rétractation
+  légal UE (14 jours) reste applicable sauf renonciation explicite de
+  l'utilisateur au moment de l'achat (case à cocher dédiée) — à faire
+  valider par un professionnel.
 
 ## Article 4 — Nature du service (avertissement important)
 
@@ -44,8 +49,8 @@ positionnement marketing du site s'oriente vers les paris.]
 ## Article 5 — Résiliation
 
 L'utilisateur peut résilier son abonnement à tout moment depuis la page
-Compte. [Préciser les modalités exactes : effet immédiat ou fin de
-période déjà payée].
+Compte. La résiliation prend effet à la fin de la période de facturation déjà
+payée (28 jours ou période annuelle).
 
 ## Article 6 — Responsabilité
 

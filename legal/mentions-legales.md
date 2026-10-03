@@ -8,16 +8,19 @@
 
 ## Éditeur du site
 
-- Nom / raison sociale : [Ton nom ou nom commercial]
-- Statut : [Auto-entrepreneur / SASU / etc.]
-- SIRET : [à obtenir lors de l'immatriculation]
-- Adresse : [ton adresse professionnelle ou domiciliation]
-- Email de contact : [email]
+- Nom commercial : TennisMind
+- Exploité par : [Prénom NOM — personne physique]
+- Statut : Micro-entreprise (en cours d'immatriculation)
+- SIRET : en cours d'attribution
+- Adresse : 59 allée Pierre Satre, 31840 Seilh, France
+- Email de contact : tennismindsupport@gmail.com
 - Directeur de la publication : [ton nom]
 
 ## Hébergement
 
-- Hébergeur : [nom de l'hébergeur choisi, ex: Railway / Render / OVH]
+- Hébergeur frontend : Vercel Inc.
+- Hébergeur backend/BDD : Railway Corporation
+- Paiements : Stripe Payments Europe, Ltd.
 - Adresse de l'hébergeur : [à récupérer sur leur site — obligatoire légalement]
 
 ## Propriété intellectuelle

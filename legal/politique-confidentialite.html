@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politique de confidentialité — TennisMind</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#131a16; --bg-2:#0c110e; --card-top:#162217; --card-bottom:#0f1612;
+    --line:rgba(215,242,44,0.10); --line-strong:rgba(215,242,44,0.22);
+    --accent:#D7F22C; --text:#FFFFFF; --text-sec:#9AA69A; --text-dim:#6C7A6C;
+    --font-h:'Unbounded','Inter',sans-serif; --font-b:'Inter',-apple-system,sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--text); font-family:var(--font-b); line-height:1.65; }
+  .wrap{ max-width:760px; margin:0 auto; padding: 60px 24px 100px; }
+  a{ color:var(--accent); }
+  .back{ display:inline-block; margin-bottom:28px; color:var(--text-sec); text-decoration:none; font-size:14px; }
+  .back:hover{ color:var(--accent); }
+  h1{ font-family:var(--font-h); font-size:clamp(26px,4vw,36px); font-weight:800; margin-bottom:8px; }
+  .updated{ color:var(--text-dim); font-size:13px; margin-bottom:36px; }
+  h2{ font-family:var(--font-h); font-size:18px; font-weight:700; margin:34px 0 12px; color:var(--accent); }
+  p, li{ color:var(--text-sec); font-size:15px; margin-bottom:10px; }
+  ul{ padding-left:20px; margin-bottom:14px; }
+  strong{ color:var(--text); }
+  .card{ background:linear-gradient(160deg,var(--card-top),var(--card-bottom)); border:1px solid var(--line-strong); border-radius:14px; padding:18px 20px; margin-bottom:10px; }
+  table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); color:var(--text-sec); vertical-align:top; }
+  th{ color:var(--text); font-family:var(--font-h); font-size:12px; text-transform:uppercase; }
+  footer{ border-top:1px solid var(--line); padding:30px 24px; text-align:center; color:var(--text-dim); font-size:13px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../landing.html">&larr; Retour à l'accueil</a>
+    <h1>Politique de confidentialité</h1>
+    <div class="updated">Dernière mise à jour : 3 octobre 2026</div>
+
+    <h2>Qui sommes-nous</h2>
+    <p>TennisMind, accessible à l'adresse du site, est édité par [Prénom NOM], micro-entrepreneur domicilié au 59 allée Pierre Satre, 31840 Seilh, France. Voir les <a href="mentions-legales.html">mentions légales</a> complètes.</p>
+
+    <h2>Données collectées</h2>
+    <table>
+      <tr><th>Catégorie</th><th>Détail</th></tr>
+      <tr><td>Compte</td><td>Adresse email, mot de passe (haché, jamais stocké en clair), nom complet (facultatif), identifiant de connexion Google (si connexion via Google)</td></tr>
+      <tr><td>Abonnement</td><td>Plan souscrit, identifiant client Stripe (aucune coordonnée bancaire n'est stockée par TennisMind : la carte est traitée directement par Stripe)</td></tr>
+      <tr><td>Usage du service</td><td>Historique des analyses de matchs demandées, compteur de quota utilisé</td></tr>
+      <tr><td>Parrainage</td><td>Code de parrainage et lien entre compte parrain / filleul (programme "Invite et gagne")</td></tr>
+    </table>
+
+    <h2>Finalité du traitement</h2>
+    <ul>
+      <li>Fournir le service (authentification, analyses, historique, quotas).</li>
+      <li>Gérer la facturation des abonnements payants.</li>
+      <li>Envoyer les emails strictement nécessaires au service (ex. réinitialisation de mot de passe).</li>
+    </ul>
+    <p>TennisMind n'envoie aucun email marketing à ce jour et n'utilise aucun cookie publicitaire ou traceur tiers (voir section Cookies ci-dessous).</p>
+
+    <h2>Base légale (RGPD)</h2>
+    <ul>
+      <li><strong>Exécution du contrat</strong> — fourniture du service souscrit par l'utilisateur.</li>
+      <li><strong>Intérêt légitime</strong> — sécurité du service, prévention de la fraude.</li>
+    </ul>
+
+    <h2>Durée de conservation</h2>
+    <p>Les données de compte sont conservées tant que le compte est actif, puis supprimées ou anonymisées dans un délai de [X mois — à définir] après suppression du compte, sauf obligation légale de conservation plus longue (ex. documents comptables liés à la facturation).</p>
+
+    <h2>Destinataires et sous-traitants</h2>
+    <table>
+      <tr><th>Prestataire</th><th>Rôle</th></tr>
+      <tr><td>Stripe Payments Europe, Ltd.</td><td>Traitement des paiements</td></tr>
+      <tr><td>Railway Corporation</td><td>Hébergement de l'application et de la base de données</td></tr>
+      <tr><td>Vercel Inc.</td><td>Hébergement du site (pages statiques)</td></tr>
+      <tr><td>Google (connexion Google, le cas échéant)</td><td>Authentification si l'utilisateur choisit "Se connecter avec Google"</td></tr>
+    </table>
+    <p>Certains de ces prestataires sont situés hors Union Européenne (États-Unis notamment). Les transferts de données sont encadrés par les clauses contractuelles types de la Commission européenne ou un mécanisme équivalent propre à chaque prestataire.</p>
+
+    <h2>Cookies et traceurs</h2>
+    <p>Le site utilise uniquement le <strong>stockage local du navigateur (localStorage)</strong> pour conserver le jeton de connexion de l'utilisateur. Il s'agit d'un usage strictement technique, nécessaire au fonctionnement du service, qui ne nécessite pas de bannière de consentement cookies.</p>
+    <p>À ce jour, TennisMind n'utilise <strong>aucun outil de mesure d'audience ni traceur publicitaire</strong> (pas de Google Analytics, Meta Pixel, TikTok Pixel ou équivalent). Cette section sera mise à jour si cela change, avec le recueil du consentement requis le cas échéant.</p>
+
+    <h2>Droits des utilisateurs</h2>
+    <p>Conformément au RGPD, chaque utilisateur dispose d'un droit d'accès, de rectification, de suppression, de limitation et de portabilité de ses données, ainsi que du droit de s'opposer à leur traitement. Ces droits s'exercent en écrivant à <a href="mailto:tennismindsupport@gmail.com">tennismindsupport@gmail.com</a>.</p>
+    <p>En cas de réponse insatisfaisante, l'utilisateur peut introduire une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>).</p>
+
+    <h2>Sécurité</h2>
+    <p>Les mots de passe sont hachés (jamais stockés en clair). Les communications avec le site sont chiffrées (HTTPS).</p>
+
+    <h2>Contact</h2>
+    <p>Pour toute question relative à vos données personnelles : <a href="mailto:tennismindsupport@gmail.com">tennismindsupport@gmail.com</a></p>
+  </div>
+  <footer>© 2026 TennisMind — Document type, à faire relire par un professionnel avant mise en ligne publique définitive.</footer>
+</body>
+</html>

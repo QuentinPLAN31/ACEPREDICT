@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CGU / CGV — TennisMind</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#131a16; --bg-2:#0c110e; --card-top:#162217; --card-bottom:#0f1612;
+    --line:rgba(215,242,44,0.10); --line-strong:rgba(215,242,44,0.22);
+    --accent:#D7F22C; --text:#FFFFFF; --text-sec:#9AA69A; --text-dim:#6C7A6C;
+    --font-h:'Unbounded','Inter',sans-serif; --font-b:'Inter',-apple-system,sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--text); font-family:var(--font-b); line-height:1.65; }
+  .wrap{ max-width:760px; margin:0 auto; padding: 60px 24px 100px; }
+  a{ color:var(--accent); }
+  .back{ display:inline-block; margin-bottom:28px; color:var(--text-sec); text-decoration:none; font-size:14px; }
+  .back:hover{ color:var(--accent); }
+  h1{ font-family:var(--font-h); font-size:clamp(26px,4vw,36px); font-weight:800; margin-bottom:8px; }
+  .updated{ color:var(--text-dim); font-size:13px; margin-bottom:36px; }
+  h2{ font-family:var(--font-h); font-size:18px; font-weight:700; margin:34px 0 12px; color:var(--accent); }
+  p, li{ color:var(--text-sec); font-size:15px; margin-bottom:10px; }
+  ul{ padding-left:20px; margin-bottom:14px; }
+  strong{ color:var(--text); }
+  .card{ background:linear-gradient(160deg,var(--card-top),var(--card-bottom)); border:1px solid var(--line-strong); border-radius:14px; padding:18px 20px; margin-bottom:10px; }
+  .flag{ background:rgba(255,196,84,0.08); border:1px solid rgba(255,196,84,0.3); border-radius:12px; padding:16px 18px; margin:20px 0; font-size:14px; color:#FFC454; }
+  table{ width:100%; border-collapse:collapse; margin:14px 0; font-size:14px; }
+  th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); color:var(--text-sec); }
+  th{ color:var(--text); font-family:var(--font-h); font-size:12px; text-transform:uppercase; }
+  footer{ border-top:1px solid var(--line); padding:30px 24px; text-align:center; color:var(--text-dim); font-size:13px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../landing.html">&larr; Retour à l'accueil</a>
+    <h1>Conditions Générales d'Utilisation et de Vente</h1>
+    <div class="updated">Dernière mise à jour : 3 octobre 2026</div>
+
+    <h2>Article 1 — Objet</h2>
+    <p>Les présentes conditions régissent l'accès et l'utilisation du site et de l'application TennisMind, service d'analyse et de prédiction de matchs de tennis par intelligence artificielle, édité par TennisMind (voir <a href="mentions-legales.html">mentions légales</a>).</p>
+
+    <h2>Article 2 — Accès au service</h2>
+    <p>Un compte gratuit permet un nombre limité d'analyses (voir quotas affichés dans l'application). Les offres payantes donnent accès à des quotas supérieurs, décrites ci-dessous et sur la page Tarifs au moment de l'achat.</p>
+
+    <h2>Article 3 — Offres et tarifs</h2>
+    <table>
+      <tr><th>Offre</th><th>Prix</th><th>Cycle de facturation</th></tr>
+      <tr><td>Starter</td><td>10 €</td><td>toutes les 4 semaines (28 jours)</td></tr>
+      <tr><td>Starter — annuel</td><td>96 € / an (soit 8 €/mois)</td><td>annuel</td></tr>
+      <tr><td>Pro</td><td>19 €</td><td>toutes les 4 semaines (28 jours)</td></tr>
+      <tr><td>Pro — annuel</td><td>180 € / an (soit 15 €/mois)</td><td>annuel</td></tr>
+      <tr><td>Lifetime</td><td>99 €</td><td>paiement unique, accès à vie</td></tr>
+      <tr><td>Pack ponctuel</td><td>4,99 €</td><td>5 analyses, sans engagement, paiement unique</td></tr>
+    </table>
+    <p>Les prix sont affichés en euros. [TTC/HT à préciser selon le régime de TVA applicable à la micro-entreprise — en franchise en base de TVA, les prix sont net de taxe (mention « TVA non applicable, art. 293B du CGI » à ajouter sur les factures tant que ce régime s'applique).]</p>
+    <p>Le paiement est traité par Stripe, prestataire de paiement tiers. TennisMind ne stocke jamais les coordonnées bancaires.</p>
+
+    <h2>Article 4 — Facturation et renouvellement</h2>
+    <p>Les offres Starter et Pro sont facturées par cycle de <strong>4 semaines (28 jours)</strong>, et non par mois calendaire. L'abonnement se renouvelle automatiquement à chaque fin de cycle, sauf résiliation préalable par l'utilisateur.</p>
+
+    <h2>Article 5 — Droit de rétractation et remboursement</h2>
+    <p>Conformément à la politique TennisMind, tout abonnement peut être remboursé dans un délai de <strong>48 heures</strong> suivant l'achat, à condition qu'<strong>aucune analyse n'ait été générée</strong> sur la période concernée. Passé ce délai, ou si une analyse a été consommée, l'abonnement n'est pas remboursable mais reste actif jusqu'à la fin de la période déjà payée.</p>
+    <p>Pour toute demande de remboursement, contacter <a href="mailto:tennismindsupport@gmail.com">tennismindsupport@gmail.com</a>.</p>
+    <div class="flag">
+      ⚠️ Pour un consommateur européen, la loi prévoit en principe un droit de rétractation de 14 jours sur les achats en ligne. Une clause de remboursement à 48h (plus restrictive) n'est opposable que si l'utilisateur a explicitement renoncé à son droit de rétractation légal au moment de l'achat (case à cocher dédiée), notamment en cas de consommation immédiate d'un service numérique. À faire valider par un professionnel avant mise en ligne définitive.
+    </div>
+
+    <h2>Article 6 — Nature du service (avertissement important)</h2>
+    <p>TennisMind fournit des <strong>estimations statistiques</strong> basées sur un modèle Elo et des données historiques de matchs. Ces prédictions :</p>
+    <ul>
+      <li>ne garantissent aucun résultat réel ;</li>
+      <li>ne constituent pas un conseil en paris sportifs et n'encouragent pas le jeu d'argent ;</li>
+      <li>sont fournies à titre strictement informatif.</li>
+    </ul>
+
+    <h2>Article 7 — Résiliation</h2>
+    <p>L'utilisateur peut résilier son abonnement à tout moment depuis les réglages de son compte. La résiliation prend effet à la fin de la période de facturation déjà payée (l'accès reste actif jusqu'à cette date, sans reconduction ultérieure).</p>
+
+    <h2>Article 8 — Responsabilité</h2>
+    <p>TennisMind met tout en œuvre pour fournir un service fiable mais ne garantit pas l'exactitude, l'exhaustivité ou la disponibilité continue des données et analyses. L'utilisateur reste seul responsable de l'usage qu'il fait des informations fournies.</p>
+
+    <h2>Article 9 — Droit applicable</h2>
+    <p>Les présentes CGU/CGV sont soumises au droit français. En cas de litige, et à défaut de résolution amiable, les tribunaux français seront compétents.</p>
+  </div>
+  <footer>© 2026 TennisMind — Document type, à faire relire par un professionnel avant mise en ligne publique définitive.</footer>
+</body>
+</html>

@@ -7,8 +7,7 @@
 
 ## Qui sommes-nous
 
-[Ton nom / ta société], éditeur du site AcePredict, accessible à
-l'adresse [URL du site].
+TennisMind (voir mentions-legales.md pour l'identité complète de l'éditeur).
 
 ## Données collectées
 
@@ -23,8 +22,7 @@ l'adresse [URL du site].
 
 - Fournir le service (authentification, analyses, historique).
 - Facturation des abonnements payants.
-- [Ajouter si applicable : emails transactionnels, statistiques d'usage
-  anonymisées, etc.]
+- Emails transactionnels uniquement (ex. réinitialisation de mot de passe) — aucun email marketing à ce jour.
 
 ## Base légale (RGPD)
 
@@ -35,7 +33,7 @@ l'adresse [URL du site].
 
 ## Durée de conservation
 
-[À définir — ex: durée du compte actif + X mois après suppression].
+Durée du compte actif, puis suppression/anonymisation sous [X mois] après clôture du compte, sauf obligation comptable de conservation plus longue.
 
 ## Droits des utilisateurs
 
@@ -46,17 +44,17 @@ la rectification, la suppression, ou la portabilité de ses données, en
 ## Sous-traitants / tiers
 
 - **Stripe** (paiement) — politique de confidentialité Stripe applicable.
-- **[Hébergeur choisi]** (hébergement des données).
+- **Railway Corporation** (hébergement backend/BDD) et **Vercel Inc.** (hébergement frontend).
 - [LiveTennisAPI / The Odds API si branchés — préciser s'ils reçoivent des
   données utilisateur, normalement non].
 
 ## Cookies
 
-[À compléter selon ce que tu utilises réellement — actuellement le site
-n'utilise que le localStorage du navigateur pour le token de connexion, pas
-de cookies tiers ni de tracking publicitaire, à confirmer/adapter si ça
-change].
+Le site utilise uniquement le localStorage du navigateur pour le token de
+connexion (usage technique, pas de bannière cookies requise). Aucun outil
+de mesure d'audience ni traceur publicitaire (Google Analytics, Meta
+Pixel, TikTok Pixel...) n'est utilisé à ce jour.
 
 ## Contact
 
-Pour toute question sur tes données : [email de contact].
+Pour toute question sur tes données : tennismindsupport@gmail.com.

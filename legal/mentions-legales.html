@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mentions légales — TennisMind</title>
+<link rel="icon" type="image/png" href="../assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#131a16; --bg-2:#0c110e; --card-top:#162217; --card-bottom:#0f1612;
+    --line:rgba(215,242,44,0.10); --line-strong:rgba(215,242,44,0.22);
+    --accent:#D7F22C; --text:#FFFFFF; --text-sec:#9AA69A; --text-dim:#6C7A6C;
+    --font-h:'Unbounded','Inter',sans-serif; --font-b:'Inter',-apple-system,sans-serif;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:var(--bg); color:var(--text); font-family:var(--font-b); line-height:1.65; }
+  .wrap{ max-width:760px; margin:0 auto; padding: 60px 24px 100px; }
+  a{ color:var(--accent); }
+  .back{ display:inline-block; margin-bottom:28px; color:var(--text-sec); text-decoration:none; font-size:14px; }
+  .back:hover{ color:var(--accent); }
+  h1{ font-family:var(--font-h); font-size:clamp(26px,4vw,36px); font-weight:800; margin-bottom:8px; }
+  .updated{ color:var(--text-dim); font-size:13px; margin-bottom:36px; }
+  h2{ font-family:var(--font-h); font-size:18px; font-weight:700; margin:34px 0 12px; color:var(--accent); }
+  p, li{ color:var(--text-sec); font-size:15px; margin-bottom:10px; }
+  ul{ padding-left:20px; margin-bottom:14px; }
+  strong{ color:var(--text); }
+  .card{ background:linear-gradient(160deg,var(--card-top),var(--card-bottom)); border:1px solid var(--line-strong); border-radius:14px; padding:18px 20px; margin-bottom:10px; }
+  .flag{ background:rgba(255,196,84,0.08); border:1px solid rgba(255,196,84,0.3); border-radius:12px; padding:16px 18px; margin:20px 0; font-size:14px; color:#FFC454; }
+  footer{ border-top:1px solid var(--line); padding:30px 24px; text-align:center; color:var(--text-dim); font-size:13px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../landing.html">&larr; Retour à l'accueil</a>
+    <h1>Mentions légales</h1>
+    <div class="updated">Dernière mise à jour : 3 octobre 2026</div>
+
+    <h2>Éditeur du site</h2>
+    <div class="card">
+      <p><strong>Nom commercial :</strong> TennisMind</p>
+      <p><strong>Exploité par :</strong> [Prénom NOM — personne physique titulaire de la micro-entreprise]</p>
+      <p><strong>Statut :</strong> Micro-entreprise (en cours d'immatriculation)</p>
+      <p><strong>SIRET :</strong> en cours d'attribution</p>
+      <p><strong>Adresse :</strong> 59 allée Pierre Satre, 31840 Seilh, France</p>
+      <p><strong>Email de contact :</strong> <a href="mailto:tennismindsupport@gmail.com">tennismindsupport@gmail.com</a></p>
+      <p><strong>Directeur de la publication :</strong> [Prénom NOM]</p>
+    </div>
+    <p style="font-size:13px; color:var(--text-dim);">Le numéro SIRET sera ajouté dès son attribution par l'INSEE. Tant que l'immatriculation n'est pas finalisée, l'activité commerciale (encaissement de paiements réels) ne doit pas être ouverte au public.</p>
+
+    <h2>Hébergement</h2>
+    <div class="card">
+      <p><strong>Hébergeur du site (frontend) :</strong> Vercel Inc. — 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis — <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></p>
+      <p><strong>Hébergeur de l'application et de la base de données (backend) :</strong> Railway Corporation — <a href="https://railway.app" target="_blank" rel="noopener">railway.app</a></p>
+      <p><strong>Traitement des paiements :</strong> Stripe Payments Europe, Ltd. — <a href="https://stripe.com" target="_blank" rel="noopener">stripe.com</a></p>
+    </div>
+
+    <h2>Propriété intellectuelle</h2>
+    <p>L'ensemble des éléments du site TennisMind (textes, logo, charte graphique, interface, code source) est la propriété de l'éditeur mentionné ci-dessus, sauf mention contraire. Toute reproduction, représentation ou exploitation, totale ou partielle, sans autorisation préalable est interdite.</p>
+
+    <h2>Données de matchs de tennis utilisées</h2>
+    <p>Le modèle de prédiction s'appuie notamment sur l'historique de matchs publié par Jeff Sackmann (<a href="https://github.com/JeffSackmann/tennis_atp" target="_blank" rel="noopener">github.com/JeffSackmann/tennis_atp</a>).</p>
+    <div class="flag">
+      ⚠️ <strong>Point à régler avant toute vente réelle :</strong> ce jeu de données est publié sous licence <strong>CC BY-NC-SA (usage non-commercial uniquement)</strong>. Il est aujourd'hui incompatible avec un service payant. Il faut soit obtenir une autorisation commerciale auprès de l'auteur, soit migrer vers une source de données sous licence commerciale, avant d'ouvrir les paiements au public.
+    </div>
+
+    <h2>Nature du service</h2>
+    <p>TennisMind fournit des estimations statistiques (modèle Elo et données historiques) à titre informatif. Ces analyses ne garantissent aucun résultat réel, ne constituent pas un conseil en paris sportifs et n'incitent pas au jeu d'argent.</p>
+
+    <h2>Litiges</h2>
+    <p>En cas de litige, et à défaut de résolution amiable, les tribunaux français seront compétents, le droit français étant applicable.</p>
+
+    <h2>Contact</h2>
+    <p>Pour toute question relative au site : <a href="mailto:tennismindsupport@gmail.com">tennismindsupport@gmail.com</a></p>
+  </div>
+  <footer>© 2026 TennisMind — Document type, à faire relire par un professionnel avant mise en ligne publique définitive.</footer>
+</body>
+</html>
