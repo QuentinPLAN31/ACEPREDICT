@@ -2881,8 +2881,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.scenarios_possibles': 'SCÉNARIOS POSSIBLES',
       'analysis.proj_title': 'PROJECTION DE SCORE',
       'analysis.proj_games': 'Games totaux estimés',
-      'analysis.proj_src_history': 'Estimation basée sur l\'historique des matchs des deux joueurs.',
-      'analysis.proj_src_default': 'Estimation basée sur des moyennes par défaut (peu d\'historique).',
       'analysis.moment_cle': 'Moment clé à surveiller',
       'analysis.mot_analyste': "Le mot de l'analyste",
       'analysis.conseil_tactique': 'CONSEIL TACTIQUE',
@@ -3343,8 +3341,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.scenarios_possibles': 'ESCENARIOS POSIBLES',
       'analysis.proj_title': 'PROYECCIÓN DE MARCADOR',
       'analysis.proj_games': 'Juegos totales estimados',
-      'analysis.proj_src_history': 'Estimación basada en el historial de partidos de ambos jugadores.',
-      'analysis.proj_src_default': 'Estimación basada en medias por defecto (poco historial).',
       'analysis.moment_cle': 'Momento clave a vigilar',
       'analysis.mot_analyste': 'La palabra del analista',
       'analysis.conseil_tactique': 'CONSEJO TÁCTICO',
@@ -3805,8 +3801,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.scenarios_possibles': 'POSSIBLE SCENARIOS',
       'analysis.proj_title': 'SCORE PROJECTION',
       'analysis.proj_games': 'Estimated total games',
-      'analysis.proj_src_history': 'Estimate based on both players\' match history.',
-      'analysis.proj_src_default': 'Estimate based on default averages (little history).',
       'analysis.moment_cle': 'Key moment to watch',
       'analysis.mot_analyste': "The analyst's take",
       'analysis.conseil_tactique': 'TACTICAL TIP',
@@ -5152,9 +5146,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     }).join('');
     var tg = sp.total_games, games = '';
     if(tg){
-      games = '<div class="result-weather-row"><span>' + t('analysis.proj_games') + '</span><strong>' + tg.low + ' – ' + tg.high + '</strong></div>' +
-        '<div class="result-weather-note" style="color:var(--muted,#9aa4b2);font-weight:500;">' +
-        t(tg.source === 'history' ? 'analysis.proj_src_history' : 'analysis.proj_src_default') + '</div>';
+      games = '<div class="result-weather-row"><span>' + t('analysis.proj_games') + '</span><strong>' + tg.low + ' – ' + tg.high + '</strong></div>';
+
     }
     return '<div class="field-label" style="margin-top:32px;">' + t('analysis.proj_title') + '</div>' +
       '<div class="scenario-list">' + rows + '</div>' + games;
