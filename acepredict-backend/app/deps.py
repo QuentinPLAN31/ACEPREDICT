@@ -65,6 +65,27 @@ def _period_length(plan: str) -> timedelta:
     return timedelta(days=1) if PLAN_PERIODS.get(plan, "month") == "day" else timedelta(days=30)
 
 
+def refresh_quota_period(quota: "models.UsageQuota", plan: str, db: Session) -> bool:
+    """Remet analyses_used à 0 si la période du plan (24 h glissantes pour les
+    plans payants, 30 jours pour free, cf. PLAN_PERIODS) est écoulée.
+    Retourne True si un reset a eu lieu. Appelée par require_quota (avant
+    chaque analyse) ET par les endpoints qui AFFICHENT le quota
+    (users.py::my_subscription) : avant ce correctif le reset n'avait lieu
+    qu'au moment de lancer une analyse, donc un abonné dont la journée était
+    écoulée voyait toujours "3 / 3" sur la page Compte jusqu'à sa prochaine
+    tentative. bonus_analyses (packs achetés à l'unité) N'EST PAS remis à 0 :
+    un pack payé survit au reset périodique du plan de base."""
+    period_start = quota.period_start or datetime.utcnow()
+    if datetime.utcnow() - period_start >= _period_length(plan):
+        quota.analyses_used = 0
+        quota.period_start = datetime.utcnow()
+        quota.analyses_limit = PLAN_QUOTAS.get(plan, quota.analyses_limit)
+        db.commit()
+        db.refresh(quota)
+        return True
+    return False
+
+
 def require_quota(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -85,16 +106,7 @@ def require_quota(
         db.commit()
         db.refresh(quota)
 
-    plan = current_user.plan.value
-    period_start = quota.period_start or datetime.utcnow()
-    if datetime.utcnow() - period_start >= _period_length(plan):
-        quota.analyses_used = 0
-        quota.period_start = datetime.utcnow()
-        quota.analyses_limit = PLAN_QUOTAS.get(plan, quota.analyses_limit)
-        # bonus_analyses (packs achetés à l'unité) N'EST PAS remis à 0 ici --
-        # un pack payé doit survivre au reset périodique du plan de base.
-        db.commit()
-        db.refresh(quota)
+    refresh_quota_period(quota, current_user.plan.value, db)
 
     if quota.analyses_used >= quota.analyses_limit + (quota.bonus_analyses or 0):
         raise HTTPException(

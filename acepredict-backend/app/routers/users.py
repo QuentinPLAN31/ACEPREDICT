@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.database import get_db
-from app.deps import get_current_user
+from app.deps import get_current_user, refresh_quota_period
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -44,6 +44,8 @@ def my_subscription(
         .first()
     )
     quota = current_user.quota
+    if quota:
+        refresh_quota_period(quota, current_user.plan.value, db)
     return {
         "plan": current_user.plan.value,
         "stripe_status": sub.status if sub else None,

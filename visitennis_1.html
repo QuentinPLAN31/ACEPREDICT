@@ -6235,7 +6235,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     listEl.innerHTML = '<div class="upcoming-loading">' + t('msg.loading_upcoming') + '</div>';
     filtersEl.innerHTML = '';
     try {
-      const res = await fetch(API_BASE + '/matches/upcoming-list?limit=100');
+      const res = await fetch(API_BASE + '/matches/upcoming-list?limit=200');
       if(!res.ok) throw new Error('bad status');
       upcomingPageMatches = await res.json();
       if(!upcomingPageMatches.length){

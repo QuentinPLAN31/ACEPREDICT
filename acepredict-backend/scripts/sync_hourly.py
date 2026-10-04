@@ -60,7 +60,7 @@ FIXTURE_LIST_LIMIT = 200
 # ça est considérée jouée/obsolète — purgée pour ne pas laisser grossir la
 # table indéfiniment (routers/matches.py ne renvoie de toute façon que les
 # fixtures futures, mais autant nettoyer à la source).
-STALE_AFTER = timedelta(days=2)
+STALE_AFTER = timedelta(hours=24)
 
 _SURFACE_VALUES = {s.value for s in models.SurfaceEnum}
 

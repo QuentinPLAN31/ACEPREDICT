@@ -77,7 +77,9 @@ def seed_data():
     for p in (alcaraz, sinner, inconnu, wta_player1, wta_player2):
         db.refresh(p)
 
-    now = datetime(2026, 11, 16, 18, 0, 0)
+    # Relatif à l'instant présent : /upcoming-list ne renvoie que la fenêtre
+    # [maintenant - 24 h ; maintenant + 3 jours] (cf. routers/matches.py).
+    now = datetime.utcnow() + timedelta(hours=1)
     db.add(models.Fixture(
         external_id="ltapi:atp-1", source="livetennisapi",
         player1_id=alcaraz.id, player2_id=sinner.id,
@@ -173,3 +175,38 @@ def test_upcoming_list_respects_limit(seed_data):
     r = client.get("/matches/upcoming-list?limit=1")
     assert r.status_code == 200
     assert len(r.json()) == 1
+
+
+def test_upcoming_list_excludes_old_and_far_future_matches(seed_data):
+    """Fenêtre d'affichage : un match de plus de 24 h dans le passé ou à plus
+    de 3 jours dans le futur ne doit pas apparaître."""
+    from datetime import datetime, timedelta
+    db = TestingSessionLocal()
+    alcaraz = db.query(models.Player).filter(models.Player.name == "Carlos Alcaraz").first()
+    sinner = db.query(models.Player).filter(models.Player.name == "Jannik Sinner").first()
+    now = datetime.utcnow()
+    db.add(models.Fixture(
+        external_id="ltapi:old", source="livetennisapi",
+        player1_id=alcaraz.id, player2_id=sinner.id,
+        player1_name_raw="Carlos Alcaraz", player2_name_raw="Jannik Sinner",
+        tour="atp", tournament_name="Vieux match", scheduled_time=now - timedelta(hours=25),
+    ))
+    db.add(models.Fixture(
+        external_id="ltapi:recent", source="livetennisapi",
+        player1_id=alcaraz.id, player2_id=sinner.id,
+        player1_name_raw="Carlos Alcaraz", player2_name_raw="Jannik Sinner",
+        tour="atp", tournament_name="Match recent", scheduled_time=now - timedelta(hours=23),
+    ))
+    db.add(models.Fixture(
+        external_id="ltapi:far", source="livetennisapi",
+        player1_id=alcaraz.id, player2_id=sinner.id,
+        player1_name_raw="Carlos Alcaraz", player2_name_raw="Jannik Sinner",
+        tour="atp", tournament_name="Match lointain", scheduled_time=now + timedelta(days=3, hours=1),
+    ))
+    db.commit()
+    db.close()
+
+    names = {m["tournament"] for m in client.get("/matches/upcoming-list?limit=200").json()}
+    assert "Match recent" in names
+    assert "Vieux match" not in names
+    assert "Match lointain" not in names

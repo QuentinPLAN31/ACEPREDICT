@@ -21,6 +21,7 @@ cette information pour que le frontend avertisse plutôt que de bloquer
 l'affichage de la prédiction en conséquence plutôt que de bloquer
 l'analyse").
 """
+from datetime import datetime, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -32,6 +33,13 @@ from app.database import get_db
 from app.services import data_confidence
 
 router = APIRouter(prefix="/matches", tags=["matches"])
+
+# Fenêtre d'affichage de la page "Matchs à venir" : on garde un match jusqu'à
+# 24 h APRÈS son horaire programmé (le temps qu'il se joue / qu'on consulte
+# le résultat), au-delà il disparaît ; et on n'annonce que les 3 prochains
+# jours (au-delà, le calendrier est trop incertain / encombrerait la liste).
+UPCOMING_PAST_GRACE = timedelta(hours=24)
+UPCOMING_HORIZON = timedelta(days=3)
 
 
 def _annotate_analyzable(db: Session, matches: list[dict]) -> list[dict]:
@@ -111,6 +119,18 @@ def upcoming_matches_list(
     )
     if tour:
         query = query.filter(models.Fixture.tour == tour.strip().lower())
+    # Fenêtre [maintenant - 24 h ; maintenant + 3 jours]. scheduled_time est
+    # stocké en UTC naïf (cf. scripts/sync_hourly.py::_parse_scheduled_time).
+    # Les fixtures sans horaire connu restent affichées (on ne peut pas
+    # savoir si elles sont passées).
+    now = datetime.utcnow()
+    query = query.filter(
+        or_(
+            models.Fixture.scheduled_time.is_(None),
+            (models.Fixture.scheduled_time >= now - UPCOMING_PAST_GRACE)
+            & (models.Fixture.scheduled_time <= now + UPCOMING_HORIZON),
+        )
+    )
     fixtures = query.order_by(models.Fixture.scheduled_time.asc()).limit(limit).all()
 
     matches = []
