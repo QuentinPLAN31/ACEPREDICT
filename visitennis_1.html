@@ -441,17 +441,17 @@
   .proj-games-label{ font-size:13px; color:var(--text-dim,#9aa4b2); }
   .proj-games-value{ font-size:16px; font-weight:800; }
   /* Sélecteur de surface : rectangles photo */
-  #surfacePicker{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
-  #surfacePicker .surf-btn{ position:relative; height:76px; padding:0; border:2px solid rgba(255,255,255,0.12); border-radius:12px; overflow:hidden; cursor:pointer; background:#1b2013 center/cover no-repeat; color:#fff; font-family:inherit; transition:transform .15s, border-color .15s, box-shadow .15s, filter .15s; filter:brightness(.72) saturate(.85); }
+  #surfacePicker{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  #surfacePicker .surf-btn{ position:relative; height:92px; padding:0; border:2px solid rgba(255,255,255,0.12); border-radius:12px; overflow:hidden; cursor:pointer; background:#1b2013 center/cover no-repeat; color:#fff; font-family:inherit; transition:transform .15s, border-color .15s, box-shadow .15s, filter .15s; filter:brightness(.72) saturate(.85); }
   #surfacePicker .surf-btn:hover{ filter:brightness(.92) saturate(1); transform:translateY(-1px); }
   #surfacePicker .surf-btn::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.05) 62%); }
-  #surfacePicker .surf-btn span{ position:absolute; left:0; right:0; bottom:8px; z-index:1; text-align:center; font-size:13px; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,0.7); }
+  #surfacePicker .surf-btn span{ position:absolute; left:0; right:0; bottom:11px; z-index:1; text-align:center; font-size:13px; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,0.7); }
   #surfacePicker .surf-btn.active{ filter:none; border-color:var(--accent,#c6f432); box-shadow:0 0 0 2px rgba(198,244,50,0.28); }
   #surfacePicker .surf-btn[data-surface=""]{ background-image:linear-gradient(135deg,#2b3320,#14180a); }
   #surfacePicker .surf-btn[data-surface="hard"]{ background-image:url('assets/surfaces/surface-hard.jpg'); }
   #surfacePicker .surf-btn[data-surface="clay"]{ background-image:url('assets/surfaces/surface-clay.jpg'); }
   #surfacePicker .surf-btn[data-surface="grass"]{ background-image:url('assets/surfaces/surface-grass.jpg'); }
-  @media (max-width:560px){ #surfacePicker{ grid-template-columns:repeat(2,1fr); } #surfacePicker .surf-btn{ height:68px; } }
+  @media (max-width:560px){ #surfacePicker{ grid-template-columns:repeat(2,1fr); gap:14px; } #surfacePicker .surf-btn{ height:80px; } }
   .upr-date{ font-size:12px; color: var(--accent); font-weight:700; text-align:right; min-width:90px; }
   .upr-btn{
     background: var(--accent-dim); color: var(--accent); border:1px solid var(--line-strong); border-radius:8px;
@@ -1956,8 +1956,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <div class="field-label" data-i18n="field.next_match_between">PROCHAIN MATCH ENTRE CES DEUX JOUEURS</div>
           <div id="upcomingList"></div>
         </div>
-        <div class="field-label" style="margin-top:18px;" data-i18n="field.surface">SURFACE (OPTIONNEL)</div>
-        <div class="surface-picker" id="surfacePicker" style="margin:0 0 6px;">
+        <div class="field-label" style="margin-top:34px;" data-i18n="field.surface">SURFACE (OPTIONNEL)</div>
+        <div class="surface-picker" id="surfacePicker" style="margin:18px 0 30px;">
           <button type="button" class="surf-btn active" data-surface=""><span data-i18n="surface.auto">Auto</span></button>
           <button type="button" class="surf-btn" data-surface="hard"><span data-i18n="surface.hard">Dur</span></button>
           <button type="button" class="surf-btn" data-surface="clay"><span data-i18n="surface.clay">Terre battue</span></button>
