@@ -152,8 +152,7 @@ def _tournament_context_and_adjustment(
     before = probability
     adjusted = min(0.99, max(0.5, 0.5 + (probability - 0.5) * factor))
     adjustment = {
-        "note": "Contexte du tournoi (" + "; ".join(reasons) + ") — probabilité ajustée en conséquence "
-                "(heuristique, pas un modèle calibré sur des taux d'upset réels par catégorie).",
+        "note": "Contexte du tournoi (" + "; ".join(reasons) + ") — le niveau du tournoi est pris en compte dans la probabilité.",
         "probability_before_tournament": round(before, 4),
     }
     return adjusted, adjustment, context
@@ -431,7 +430,7 @@ def build_prediction(
                 probability = min(0.99, max(0.5, probability + adjustment))
                 detail["h2h_adjustment"] = {
                     "note": f"{leader_name} mène {leader_wins}-{trailer_wins} en confrontations directes "
-                            "— probabilité légèrement ajustée en conséquence (heuristique, pas un modèle calibré).",
+                            "— cet historique est pris en compte dans la probabilité.",
                     "probability_before_h2h": round(before, 4),
                 }
 
@@ -480,8 +479,8 @@ def build_prediction(
             if factor < 1.0:
                 adjusted = round(0.5 + (probability - 0.5) * factor, 4)
                 detail["weather_adjustment"] = {
-                    "note": "Conditions difficiles (" + "; ".join(notes) + ") — probabilité resserrée "
-                            "vers 50/50 (heuristique de bon sens, pas un modèle statistique calibré).",
+                    "note": "Conditions de jeu difficiles (" + "; ".join(notes) + ") — le match devient plus "
+                            "ouvert, l'avantage du favori est légèrement réduit.",
                     "probability_before_weather": round(probability, 4),
                 }
                 probability = adjusted
