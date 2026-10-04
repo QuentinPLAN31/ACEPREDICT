@@ -3077,6 +3077,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Dernière défaite',
       'pj.vs': 'vs',
       'pj.stats_service': 'Stats de service',
+      'res.win_letter': 'V',
+      'res.loss_letter': 'D',
       'pj.group_service': 'Service',
       'pj.group_return': 'Retour',
       'pj.svc_pts_won': 'Points gagnés au service',
@@ -3544,6 +3546,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Última derrota',
       'pj.vs': 'vs',
       'pj.stats_service': 'Estadísticas de saque',
+      'res.win_letter': 'G',
+      'res.loss_letter': 'P',
       'pj.group_service': 'Saque',
       'pj.group_return': 'Resto',
       'pj.svc_pts_won': 'Puntos ganados al saque',
@@ -4011,6 +4015,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Last loss',
       'pj.vs': 'vs',
       'pj.stats_service': 'Serve stats',
+      'res.win_letter': 'W',
+      'res.loss_letter': 'L',
       'pj.group_service': 'Serve',
       'pj.group_return': 'Return',
       'pj.svc_pts_won': 'Service points won',
@@ -5109,7 +5115,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(f1 && f2){
       const streak1 = currentWinStreak(f1.results), streak2 = currentWinStreak(f2.results);
       const maxStreak = Math.max(f1.results.length, f2.results.length, 1);
-      html += statBarRowCenter(t('stat.victoires_consecutives'), streak1, streak2, maxStreak, { suffix: 'V' });
+      html += statBarRowCenter(t('stat.victoires_consecutives'), streak1, streak2, maxStreak, { suffix: t('res.win_letter') });
 
       // Jauge supplémentaire (donnée déjà disponible via form_player1/2, pas
       // inventée) : taux de victoire sur l'échantillon récent suivi.
@@ -5444,7 +5450,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           '<div class="form-card-label">' + t('analysis.historique_indisponible') + '</div></div>';
       }
       const pills = form.results.map(r =>
-        '<span class="form-pill ' + (r === 'V' ? 'win' : 'loss') + '">' + r + '</span>'
+        '<span class="form-pill ' + (r === 'V' ? 'win' : 'loss') + '">' + (r === 'V' ? t('res.win_letter') : t('res.loss_letter')) + '</span>'
       ).join('');
       return '<div class="' + cls + '">' +
         '<div class="' + nameCls + '">' + name + '</div>' +
@@ -6807,7 +6813,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     html += '<div class="pj-winrate-card">' +
       '<div class="pj-winrate-ring" style="--wr:' + winRatePct + '"><span>' + winRatePct + '%</span></div>' +
       '<div class="pj-winrate-info">' +
-        '<div class="pj-winrate-record"><b class="w">' + stats.wins + 'V</b> - <b class="l">' + stats.losses + 'D</b></div>' +
+        '<div class="pj-winrate-record"><b class="w">' + stats.wins + t('res.win_letter') + '</b> - <b class="l">' + stats.losses + t('res.loss_letter') + '</b></div>' +
         '<div class="pj-winrate-label">' + tf('pj.matches_played', { n: stats.matches_played }) + '</div>' +
         (stats.current_streak
           ? '<div class="pj-streak-pill ' + (stats.current_streak.type === 'W' ? 'win' : 'loss') + '">' +
@@ -6821,7 +6827,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(stats.recent_form && stats.recent_form.length){
       html += '<div class="pj-form-row">' +
         stats.recent_form.map(m =>
-          '<div class="pj-form-dot ' + (m.result === 'W' ? 'w' : 'l') + '" title="' + m.result + ' vs ' + m.opponent_name + (m.tournament ? ' — ' + m.tournament : '') + '">' + m.result + '</div>'
+          '<div class="pj-form-dot ' + (m.result === 'W' ? 'w' : 'l') + '" title="' + (m.result === 'W' ? t('res.win_letter') : t('res.loss_letter')) + ' vs ' + m.opponent_name + (m.tournament ? ' — ' + m.tournament : '') + '">' + (m.result === 'W' ? t('res.win_letter') : t('res.loss_letter')) + '</div>'
         ).join('') +
       '</div>';
     }
