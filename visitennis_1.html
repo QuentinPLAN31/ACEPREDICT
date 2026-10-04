@@ -415,6 +415,12 @@
   .upr-surface-pill.surf-grass{ background: rgba(62,214,107,0.18); color: var(--surf-grass); }
   .upr-surface-pill.surf-carpet{ background: rgba(184,184,184,0.18); color: var(--surf-carpet); }
   .upr-surface-pill.surf-unknown{ background: rgba(255,255,255,0.06); color: var(--text-dim); }
+  /* Sélecteur de surface : couleur de chaque surface (même code que les pastilles) */
+  #surfacePicker .upcoming-chip[data-surface="hard"]{ --chip-c: var(--surf-hard); }
+  #surfacePicker .upcoming-chip[data-surface="clay"]{ --chip-c: var(--surf-clay); }
+  #surfacePicker .upcoming-chip[data-surface="grass"]{ --chip-c: var(--surf-grass); }
+  #surfacePicker .upcoming-chip[data-surface]:not([data-surface=""]){ color: var(--chip-c); border-color: color-mix(in srgb, var(--chip-c) 35%, transparent); }
+  #surfacePicker .upcoming-chip[data-surface]:not([data-surface=""]).active{ color: var(--chip-c); border-color: var(--chip-c); background: color-mix(in srgb, var(--chip-c) 18%, transparent); }
   .upr-date{ font-size:12px; color: var(--accent); font-weight:700; text-align:right; min-width:90px; }
   .upr-btn{
     background: var(--accent-dim); color: var(--accent); border:1px solid var(--line-strong); border-radius:8px;
