@@ -127,13 +127,11 @@
     position:relative;
     padding: 84px 32px 0;
     text-align:center;
-    overflow:hidden;
-    background:
-      radial-gradient(ellipse 900px 480px at 50% 210px, rgba(215,242,44,0.10), transparent 70%),
-      linear-gradient(180deg, var(--bg) 0%, var(--bg) 60%, var(--bg-2) 100%);
+    overflow:visible;
+    background: radial-gradient(ellipse 900px 480px at 50% 210px, rgba(215,242,44,0.10), transparent 70%);
   }
   .court-bg{
-    position:absolute; inset:0; z-index:0; opacity:.5;
+    position:absolute; inset:0 0 -420px 0; z-index:0; opacity:.5; pointer-events:none;
     background:
       radial-gradient(ellipse 1200px 620px at 50% 780px, rgba(215,242,44,0.05), transparent 65%);
   }
@@ -307,14 +305,13 @@
 
   /* ---------- SCORE / COURT SECTION ---------- */
   .court-section{
-    position:relative; padding: 70px 32px 90px; text-align:center; overflow:hidden;
+    position:relative; padding: 70px 32px 90px; text-align:center; overflow:visible;
   }
+  /* Les halos dépassent volontairement de leur section (inset négatif, sections en
+     overflow visible) pour que chaque tache se complète au lieu d'être coupée net. */
   .court-visual{
-    position:absolute; inset:0; z-index:0;
-    background:
-      linear-gradient(180deg, var(--bg-2) 0%, transparent 160px),
-      linear-gradient(180deg, transparent 0%, rgba(19,26,22,0.2) 55%, var(--bg) 100%),
-      radial-gradient(ellipse 900px 500px at 50% 40%, rgba(96,180,90,0.16), transparent 70%);
+    position:absolute; inset:-300px 0; z-index:0; pointer-events:none;
+    background: radial-gradient(ellipse 900px 500px at 50% 50%, rgba(96,180,90,0.16), transparent 70%);
   }
   .court-section > *:not(.court-visual){ position:relative; z-index:1; }
   /* La section "sources" suivait la section "court" avec le même halo vert centré :
@@ -322,8 +319,8 @@
      droite, avec un léger filet en haut -- visuellement distinct du halo vert. */
   .sources-section .court-visual{
     background:
-      radial-gradient(ellipse 620px 360px at 88% 18%, rgba(255,122,69,0.09), transparent 70%),
-      radial-gradient(ellipse 520px 300px at 8% 92%, rgba(215,242,44,0.05), transparent 70%);
+      radial-gradient(ellipse 620px 360px at 88% 38%, rgba(255,122,69,0.09), transparent 70%),
+      radial-gradient(ellipse 520px 300px at 8% 66%, rgba(215,242,44,0.05), transparent 70%);
   }
   .sources-section > *:not(.court-visual){ position:relative; z-index:1; }
   .court-h2{ font-size: clamp(28px,4.2vw,46px); font-weight:800; text-transform:uppercase; }
@@ -414,7 +411,7 @@
   .feature-section > .wrap > p{ max-width:480px; margin: 20px auto 0; color: var(--text-sec); font-size:15px; line-height:1.6; }
 
   /* ---------- SOURCES SECTION ---------- */
-  .sources-section{ position:relative; padding: 90px 32px; text-align:center; overflow:hidden; }
+  .sources-section{ position:relative; padding: 90px 32px; text-align:center; overflow:visible; }
   .sources-pill{
     display:inline-flex; align-items:center; background: rgba(255,255,255,0.05);
     border:1px solid var(--line-strong); border-radius:999px; padding:8px 20px; font-size:13px; font-weight:600;
