@@ -316,6 +316,16 @@
       radial-gradient(ellipse 900px 500px at 50% 40%, rgba(96,180,90,0.16), transparent 70%);
   }
   .court-section > *:not(.court-visual){ position:relative; z-index:1; }
+  /* La section "sources" suivait la section "court" avec le même halo vert centré :
+     le motif se répétait deux fois d'affilée. Ici : halo orange discret, décalé à
+     droite, avec un léger filet en haut -- visuellement distinct du halo vert. */
+  .sources-section .court-visual{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 18%),
+      radial-gradient(ellipse 620px 360px at 88% 18%, rgba(255,122,69,0.09), transparent 70%),
+      radial-gradient(ellipse 520px 300px at 8% 92%, rgba(215,242,44,0.05), transparent 70%);
+  }
+  .sources-section > *:not(.court-visual){ position:relative; z-index:1; }
   .court-h2{ font-size: clamp(28px,4.2vw,46px); font-weight:800; text-transform:uppercase; }
   .court-h2 .lime{ background: linear-gradient(90deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
   .court-p{ max-width:560px; margin: 20px auto 0; color: var(--text-sec); font-size:15px; line-height:1.6; }
