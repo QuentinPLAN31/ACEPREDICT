@@ -587,6 +587,19 @@
   .res-sec .proj-card{ border:0; background:none; border-radius:0; }
   .res-sec .proj-row{ padding:14px 0; }
   .res-sec .proj-games{ margin:0 -18px; border-radius:0 0 12px 12px; padding:14px 18px; }
+  /* Météo : en-tête avec icône + 3 tuiles */
+  .wx-head{ display:flex; align-items:center; gap:14px; padding:14px 16px; border:1px solid rgba(255,255,255,0.08); border-radius:14px; background:rgba(255,255,255,0.03); }
+  .wx-head-ico{ width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(215,242,44,0.12); color:var(--accent); flex-shrink:0; }
+  .wx-head-ico svg{ width:26px; height:26px; }
+  .wx-head-title{ font-size:15px; font-weight:700; text-transform:capitalize; line-height:1.35; }
+  .wx-tiles{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-top:12px; }
+  .wx-tile{ border:1px solid rgba(255,255,255,0.08); border-radius:14px; background:rgba(255,255,255,0.03); padding:14px 10px; text-align:center; }
+  .wx-ico{ color:var(--accent); display:flex; justify-content:center; margin-bottom:8px; }
+  .wx-val{ font-size:18px; font-weight:800; }
+  .wx-lab{ font-size:11px; color:var(--text-dim); margin-top:3px; letter-spacing:.04em; }
+  .wx-tile.hot{ border-color:rgba(255,153,56,0.45); }
+  .wx-tile.hot .wx-ico{ color:#ff9938; }
+  .wx-note{ margin-top:12px; padding:11px 14px; border-radius:12px; border:1px solid rgba(255,153,56,0.35); background:rgba(255,153,56,0.08); color:#ffb066; font-size:12.5px; font-weight:600; line-height:1.5; }
   /* Stats de service : 2 tuiles + groupes avec barres */
   .pj-tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; margin-bottom:14px; }
   .pj-groups{ display:grid; grid-template-columns:1.4fr 1fr; gap:14px; align-items:start; }
@@ -3033,6 +3046,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'favorite.balanced': 'Match très équilibré',
       'weather.title': 'Météo ({desc})',
       'weather.wind': 'Vent',
+      'weather.section_title': 'Conditions de jeu',
+      'weather.temp': 'Température',
       'weather.humidity': 'Humidité',
       'weather.indoor': 'Conditions',
       'weather.indoor_value': 'Match en intérieur — météo non applicable',
@@ -3502,6 +3517,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'favorite.balanced': 'Partido muy equilibrado',
       'weather.title': 'Clima ({desc})',
       'weather.wind': 'Viento',
+      'weather.section_title': 'Condiciones de juego',
+      'weather.temp': 'Temperatura',
       'weather.humidity': 'Humedad',
       'weather.indoor': 'Condiciones',
       'weather.indoor_value': 'Partido en pista cubierta — clima no aplicable',
@@ -3971,6 +3988,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'favorite.balanced': 'Very even match',
       'weather.title': 'Weather ({desc})',
       'weather.wind': 'Wind',
+      'weather.section_title': 'Playing conditions',
+      'weather.temp': 'Temperature',
       'weather.humidity': 'Humidity',
       'weather.indoor': 'Conditions',
       'weather.indoor_value': 'Indoor match — weather not applicable',
@@ -5381,22 +5400,55 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     return html;
   }
 
+  // Icônes SVG (trait fin, comme le reste de l'interface) pour la météo.
+  const WX_ICONS = {
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    cloud: '<path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 9.5 4.25 4.25 0 0 1 17.5 18H7z"/>',
+    rain: '<path d="M7 15a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 6.5 4.25 4.25 0 0 1 17.5 15H7z"/><path d="M8 18l-1 2M12 18l-1 2M16 18l-1 2"/>',
+    storm: '<path d="M7 14a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 5.5 4.25 4.25 0 0 1 17.5 14H7z"/><path d="M12 14l-2 4h3l-2 4"/>',
+    snow: '<path d="M12 2v20M4.2 7l15.6 10M4.2 17L19.8 7"/>',
+    fog: '<path d="M4 9h16M3 13h18M5 17h14"/>',
+    thermo: '<path d="M14 14.76V4a2 2 0 1 0-4 0v10.76a4 4 0 1 0 4 0z"/>',
+    wind: '<path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7a2.5 2.5 0 1 1-2.5 2.5"/>',
+    drop: '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+    indoor: '<path d="M3 21h18M5 21V9l7-5 7 5v12M10 21v-6h4v6"/>',
+  };
+  function wxIcon(name){
+    return '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (WX_ICONS[name] || WX_ICONS.cloud) + '</svg>';
+  }
+  function wxIconForDescription(desc){
+    const d = String(desc || '').toLowerCase();
+    if(/orage|storm|thunder|tormenta/.test(d)) return 'storm';
+    if(/pluie|averse|bruine|rain|drizzle|shower|lluvia|llovizna/.test(d)) return 'rain';
+    if(/neige|snow|nieve/.test(d)) return 'snow';
+    if(/brouillard|brume|fog|mist|niebla/.test(d)) return 'fog';
+    if(/soleil|ensoleill|dégagé|degage|clear|sunny|despejado|soleado/.test(d)) return 'sun';
+    return 'cloud';
+  }
+
   function renderWeatherBlock(detail){
     const w = detail.weather;
     if(!w) return '';
+    const tile = (icon, label, value, hot) =>
+      '<div class="wx-tile' + (hot ? ' hot' : '') + '"><div class="wx-ico">' + wxIcon(icon) + '</div>' +
+      '<div class="wx-val">' + value + '</div><div class="wx-lab">' + label + '</div></div>';
     if(w.indoor){
-      return '<div class="result-weather"><div class="result-weather-row"><span>' + t('weather.indoor') + '</span><span>' + t('weather.indoor_value') + '</span></div></div>';
+      return resSection('bare', t('weather.section_title'),
+        '<div class="wx-head"><div class="wx-head-ico">' + wxIcon('indoor') + '</div>' +
+        '<div><div class="wx-head-title">' + t('weather.indoor_value') + '</div></div></div>');
     }
-    let html = '<div class="result-weather">' +
-      '<div class="result-weather-row"><span>' + tf('weather.title', { desc: (w.description || '—') }) + '</span><span>' + w.temp_c + '°C</span></div>' +
-      '<div class="result-weather-row"><span>' + t('weather.wind') + '</span><span>' + w.wind_kmh + ' km/h</span></div>' +
-      '<div class="result-weather-row"><span>' + t('weather.humidity') + '</span><span>' + w.humidity_pct + '%</span></div>';
+    const windHot = w.wind_kmh != null && w.wind_kmh >= 25;
+    const tempHot = w.temp_c != null && (w.temp_c >= 32 || w.temp_c <= 5);
+    let body = '<div class="wx-head"><div class="wx-head-ico">' + wxIcon(wxIconForDescription(w.description)) + '</div>' +
+      '<div><div class="wx-head-title">' + (w.description || '—') + '</div></div></div>' +
+      '<div class="wx-tiles">' +
+        tile('thermo', t('weather.temp'), w.temp_c + '°C', tempHot) +
+        tile('wind', t('weather.wind'), w.wind_kmh + ' km/h', windHot) +
+        tile('drop', t('weather.humidity'), w.humidity_pct + '%', false) +
+      '</div>';
     const adj = detail.weather_adjustment;
-    if(adj){
-      html += '<div class="result-weather-note">⚠️ ' + adj.note + '</div>';
-    }
-    html += '</div>';
-    return html;
+    if(adj) body += '<div class="wx-note">' + adj.note + '</div>';
+    return resSection('bare', t('weather.section_title'), body);
   }
 
   // Repondération du pourcentage AFFICHÉ (70-98 au lieu de 50-99) : un
