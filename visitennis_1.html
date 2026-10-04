@@ -1753,6 +1753,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     border-radius:12px; padding:20px; text-align:center;
   }
   .result-winner{ font-size:19px; font-weight:800; color: var(--accent); margin-bottom:4px; }
+  .result-winner-name{ background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
   .result-prob{ font-size:13.5px; color: var(--text-sec); margin-bottom:10px; }
   .result-detail{ font-size:12px; color: var(--text-dim); }
   .result-confidence-warning{
@@ -5418,7 +5419,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     const teaser =
       '<div class="result-badge">' + favoriteLabel(rawPct) + '</div>' +
-      '<div class="result-winner">' + winnerName + ' ' + t('analysis.gagnant_probable') + '</div>' +
+      '<div class="result-winner"><span class="result-winner-name">' + winnerName + '</span> ' + t('analysis.gagnant_probable') + '</div>' +
       '<div class="result-detail">' + t('analysis.face_a') + ' ' + loserName + surfaceTag + '</div>' +
       '<div class="form-row" style="margin-top:12px;">' +
         '<div class="form-card"><div class="form-card-name">' + p1Name + '</div>' +
