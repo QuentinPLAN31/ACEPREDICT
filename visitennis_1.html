@@ -2879,6 +2879,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nar.lecture_tactique': 'Lecture tactique',
       'nar.vigilance': 'Points de vigilance',
       'analysis.scenarios_possibles': 'SCÉNARIOS POSSIBLES',
+      'analysis.proj_title': 'PROJECTION DE SCORE',
+      'analysis.proj_games': 'Games totaux estimés',
+      'analysis.proj_src_history': 'Estimation basée sur l\'historique des matchs des deux joueurs.',
+      'analysis.proj_src_default': 'Estimation basée sur des moyennes par défaut (peu d\'historique).',
       'analysis.moment_cle': 'Moment clé à surveiller',
       'analysis.mot_analyste': "Le mot de l'analyste",
       'analysis.conseil_tactique': 'CONSEIL TACTIQUE',
@@ -3337,6 +3341,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nar.lecture_tactique': 'Lectura táctica',
       'nar.vigilance': 'Puntos de atención',
       'analysis.scenarios_possibles': 'ESCENARIOS POSIBLES',
+      'analysis.proj_title': 'PROYECCIÓN DE MARCADOR',
+      'analysis.proj_games': 'Juegos totales estimados',
+      'analysis.proj_src_history': 'Estimación basada en el historial de partidos de ambos jugadores.',
+      'analysis.proj_src_default': 'Estimación basada en medias por defecto (poco historial).',
       'analysis.moment_cle': 'Momento clave a vigilar',
       'analysis.mot_analyste': 'La palabra del analista',
       'analysis.conseil_tactique': 'CONSEJO TÁCTICO',
@@ -3795,6 +3803,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nar.lecture_tactique': 'Tactical reading',
       'nar.vigilance': 'Points to watch',
       'analysis.scenarios_possibles': 'POSSIBLE SCENARIOS',
+      'analysis.proj_title': 'SCORE PROJECTION',
+      'analysis.proj_games': 'Estimated total games',
+      'analysis.proj_src_history': 'Estimate based on both players\' match history.',
+      'analysis.proj_src_default': 'Estimate based on default averages (little history).',
       'analysis.moment_cle': 'Key moment to watch',
       'analysis.mot_analyste': "The analyst's take",
       'analysis.conseil_tactique': 'TACTICAL TIP',
@@ -5127,6 +5139,27 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="fiche-grid">' + card(p1Name, fiches.j1, false) + card(p2Name, fiches.j2, true) + '</div>';
   }
 
+  function renderScoreProjectionBlock(detail){
+    var sp = detail && detail.score_projection;
+    if(!sp || !sp.scenarios || !sp.scenarios.length) return '';
+    var esc = function(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    var rows = sp.scenarios.map(function(sc, idx){
+      var pctTxt = (Math.round(sc.probability * 1000) / 10).toString().replace('.', (currentLang === 'en' ? '.' : ','));
+      return '<div class="scenario-item">' +
+        '<div class="scenario-num">' + (idx + 1) + '</div>' +
+        '<div class="scenario-text"><strong>' + esc(sc.winner_name) + ' ' + esc(sc.score) + '</strong> &middot; ' + pctTxt + '%</div>' +
+      '</div>';
+    }).join('');
+    var tg = sp.total_games, games = '';
+    if(tg){
+      games = '<div class="result-weather-row"><span>' + t('analysis.proj_games') + '</span><strong>' + tg.low + ' – ' + tg.high + '</strong></div>' +
+        '<div class="result-weather-note" style="color:var(--muted,#9aa4b2);font-weight:500;">' +
+        t(tg.source === 'history' ? 'analysis.proj_src_history' : 'analysis.proj_src_default') + '</div>';
+    }
+    return '<div class="field-label" style="margin-top:32px;">' + t('analysis.proj_title') + '</div>' +
+      '<div class="scenario-list">' + rows + '</div>' + games;
+  }
+
   function renderScenariosBlock(scenarios){
     return '<div class="field-label" style="margin-top:32px;">' + t('analysis.scenarios_possibles') + '</div>' +
       '<div class="scenario-list">' + scenarios.map(function(s, idx){
@@ -5371,6 +5404,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       (narrative ? renderCroisementBlock(narrative.croisement) : '') +
       (narrative && narrative.momentCle ? renderMomentCleBlock(narrative.momentCle) : '') +
       (narrative && narrative.scenarios.length ? renderScenariosBlock(narrative.scenarios) : '') +
+      renderScoreProjectionBlock(data.detail) +
       (narrative && narrative.conseilTactique && narrative.conseilTactique.length ? renderConseilTactiqueBlock(narrative.conseilTactique) : '') +
       renderTournamentBlock(data.detail) +
       renderMarketBlock(data.detail, p1Name, p2Name) +

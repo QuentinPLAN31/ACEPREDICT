@@ -32,6 +32,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.services.elo import expected_score
 from app.services import ai_narrative
+from app.services import score_projection
 
 MODEL_VERSION = "elo-h2h-fatigue-tournament-weather-market-v5"
 
@@ -486,6 +487,18 @@ def build_prediction(
     probability, winner, market_adjustment = _apply_market_blend(probability, winner, player1, player2, market)
     if market_adjustment:
         detail["market_adjustment"] = market_adjustment
+
+    # Scénario du match (score en sets + nombre de jeux), cf. score_projection.py.
+    # Purement informatif : n'influence jamais la probabilité. Ne doit JAMAIS
+    # faire échouer l'analyse -- en cas de souci, on omet simplement le bloc.
+    try:
+        loser = player2 if winner.id == player1.id else player1
+        is_bo5 = str((detail.get("tournament_context") or {}).get("format", "")).startswith("Bo5")
+        detail["score_projection"] = score_projection.build_score_projection(
+            db, winner, loser, probability, surface, is_bo5
+        )
+    except Exception:
+        pass
 
     # Commentaire d'analyse en langage naturel (optionnel — cf. ai_narrative.py) :
     # explique les chiffres ci-dessus, n'influence jamais la probabilité elle-même.
