@@ -7154,7 +7154,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     // consultable dans l'historique (sinon il traîne sous le formulaire).
     document.getElementById('page-matchs').classList.remove('view-history');
     const prev = document.querySelector('.page.active');
-    if(prev && prev.id === 'page-matchs' && name !== 'matchs'){
+    // Aussi quand on re-clique sur "Nouvelle analyse" depuis cette même page.
+    if(prev && prev.id === 'page-matchs' || name === 'matchs'){
       const rb = document.getElementById('analyseResult');
       if(rb){ rb.style.display = 'none'; rb.innerHTML = ''; }
       const am = document.getElementById('analyseMsg');
