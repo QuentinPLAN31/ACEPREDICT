@@ -556,6 +556,22 @@
   }
   .pj-stat-value{ font-size:20px; font-weight:800; color: var(--accent); }
   .pj-stat-label{ font-size:11px; color: var(--text-dim); margin-top:4px; }
+  /* Stats de service : 2 tuiles + groupes avec barres */
+  .pj-tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; margin-bottom:14px; }
+  .pj-groups{ display:grid; grid-template-columns:1.4fr 1fr; gap:14px; align-items:start; }
+  @media (max-width: 700px){ .pj-groups{ grid-template-columns:1fr; } }
+  .pj-group{ border:1px solid var(--line); border-radius:14px; padding:16px 18px 6px; background:linear-gradient(160deg, var(--card-top), var(--card-bottom)); }
+  .pj-group-title{ font-size:11px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase; margin-bottom:14px; }
+  .pj-group.serve .pj-group-title{ color: var(--accent); }
+  .pj-group.ret .pj-group-title{ color:#ff9a55; }
+  .pj-bar-row{ margin-bottom:14px; }
+  .pj-bar-head{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; font-size:12.5px; color: var(--text-sec); margin-bottom:6px; }
+  .pj-bar-head b{ font-size:14px; font-weight:800; color:#fff; }
+  .pj-bar{ height:6px; border-radius:3px; background:rgba(255,255,255,0.08); overflow:hidden; }
+  .pj-bar-fill{ height:100%; border-radius:3px; }
+  .pj-group.serve .pj-bar-fill{ background: var(--accent); }
+  .pj-group.ret .pj-bar-fill{ background: linear-gradient(90deg, #ff7a45, #ffb020, #ff5f6d); }
+
   .pj-bio{
     margin-top:6px; padding:18px 20px; text-align:left;
     background: rgba(255,255,255,0.025); border:1px solid var(--line); border-radius:12px;
@@ -3030,6 +3046,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Dernière défaite',
       'pj.vs': 'vs',
       'pj.stats_service': 'Stats de service',
+      'pj.group_service': 'Service',
+      'pj.group_return': 'Retour',
       'pj.svc_pts_won': 'Points gagnés au service',
       'pj.svc_games_held': 'Jeux de service tenus',
       'pj.ret_pts_won': 'Points gagnés en retour',
@@ -3495,6 +3513,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Última derrota',
       'pj.vs': 'vs',
       'pj.stats_service': 'Estadísticas de saque',
+      'pj.group_service': 'Saque',
+      'pj.group_return': 'Resto',
       'pj.svc_pts_won': 'Puntos ganados al saque',
       'pj.svc_games_held': 'Juegos de saque ganados',
       'pj.ret_pts_won': 'Puntos ganados al resto',
@@ -3960,6 +3980,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Last loss',
       'pj.vs': 'vs',
       'pj.stats_service': 'Serve stats',
+      'pj.group_service': 'Serve',
+      'pj.group_return': 'Return',
       'pj.svc_pts_won': 'Service points won',
       'pj.svc_games_held': 'Service games held',
       'pj.ret_pts_won': 'Return points won',
@@ -6802,21 +6824,29 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   function renderServeStatsBlock(stats){
     if(!stats || !stats.serve_stats) return '';
     const ss = stats.serve_stats;
-    const statCard = (val, label, suffix) => val == null ? '' :
-      '<div class="pj-stat-card"><div class="pj-stat-value">' + val + (suffix || '') + '</div><div class="pj-stat-label">' + label + '</div></div>';
+    const bigTile = (val, label) => val == null ? '' :
+      '<div class="pj-stat-card"><div class="pj-stat-value">' + val + '</div><div class="pj-stat-label">' + label + '</div></div>';
+    const bar = (val, label) => val == null ? '' :
+      '<div class="pj-bar-row"><div class="pj-bar-head"><span>' + label + '</span><b>' + val + '%</b></div>' +
+      '<div class="pj-bar"><div class="pj-bar-fill" style="width:' + Math.max(2, Math.min(100, val)) + '%"></div></div></div>';
+    const group = (cls, title, rows) => rows.replace(/<[^>]*>/g, '').trim() === '' ? '' :
+      '<div class="pj-group ' + cls + '"><div class="pj-group-title">' + title + '</div>' + rows + '</div>';
+
+    const tiles = bigTile(ss.avg_aces_per_match, t('pj.aces_avg')) + bigTile(ss.avg_double_faults_per_match, t('pj.df_avg'));
+    const service =
+      bar(ss.first_serve_in_pct, t('pj.first_serve_in')) +
+      bar(ss.first_serve_won_pct, t('pj.first_serve_won')) +
+      bar(ss.second_serve_won_pct, t('pj.second_serve_won')) +
+      bar(ss.service_points_won_pct, t('pj.svc_pts_won')) +
+      bar(ss.service_games_held_pct, t('pj.svc_games_held')) +
+      bar(ss.break_points_saved_pct, t('pj.bp_saved'));
+    const ret =
+      bar(ss.return_points_won_pct, t('pj.ret_pts_won')) +
+      bar(ss.break_points_converted_pct, t('pj.bp_converted'));
+
     return '<div class="pj-section-label">' + t('pj.stats_service') + '</div>' +
-      '<div class="pj-stats-grid">' +
-        statCard(ss.avg_aces_per_match, t('pj.aces_avg')) +
-        statCard(ss.avg_double_faults_per_match, t('pj.df_avg')) +
-        statCard(ss.first_serve_in_pct, t('pj.first_serve_in'), '%') +
-        statCard(ss.first_serve_won_pct, t('pj.first_serve_won'), '%') +
-        statCard(ss.second_serve_won_pct, t('pj.second_serve_won'), '%') +
-        statCard(ss.break_points_saved_pct, t('pj.bp_saved'), '%') +
-        statCard(ss.service_points_won_pct, t('pj.svc_pts_won'), '%') +
-        statCard(ss.service_games_held_pct, t('pj.svc_games_held'), '%') +
-        statCard(ss.return_points_won_pct, t('pj.ret_pts_won'), '%') +
-        statCard(ss.break_points_converted_pct, t('pj.bp_converted'), '%') +
-      '</div>';
+      (tiles ? '<div class="pj-tiles">' + tiles + '</div>' : '') +
+      '<div class="pj-groups">' + group('serve', t('pj.group_service'), service) + group('ret', t('pj.group_return'), ret) + '</div>';
   }
 
   // ---------- Page profil joueur (clic sur un nom) ----------
