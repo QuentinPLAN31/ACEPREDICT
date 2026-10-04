@@ -440,12 +440,18 @@
   .proj-games{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 16px; background:rgba(255,255,255,0.04); }
   .proj-games-label{ font-size:13px; color:var(--text-dim,#9aa4b2); }
   .proj-games-value{ font-size:16px; font-weight:800; }
-  /* Sélecteur de surface : couleur de chaque surface (même code que les pastilles) */
-  #surfacePicker .upcoming-chip[data-surface="hard"]{ --chip-c: var(--surf-hard); }
-  #surfacePicker .upcoming-chip[data-surface="clay"]{ --chip-c: var(--surf-clay); }
-  #surfacePicker .upcoming-chip[data-surface="grass"]{ --chip-c: var(--surf-grass); }
-  #surfacePicker .upcoming-chip[data-surface]:not([data-surface=""]){ color: var(--chip-c); border-color: color-mix(in srgb, var(--chip-c) 35%, transparent); }
-  #surfacePicker .upcoming-chip[data-surface]:not([data-surface=""]).active{ color: var(--chip-c); border-color: var(--chip-c); background: color-mix(in srgb, var(--chip-c) 18%, transparent); }
+  /* Sélecteur de surface : rectangles photo */
+  #surfacePicker{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  #surfacePicker .surf-btn{ position:relative; height:76px; padding:0; border:2px solid rgba(255,255,255,0.12); border-radius:12px; overflow:hidden; cursor:pointer; background:#1b2013 center/cover no-repeat; color:#fff; font-family:inherit; transition:transform .15s, border-color .15s, box-shadow .15s, filter .15s; filter:brightness(.72) saturate(.85); }
+  #surfacePicker .surf-btn:hover{ filter:brightness(.92) saturate(1); transform:translateY(-1px); }
+  #surfacePicker .surf-btn::after{ content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.05) 62%); }
+  #surfacePicker .surf-btn span{ position:absolute; left:0; right:0; bottom:8px; z-index:1; text-align:center; font-size:13px; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,0.7); }
+  #surfacePicker .surf-btn.active{ filter:none; border-color:var(--accent,#c6f432); box-shadow:0 0 0 2px rgba(198,244,50,0.28); }
+  #surfacePicker .surf-btn[data-surface=""]{ background-image:linear-gradient(135deg,#2b3320,#14180a); }
+  #surfacePicker .surf-btn[data-surface="hard"]{ background-image:url('assets/surfaces/surface-hard.jpg'); }
+  #surfacePicker .surf-btn[data-surface="clay"]{ background-image:url('assets/surfaces/surface-clay.jpg'); }
+  #surfacePicker .surf-btn[data-surface="grass"]{ background-image:url('assets/surfaces/surface-grass.jpg'); }
+  @media (max-width:560px){ #surfacePicker{ grid-template-columns:repeat(2,1fr); } #surfacePicker .surf-btn{ height:68px; } }
   .upr-date{ font-size:12px; color: var(--accent); font-weight:700; text-align:right; min-width:90px; }
   .upr-btn{
     background: var(--accent-dim); color: var(--accent); border:1px solid var(--line-strong); border-radius:8px;
@@ -1951,11 +1957,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <div id="upcomingList"></div>
         </div>
         <div class="field-label" style="margin-top:18px;" data-i18n="field.surface">SURFACE (OPTIONNEL)</div>
-        <div class="upcoming-filters surface-picker" id="surfacePicker" style="margin:0 0 6px;">
-          <button type="button" class="upcoming-chip active" data-surface="" data-i18n="surface.auto">Auto</button>
-          <button type="button" class="upcoming-chip" data-surface="hard" data-i18n="surface.hard">Dur</button>
-          <button type="button" class="upcoming-chip" data-surface="clay" data-i18n="surface.clay">Terre battue</button>
-          <button type="button" class="upcoming-chip" data-surface="grass" data-i18n="surface.grass">Gazon</button>
+        <div class="surface-picker" id="surfacePicker" style="margin:0 0 6px;">
+          <button type="button" class="surf-btn active" data-surface=""><span data-i18n="surface.auto">Auto</span></button>
+          <button type="button" class="surf-btn" data-surface="hard"><span data-i18n="surface.hard">Dur</span></button>
+          <button type="button" class="surf-btn" data-surface="clay"><span data-i18n="surface.clay">Terre battue</span></button>
+          <button type="button" class="surf-btn" data-surface="grass"><span data-i18n="surface.grass">Gazon</span></button>
         </div>
         <div class="analyse-msg" id="analyseMsg"></div>
         <button class="btn-primary" id="analyseBtn" data-i18n="btn.analyze_match">Analyser le match avec l'IA</button>
@@ -5522,10 +5528,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // venir sélectionné s'il y en a un, sinon Elo global côté backend. Un choix
   // explicite (dur/terre/gazon) prime sur la surface du match à venir.
   let manualSurface = '';
-  document.querySelectorAll('#surfacePicker .upcoming-chip').forEach(chip=>{
+  document.querySelectorAll('#surfacePicker .surf-btn').forEach(chip=>{
     chip.addEventListener('click', ()=>{
       manualSurface = chip.dataset.surface || '';
-      document.querySelectorAll('#surfacePicker .upcoming-chip').forEach(c=> c.classList.toggle('active', c === chip));
+      document.querySelectorAll('#surfacePicker .surf-btn').forEach(c=> c.classList.toggle('active', c === chip));
     });
   });
 
