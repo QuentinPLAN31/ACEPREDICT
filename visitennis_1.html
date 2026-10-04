@@ -556,6 +556,37 @@
   }
   .pj-stat-value{ font-size:20px; font-weight:800; color: var(--accent); }
   .pj-stat-label{ font-size:11px; color: var(--text-dim); margin-top:4px; }
+
+  /* ===== Sections de l'analyse : cartes à titre coloré, une couleur par type ===== */
+  .res-sec{ --sec-c: var(--accent); margin-top:24px; text-align:left; }
+  .res-lime{ --sec-c:#c6f432; } .res-orange{ --sec-c:#ff9a55; } .res-violet{ --sec-c:#b794f6; }
+  .res-teal{ --sec-c:#3ed6a0; } .res-rose{ --sec-c:#ff6b81; } .res-slate{ --sec-c:#9fb0c3; } .res-bare{ --sec-c:#c6f432; }
+  .res-sec-head{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+  .res-sec-dot{ width:8px; height:8px; border-radius:50%; background:var(--sec-c); box-shadow:0 0 0 3px color-mix(in srgb, var(--sec-c) 22%, transparent); flex-shrink:0; }
+  .res-sec-title{ font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--sec-c); }
+  .res-sec:not(.res-bare) > .res-sec-body{ border:1px solid rgba(255,255,255,0.08); border-top:3px solid var(--sec-c); border-radius:14px; background:rgba(255,255,255,0.03); padding:6px 18px; }
+  /* Lignes séparées par un filet, numéros colorés */
+  .res-sec .scenario-list{ margin:0; border-top:0; padding-top:0; }
+  .res-sec .scenario-item{ margin:0; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.07); gap:14px; align-items:flex-start; }
+  .res-sec .scenario-item:last-child{ border-bottom:0; }
+  .res-sec .scenario-num, .res-sec .scenario-item:nth-child(even) .scenario-num{ width:24px; height:24px; background:color-mix(in srgb, var(--sec-c) 18%, transparent); color:var(--sec-c); }
+  .res-sec .result-narrative-list.numbered{ counter-reset:rn; }
+  .res-sec .result-narrative-list.numbered li{ counter-increment:rn; padding:14px 0 14px 38px; margin:0; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .res-sec .result-narrative-list.numbered li:last-child{ border-bottom:0; }
+  .res-sec .result-narrative-list.numbered li::before{ content:counter(rn); left:0; top:13px; width:24px; height:24px; border-radius:50%; background:color-mix(in srgb, var(--sec-c) 18%, transparent); color:var(--sec-c); font-size:12px; display:flex; align-items:center; justify-content:center; }
+  .res-sec .conseil-tactique-wrap{ gap:0; }
+  .res-sec .conseil-tactique-card{ background:none; border:0; border-bottom:1px solid rgba(255,255,255,0.07); border-radius:0; padding:14px 0; gap:12px; }
+  .res-sec .conseil-tactique-card:last-child{ border-bottom:0; }
+  .res-sec .result-narrative{ margin:0; padding:0; border-top:0; }
+  .res-sec .result-narrative-section{ margin:0; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .res-sec .result-narrative-section:last-child{ border-bottom:0; }
+  .res-sec .result-narrative-section-label{ color:var(--sec-c); }
+  .res-sec .result-narrative-list li::before{ color:var(--sec-c); }
+  .res-sec .result-summary{ margin:0; padding:10px 0; }
+  .res-lime > .res-sec-body{ padding:0 18px; }
+  .res-sec .proj-card{ border:0; background:none; border-radius:0; }
+  .res-sec .proj-row{ padding:14px 0; }
+  .res-sec .proj-games{ margin:0 -18px; border-radius:0 0 12px 12px; padding:14px 18px; }
   /* Stats de service : 2 tuiles + groupes avec barres */
   .pj-tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; margin-bottom:14px; }
   .pj-groups{ display:grid; grid-template-columns:1.4fr 1fr; gap:14px; align-items:start; }
@@ -4989,6 +5020,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     return { f1: f1, f2: f2 };
   }
 
+  // Enveloppe commune des sections de l'analyse : un titre coloré + un corps,
+  // chaque type de section ayant sa propre couleur (--sec-c) pour que la
+  // lecture ne soit pas monotone. kind 'bare' = titre seul, sans cadre (le
+  // contenu a déjà ses propres cartes).
+  function resSection(kind, title, body){
+    return '<section class="res-sec res-' + kind + '">' +
+      '<div class="res-sec-head"><span class="res-sec-dot"></span><span class="res-sec-title">' + title + '</span></div>' +
+      '<div class="res-sec-body">' + body + '</div></section>';
+  }
+
   function renderForcesClesBlock(detail, p1Name, p2Name){
     const forces = computeForces(detail);
     if(!forces.f1.length && !forces.f2.length) return '';
@@ -4997,8 +5038,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       return '<div class="result-force-card"><div class="result-force-card-name">' + name + '</div>' +
         '<ul class="result-force-list">' + items.map(function(i){ return '<li>' + i + '</li>'; }).join('') + '</ul></div>';
     };
-    return '<div class="field-label" style="margin-top:28px;">' + t('analysis.forces_cles') + '</div>' +
-      '<div class="result-forces-cards">' + card(p1Name, forces.f1) + card(p2Name, forces.f2) + '</div>';
+    return resSection('bare', t('analysis.forces_cles'),
+      '<div class="result-forces-cards">' + card(p1Name, forces.f1) + card(p2Name, forces.f2) + '</div>');
   }
 
   function computeFactorTags(detail){
@@ -5039,8 +5080,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   function renderFactorsBlock(detail){
     const tags = computeFactorTags(detail);
     if(!tags.length) return '';
-    return '<div class="field-label" style="margin-top:28px;">' + t('analysis.facteurs_pris_en_compte') + '</div>' +
-      '<div class="result-factors">' + tags.map(function(tag){ return '<span class="result-factor-pill">' + tag + '</span>'; }).join('') + '</div>';
+    return resSection('slate', t('analysis.facteurs_pris_en_compte'),
+      '<div class="result-factors">' + tags.map(function(tag){ return '<span class="result-factor-pill">' + tag + '</span>'; }).join('') + '</div>');
   }
 
         function renderStatCompareBars(detail, p1Name, p2Name, pct, p1IsWinner){
@@ -5193,8 +5234,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // laisser noyée plus bas dans l'analyse.
   function renderCroisementBlock(bullets){
     if(!bullets || !bullets.length) return '';
-    return '<div class="field-label" style="margin-top:32px;">' + t('analysis.interpretation') + '</div>' +
-      '<ul class="result-narrative-list">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>';
+    return resSection('violet', t('analysis.interpretation'),
+      '<ul class="result-narrative-list numbered">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>');
   }
 
   function renderFichesBlock(fiches, p1Name, p2Name){
@@ -5210,8 +5251,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="fiche-card-sub fiche-sub-neg">' + t('analysis.a_surveiller') + '</div>' + list(f.faiblesses, 'fiche-neg') +
       '</div>';
     };
-    return '<div class="field-label" style="margin-top:32px;">' + t('analysis.fiches_joueurs') + '</div>' +
-      '<div class="fiche-grid">' + card(p1Name, fiches.j1, false) + card(p2Name, fiches.j2, true) + '</div>';
+    return resSection('bare', t('analysis.fiches_joueurs'),
+      '<div class="fiche-grid">' + card(p1Name, fiches.j1, false) + card(p2Name, fiches.j2, true) + '</div>');
   }
 
   function renderScoreProjectionBlock(detail){
@@ -5238,18 +5279,17 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       games = '<div class="proj-games"><span class="proj-games-label">' + t('analysis.proj_games') + '</span>' +
         '<span class="proj-games-value">' + tg.low + ' – ' + tg.high + '</span></div>';
     }
-    return '<div class="field-label" style="margin-top:32px;">' + t('analysis.proj_title') + '</div>' +
-      '<div class="proj-card">' + rows + games + '</div>';
+    return resSection('lime', t('analysis.proj_title'), '<div class="proj-card">' + rows + games + '</div>');
   }
 
   function renderScenariosBlock(scenarios){
-    return '<div class="field-label" style="margin-top:32px;">' + t('analysis.scenarios_possibles') + '</div>' +
+    return resSection('orange', t('analysis.scenarios_possibles'),
       '<div class="scenario-list">' + scenarios.map(function(s, idx){
         return '<div class="scenario-item">' +
           '<div class="scenario-num">' + (idx + 1) + '</div>' +
           '<div class="scenario-text">' + s + '</div>' +
         '</div>';
-      }).join('') + '</div>';
+      }).join('') + '</div>');
   }
 
   // Callout coloré unique (section MOMENT_CLE) : casse la présentation en
@@ -5278,11 +5318,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // l'une des deux nouvelles sections demandées pour enrichir l'analyse.
   function renderConseilTactiqueBlock(bullets){
     if(!bullets || !bullets.length) return '';
-    return '<div class="field-label" style="margin-top:32px;">' + t('analysis.conseil_tactique') + '</div>' +
+    return resSection('teal', t('analysis.conseil_tactique'),
       '<div class="conseil-tactique-wrap">' + bullets.map(function(b){
         return '<div class="conseil-tactique-card"><span class="conseil-tactique-icon">🎾</span>' +
           '<span class="conseil-tactique-text">' + b + '</span></div>';
-      }).join('') + '</div>';
+      }).join('') + '</div>');
   }
 
   // Chiffre le plus déterminant (section CHIFFRE_CLE) : callout compact en
@@ -5306,8 +5346,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="result-narrative-section-label">' + s.label + '</div>' + body +
       '</div>';
     }).join('');
-    return '<div class="field-label" style="margin-top:32px;">' + t('analysis.analyse_approfondie') + '</div>' +
-      '<div class="result-narrative">' + html + '</div>';
+    return resSection('rose', t('analysis.analyse_approfondie'), '<div class="result-narrative">' + html + '</div>');
   }
 
   function renderTournamentBlock(detail){
@@ -5414,8 +5453,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="form-card-record">' + tf('analysis.record_matches', { wins: form.wins, losses: form.losses, n: form.results.length }) + '</div>' +
       '</div>';
     };
-    return '<div class="field-label" style="margin-top:28px;">' + t('analysis.forme_recente') + '</div>' +
-      '<div class="form-row">' + card(p1Name, f1, false) + card(p2Name, f2, true) + '</div>';
+    return resSection('bare', t('analysis.forme_recente'),
+      '<div class="form-row" style="margin-top:0;">' + card(p1Name, f1, false) + card(p2Name, f2, true) + '</div>');
   }
 
   function buildSummaryText(detail, p1Name, p2Name, winnerName, loserName, surfaceNote){
@@ -5464,8 +5503,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       renderConfidenceWarning(data, p1Name, p2Name) +
       (narrative ? '<p class="result-lead">' + narrative.lead + '</p>' : '') +
       renderFormBlock(data.detail, p1Name, p2Name) +
-      '<div class="field-label" style="margin-top:28px;">' + t('analysis.resume_rapide') + '</div>' +
-      '<div class="result-summary">' + buildSummaryText(data.detail, p1Name, p2Name, winnerName, loserName, surfaceNote) + '</div>' +
+      resSection('slate', t('analysis.resume_rapide'),
+        '<div class="result-summary">' + buildSummaryText(data.detail, p1Name, p2Name, winnerName, loserName, surfaceNote) + '</div>') +
       '<div class="confidence-wrap">' +
         // Dégradé "crescendo" : couleur la plus intense (le rouge-corail) à
         // LA FIN de l'arc (à la pointe, sur le pourcentage), pas au milieu --
@@ -6530,10 +6569,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   function renderLexiqueBlock(found){
     if(!found.length) return '';
-    return '<div class="field-label" style="margin-top:28px;">' + t('analysis.lexique') + '</div>' +
+    return resSection('slate', t('analysis.lexique'),
       '<div class="result-summary" style="font-size:12.5px;"><ul style="margin:0; padding-left:18px;">' +
         found.map(j => '<li><b>' + j.term + '</b> : ' + j.def + '</li>').join('') +
-      '</ul></div>';
+      '</ul></div>');
   }
 
   function surfacePillHtml(surface){
@@ -6787,7 +6826,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '</div>';
     }
 
-    if(stats.last_win || stats.last_loss){
+    // Désactivé : les derniers résultats viennent d'un import quotidien en retard,
+    // donc la "dernière victoire/défaite" affichée pouvait dater de plusieurs mois.
+    const SHOW_LAST_MATCHES = false;
+    if(SHOW_LAST_MATCHES && (stats.last_win || stats.last_loss)){
       html += '<div class="pj-lastmatch-grid">';
       if(stats.last_win){
         html += '<div class="pj-lastmatch-card win">' +
