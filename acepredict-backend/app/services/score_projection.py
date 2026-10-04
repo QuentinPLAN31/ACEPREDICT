@@ -122,6 +122,7 @@ def build_score_projection(
         scenarios.append({
             "winner_id": str(player.id),
             "winner_name": player.name,
+            "side": d["side"],
             "score": d["score"],
             "probability": round(d["probability"], 4),
         })
