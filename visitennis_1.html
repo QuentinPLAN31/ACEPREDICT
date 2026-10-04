@@ -1919,6 +1919,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <div class="field-label" data-i18n="field.next_match_between">PROCHAIN MATCH ENTRE CES DEUX JOUEURS</div>
           <div id="upcomingList"></div>
         </div>
+        <div class="field-label" style="margin-top:18px;" data-i18n="field.surface">SURFACE (OPTIONNEL)</div>
+        <div class="upcoming-filters surface-picker" id="surfacePicker" style="margin:0 0 6px;">
+          <button type="button" class="upcoming-chip active" data-surface="" data-i18n="surface.auto">Auto</button>
+          <button type="button" class="upcoming-chip" data-surface="hard" data-i18n="surface.hard">Dur</button>
+          <button type="button" class="upcoming-chip" data-surface="clay" data-i18n="surface.clay">Terre battue</button>
+          <button type="button" class="upcoming-chip" data-surface="grass" data-i18n="surface.grass">Gazon</button>
+        </div>
         <div class="analyse-msg" id="analyseMsg"></div>
         <button class="btn-primary" id="analyseBtn" data-i18n="btn.analyze_match">Analyser le match avec l'IA</button>
         <div class="analyse-result" id="analyseResult" style="display:none;"></div>
@@ -2576,6 +2583,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'placeholder.search_player2': 'Cherche un joueur (ex: Sinner, Zverev...)',
       'vs': 'VS',
       'field.next_match_between': 'PROCHAIN MATCH ENTRE CES DEUX JOUEURS',
+      'field.surface': 'SURFACE (OPTIONNEL)',
+      'surface.auto': 'Auto',
       'btn.analyze_match': "Analyser le match avec l'IA",
       'btn.analyzing': 'Analyse en cours...',
 
@@ -3032,6 +3041,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'placeholder.search_player2': 'Busca un jugador (ej: Sinner, Zverev...)',
       'vs': 'VS',
       'field.next_match_between': 'PRÓXIMO PARTIDO ENTRE ESTOS DOS JUGADORES',
+      'field.surface': 'SUPERFICIE (OPCIONAL)',
+      'surface.auto': 'Auto',
       'btn.analyze_match': 'Analizar el partido con la IA',
       'btn.analyzing': 'Analizando...',
 
@@ -3488,6 +3499,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'placeholder.search_player2': 'Search for a player (e.g. Sinner, Zverev...)',
       'vs': 'VS',
       'field.next_match_between': 'NEXT MATCH BETWEEN THESE TWO PLAYERS',
+      'field.surface': 'SURFACE (OPTIONAL)',
+      'surface.auto': 'Auto',
       'btn.analyze_match': 'Analyze the match with AI',
       'btn.analyzing': 'Analyzing...',
 
@@ -5439,6 +5452,17 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     return null;
   }
 
+  // Sélecteur de surface (analyse manuelle) : "" = Auto -> surface du match à
+  // venir sélectionné s'il y en a un, sinon Elo global côté backend. Un choix
+  // explicite (dur/terre/gazon) prime sur la surface du match à venir.
+  let manualSurface = '';
+  document.querySelectorAll('#surfacePicker .upcoming-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      manualSurface = chip.dataset.surface || '';
+      document.querySelectorAll('#surfacePicker .upcoming-chip').forEach(c=> c.classList.toggle('active', c === chip));
+    });
+  });
+
   document.getElementById('analyseBtn').addEventListener('click', ()=>{
     const msg = document.getElementById('analyseMsg');
     const resultBox = document.getElementById('analyseResult');
@@ -5468,7 +5492,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           body: JSON.stringify({
             player1_id: p1Id,
             player2_id: p2Id,
-            surface: normalizeSurface(selectedUpcomingMatch && selectedUpcomingMatch.surface),
+            surface: normalizeSurface(manualSurface) || normalizeSurface(selectedUpcomingMatch && selectedUpcomingMatch.surface),
             match_city: (selectedUpcomingMatch && selectedUpcomingMatch.city) || null,
             match_date: (selectedUpcomingMatch && selectedUpcomingMatch.scheduled_time) || null,
             tournament_name: (selectedUpcomingMatch && selectedUpcomingMatch.tournament) || null,
