@@ -415,6 +415,22 @@
   .upr-surface-pill.surf-grass{ background: rgba(62,214,107,0.18); color: var(--surf-grass); }
   .upr-surface-pill.surf-carpet{ background: rgba(184,184,184,0.18); color: var(--surf-carpet); }
   .upr-surface-pill.surf-unknown{ background: rgba(255,255,255,0.06); color: var(--text-dim); }
+  /* Projection de score */
+  .proj-card{ margin-top:14px; border:1px solid rgba(255,255,255,0.08); border-radius:14px; background:rgba(255,255,255,0.03); overflow:hidden; }
+  .proj-row{ display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .proj-rank{ flex:0 0 24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--text-dim,#9aa4b2); }
+  .proj-row.top .proj-rank{ background:var(--accent,#c6f432); color:#14180a; }
+  .proj-main{ flex:1; min-width:0; }
+  .proj-line{ display:flex; align-items:baseline; gap:10px; }
+  .proj-name{ flex:1; min-width:0; font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .proj-score{ font-size:15px; font-weight:800; color:var(--accent,#c6f432); letter-spacing:.5px; }
+  .proj-pct{ flex:0 0 52px; text-align:right; font-size:14px; font-weight:700; }
+  .proj-bar{ margin-top:9px; height:5px; border-radius:3px; background:rgba(255,255,255,0.08); overflow:hidden; }
+  .proj-bar-fill{ height:100%; border-radius:3px; background:rgba(198,244,50,0.45); }
+  .proj-row.top .proj-bar-fill{ background:var(--accent,#c6f432); }
+  .proj-games{ display:flex; justify-content:space-between; align-items:center; gap:12px; padding:14px 16px; background:rgba(255,255,255,0.04); }
+  .proj-games-label{ font-size:13px; color:var(--text-dim,#9aa4b2); }
+  .proj-games-value{ font-size:16px; font-weight:800; }
   /* Sélecteur de surface : couleur de chaque surface (même code que les pastilles) */
   #surfacePicker .upcoming-chip[data-surface="hard"]{ --chip-c: var(--surf-hard); }
   #surfacePicker .upcoming-chip[data-surface="clay"]{ --chip-c: var(--surf-clay); }
@@ -5143,20 +5159,28 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     var sp = detail && detail.score_projection;
     if(!sp || !sp.scenarios || !sp.scenarios.length) return '';
     var esc = function(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    var maxP = Math.max.apply(null, sp.scenarios.map(function(sc){ return sc.probability; })) || 1;
     var rows = sp.scenarios.map(function(sc, idx){
-      var pctTxt = (Math.round(sc.probability * 1000) / 10).toString().replace('.', (currentLang === 'en' ? '.' : ','));
-      return '<div class="scenario-item">' +
-        '<div class="scenario-num">' + (idx + 1) + '</div>' +
-        '<div class="scenario-text"><strong>' + esc(sc.winner_name) + ' ' + esc(sc.score) + '</strong> &middot; ' + pctTxt + '%</div>' +
+      var pct = Math.round(sc.probability * 1000) / 10;
+      var pctTxt = String(pct).replace('.', currentLang === 'en' ? '.' : ',');
+      var w = Math.max(6, Math.round(sc.probability / maxP * 100));
+      return '<div class="proj-row' + (idx === 0 ? ' top' : '') + '">' +
+        '<div class="proj-rank">' + (idx + 1) + '</div>' +
+        '<div class="proj-main">' +
+          '<div class="proj-line"><span class="proj-name">' + esc(sc.winner_name) + '</span>' +
+            '<span class="proj-score">' + esc(sc.score) + '</span>' +
+            '<span class="proj-pct">' + pctTxt + '%</span></div>' +
+          '<div class="proj-bar"><div class="proj-bar-fill" style="width:' + w + '%"></div></div>' +
+        '</div>' +
       '</div>';
     }).join('');
     var tg = sp.total_games, games = '';
     if(tg){
-      games = '<div class="result-weather-row"><span>' + t('analysis.proj_games') + '</span><strong>' + tg.low + ' – ' + tg.high + '</strong></div>';
-
+      games = '<div class="proj-games"><span class="proj-games-label">' + t('analysis.proj_games') + '</span>' +
+        '<span class="proj-games-value">' + tg.low + ' – ' + tg.high + '</span></div>';
     }
     return '<div class="field-label" style="margin-top:32px;">' + t('analysis.proj_title') + '</div>' +
-      '<div class="scenario-list">' + rows + '</div>' + games;
+      '<div class="proj-card">' + rows + games + '</div>';
   }
 
   function renderScenariosBlock(scenarios){
