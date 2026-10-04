@@ -3030,6 +3030,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Dernière défaite',
       'pj.vs': 'vs',
       'pj.stats_service': 'Stats de service',
+      'pj.svc_pts_won': 'Points gagnés au service',
+      'pj.svc_games_held': 'Jeux de service tenus',
+      'pj.ret_pts_won': 'Points gagnés en retour',
+      'pj.bp_converted': 'Balles de break converties',
       'pj.aces_avg': 'Aces / match (moy.)',
       'pj.df_avg': 'Double fautes / match (moy.)',
       'pj.first_serve_in': '1ères balles au service dans le carré',
@@ -3491,6 +3495,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Última derrota',
       'pj.vs': 'vs',
       'pj.stats_service': 'Estadísticas de saque',
+      'pj.svc_pts_won': 'Puntos ganados al saque',
+      'pj.svc_games_held': 'Juegos de saque ganados',
+      'pj.ret_pts_won': 'Puntos ganados al resto',
+      'pj.bp_converted': 'Puntos de break convertidos',
       'pj.aces_avg': 'Aces / partido (prom.)',
       'pj.df_avg': 'Dobles faltas / partido (prom.)',
       'pj.first_serve_in': 'Primeros saques dentro',
@@ -3952,6 +3960,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'pj.last_loss': '✕ Last loss',
       'pj.vs': 'vs',
       'pj.stats_service': 'Serve stats',
+      'pj.svc_pts_won': 'Service points won',
+      'pj.svc_games_held': 'Service games held',
+      'pj.ret_pts_won': 'Return points won',
+      'pj.bp_converted': 'Break points converted',
       'pj.aces_avg': 'Aces / match (avg.)',
       'pj.df_avg': 'Double faults / match (avg.)',
       'pj.first_serve_in': 'First serves in',
@@ -6800,6 +6812,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         statCard(ss.first_serve_won_pct, t('pj.first_serve_won'), '%') +
         statCard(ss.second_serve_won_pct, t('pj.second_serve_won'), '%') +
         statCard(ss.break_points_saved_pct, t('pj.bp_saved'), '%') +
+        statCard(ss.service_points_won_pct, t('pj.svc_pts_won'), '%') +
+        statCard(ss.service_games_held_pct, t('pj.svc_games_held'), '%') +
+        statCard(ss.return_points_won_pct, t('pj.ret_pts_won'), '%') +
+        statCard(ss.break_points_converted_pct, t('pj.bp_converted'), '%') +
       '</div>';
   }
 

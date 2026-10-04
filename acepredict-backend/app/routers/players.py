@@ -167,6 +167,10 @@ def get_player_stats(player_id: str, limit_recent: int = 10, db: Session = Depen
     first_won_pcts: list[float] = []
     second_won_pcts: list[float] = []
     bp_saved_pcts: list[float] = []
+    svc_won_pcts: list[float] = []
+    ret_won_pcts: list[float] = []
+    bp_conv_pcts: list[float] = []
+    hold_pcts: list[float] = []
     for m in matches:
         stats = m.stats or {}
         is_winner_side = m.winner_id == player_id
@@ -193,6 +197,24 @@ def get_player_stats(player_id: str, limit_recent: int = 10, db: Session = Depen
             second_won_pcts.append(second_won / (svpt - first_in) * 100)
         if bp_faced:
             bp_saved_pcts.append((bp_saved or 0) / bp_faced * 100)
+        if svpt and first_won is not None and second_won is not None:
+            svc_won_pcts.append((first_won + second_won) / svpt * 100)
+        sv_games = _to_int(stats.get(prefix + "SvGms"))
+        if sv_games and bp_faced is not None and bp_saved is not None:
+            hold_pcts.append(max(0, sv_games - max(0, bp_faced - bp_saved)) / sv_games * 100)
+
+        # Retour / balles de break converties : lues dans les stats de l'adversaire
+        # (ses points au service = nos points au retour).
+        opp = "l_" if is_winner_side else "w_"
+        o_svpt = _to_int(stats.get(opp + "svpt"))
+        o_1won = _to_int(stats.get(opp + "1stWon"))
+        o_2won = _to_int(stats.get(opp + "2ndWon"))
+        o_bpf = _to_int(stats.get(opp + "bpFaced"))
+        o_bps = _to_int(stats.get(opp + "bpSaved"))
+        if o_svpt and o_1won is not None and o_2won is not None:
+            ret_won_pcts.append((o_svpt - o_1won - o_2won) / o_svpt * 100)
+        if o_bpf and o_bps is not None:
+            bp_conv_pcts.append((o_bpf - o_bps) / o_bpf * 100)
 
     def _avg(values):
         return round(sum(values) / len(values), 1) if values else None
@@ -206,6 +228,10 @@ def get_player_stats(player_id: str, limit_recent: int = 10, db: Session = Depen
             "first_serve_won_pct": _avg(first_won_pcts),
             "second_serve_won_pct": _avg(second_won_pcts),
             "break_points_saved_pct": _avg(bp_saved_pcts),
+            "service_points_won_pct": _avg(svc_won_pcts),
+            "service_games_held_pct": _avg(hold_pcts),
+            "return_points_won_pct": _avg(ret_won_pcts),
+            "break_points_converted_pct": _avg(bp_conv_pcts),
             "matches_with_data": len(ace_values),
         }
 

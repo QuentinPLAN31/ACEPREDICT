@@ -105,16 +105,16 @@ def get_or_create_competition(db: Session, tourney_name: str, surface: str,
     return comp
 
 
-def _match_already_ingested(db: Session, competition_id: str, winner_id: str, loser_id: str,
-                             tourney_date, round_: str) -> bool:
+def _find_ingested_match(db: Session, competition_id: str, winner_id: str, loser_id: str,
+                         tourney_date, round_: str):
     """Deux joueurs ne rejouent pas le même tour d'un même tournoi le même
     jour : (compétition, vainqueur, perdant, date, tour) identifie un match
     de façon fiable, sans dépendre de match_num (pas importé, cf. en-tête).
     Nécessaire pour que scripts/sync_daily.py puisse ré-ingérer chaque jour
     le CSV de la saison en cours (qui grossit au fil des tournois) sans
-    dupliquer les matchs déjà connus."""
+    dupliquer les matchs déjà connus. Renvoie le Match existant ou None."""
     return (
-        db.query(models.Match.id)
+        db.query(models.Match)
         .filter(
             models.Match.competition_id == competition_id,
             models.Match.winner_id == winner_id,
@@ -123,8 +123,18 @@ def _match_already_ingested(db: Session, competition_id: str, winner_id: str, lo
             models.Match.round == round_,
         )
         .first()
-        is not None
     )
+
+
+def _match_already_ingested(db: Session, competition_id: str, winner_id: str, loser_id: str,
+                             tourney_date, round_: str) -> bool:
+    return _find_ingested_match(db, competition_id, winner_id, loser_id, tourney_date, round_) is not None
+
+
+_SERVE_DETAIL_KEYS = (
+    "w_svpt", "w_1stIn", "w_1stWon", "w_2ndWon", "w_SvGms", "w_bpSaved", "w_bpFaced",
+    "l_svpt", "l_1stIn", "l_1stWon", "l_2ndWon", "l_SvGms", "l_bpSaved", "l_bpFaced",
+)
 
 
 def ingest_csv(path: str, tour: str = "atp", db: Session | None = None) -> int:
@@ -134,6 +144,7 @@ def ingest_csv(path: str, tour: str = "atp", db: Session | None = None) -> int:
     owns_session = db is None
     db = db or SessionLocal()
     count = 0
+    count_updated = 0
     try:
         with open(path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
@@ -159,7 +170,17 @@ def ingest_csv(path: str, tour: str = "atp", db: Session | None = None) -> int:
                 )
 
                 round_ = row.get("round")
-                if _match_already_ingested(db, comp.id, winner.id, loser.id, tdate, round_):
+                existing = _find_ingested_match(db, comp.id, winner.id, loser.id, tdate, round_)
+                if existing is not None:
+                    # Rattrapage : les matchs importés avant l'ajout du détail de
+                    # service n'ont que aces/doubles fautes -> on complète leurs
+                    # stats sans rien dupliquer (idempotent).
+                    cur = dict(existing.stats or {})
+                    if cur.get("w_svpt") in (None, "") and row.get("w_svpt") not in (None, ""):
+                        for k in _SERVE_DETAIL_KEYS:
+                            cur[k] = row.get(k)
+                        existing.stats = cur
+                        count_updated += 1
                     continue
 
                 surface = SURFACE_MAP.get(row.get("surface", ""))
@@ -195,6 +216,8 @@ def ingest_csv(path: str, tour: str = "atp", db: Session | None = None) -> int:
                 count += 1
 
         db.commit()
+        if count_updated:
+            print(f"{count_updated} matchs existants complétés avec le détail de service")
         return count
     finally:
         if owns_session:
