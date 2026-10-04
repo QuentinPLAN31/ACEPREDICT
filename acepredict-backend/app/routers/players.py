@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.database import get_db
+from app.services.name_utils import name_key
 
 router = APIRouter(prefix="/players", tags=["players"])
 
@@ -35,7 +36,19 @@ def list_players(
         "grass": models.Player.elo_grass,
     }.get(surface, models.Player.elo_overall)
 
-    return query.order_by(order_col.desc()).limit(limit).all()
+    # Filet de sécurité anti-doublons : si deux fiches désignent le même
+    # joueur (cf. services/name_utils.py), on n'affiche que la première (celle
+    # au meilleur Elo). On sur-échantillonne avant de dédupliquer pour que
+    # `limit` reste atteint. Le vrai nettoyage en base : scripts/dedupe_players.py.
+    rows = query.order_by(order_col.desc()).limit(limit * 2 + 10).all()
+    seen, unique = set(), []
+    for p in rows:
+        key = (p.tour, name_key(p.name))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(p)
+    return unique[:limit]
 
 
 @router.get("/{player_id}", response_model=schemas.PlayerOut)

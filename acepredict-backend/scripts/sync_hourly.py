@@ -51,6 +51,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.database import SessionLocal
 from app.services import data_confidence, market_providers, weather_providers
+from app.services.name_utils import name_key
 from app.services.livetennis_client import get_live_client, is_configured
 
 TOURS = ("atp", "wta")
@@ -96,7 +97,22 @@ def _external_id_for(tour: str, p1_name: str, p2_name: str, scheduled_time_raw: 
 def _find_player(db: Session, name: str) -> Optional[models.Player]:
     if not name or not name.strip():
         return None
-    return db.query(models.Player).filter(models.Player.name.ilike(name.strip())).first()
+    exact = db.query(models.Player).filter(models.Player.name.ilike(name.strip())).first()
+    if exact:
+        return exact
+    # Variantes d'écriture ("Alex de Minaur" / "Alex De Minaur" / "De Minaur
+    # Alex" / "Alex Minaur") : sans ce repli, chacune créait une 2e fiche
+    # (doublon visible dans le classement). Comparaison par clé de nom, sur
+    # les candidats partageant un mot significatif avec le nom cherché.
+    target = name_key(name)
+    if not target:
+        return None
+    longest = max(target, key=len)
+    if len(longest) < 3:
+        return None
+    candidates = db.query(models.Player).filter(models.Player.name.ilike(f"%{longest}%")).all()
+    matches = [p for p in candidates if name_key(p.name) == target]
+    return matches[0] if len(matches) == 1 else None
 
 
 async def _auto_discover_player(db: Session, name: str, tour: str, country: Optional[str],

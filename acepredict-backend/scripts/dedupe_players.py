@@ -34,13 +34,11 @@ import unicodedata
 
 from app import models
 from app.database import SessionLocal
+from app.services.name_utils import name_key
 
 
 def _norm_words(name: str) -> frozenset:
-    if not name:
-        return frozenset()
-    txt = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode("ascii")
-    return frozenset(w for w in txt.lower().replace("-", " ").split() if w)
+    return name_key(name)
 
 
 def _reference_count(db, player_id) -> int:

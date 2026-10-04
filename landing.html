@@ -108,8 +108,18 @@
   .nav-login .chev svg{ width:15px; height:15px; }
   .burger{ display:flex; flex-direction:column; gap:5px; cursor:pointer; padding:6px; }
   .burger span{ width:26px; height:2px; background: var(--text); display:block; border-radius:2px; }
+  /* Bouton "Se connecter" (mobile uniquement) : remplace le bouton à deux
+     barres en haut à droite sur téléphone. */
+  .nav-login-mobile{ display:none; }
   @media (max-width: 760px){
     .lang-select, .nav-login{ display:none; }
+    .burger{ display:none; }
+    .nav-login-mobile{
+      display:inline-flex; align-items:center; justify-content:center;
+      background: var(--accent); color: var(--bg); border-radius:999px;
+      padding:9px 16px; font-family: var(--font-h); font-weight:800; font-size:13px;
+      letter-spacing:.02em; white-space:nowrap; cursor:pointer;
+    }
   }
 
   /* ---------- HERO ---------- */
@@ -575,6 +585,7 @@
       <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 8-6 8"/><path d="M13 4l6 8-6 8"/></svg></span>
       <span data-i18n="nav_login">Connexion</span>
     </a>
+    <a href="#" class="nav-login-mobile" id="navLoginMobileBtn" data-i18n="nav_login_cta">Se connecter</a>
     <div class="burger"><span></span><span></span></div>
   </div>
 </header>
@@ -846,6 +857,7 @@
   const TR = {
   "fr": {
     "nav_login": "Connexion",
+    "nav_login_cta": "Se connecter",
     "auth_or_divider": "ou",
     "auth_google_error": "Connexion Google impossible — réessaie.",
     "auth_google_connecting": "Connexion avec Google…",
@@ -915,6 +927,7 @@
   },
   "en": {
     "nav_login": "Log in",
+    "nav_login_cta": "Log in",
     "auth_or_divider": "or",
     "auth_google_error": "Google sign-in failed — please try again.",
     "auth_google_connecting": "Signing in with Google…",
@@ -984,6 +997,7 @@
   },
   "es": {
     "nav_login": "Iniciar sesión",
+    "nav_login_cta": "Iniciar sesión",
     "auth_or_divider": "o",
     "auth_google_error": "No se pudo iniciar sesión con Google — inténtalo de nuevo.",
     "auth_google_connecting": "Conectando con Google…",
@@ -1053,6 +1067,7 @@
   },
   "de": {
     "nav_login": "Anmelden",
+    "nav_login_cta": "Anmelden",
     "auth_or_divider": "oder",
     "auth_google_error": "Google-Anmeldung fehlgeschlagen — bitte erneut versuchen.",
     "auth_google_connecting": "Anmeldung mit Google…",
@@ -1122,6 +1137,7 @@
   },
   "it": {
     "nav_login": "Accedi",
+    "nav_login_cta": "Accedi",
     "auth_or_divider": "o",
     "auth_google_error": "Accesso con Google non riuscito — riprova.",
     "auth_google_connecting": "Accesso con Google…",
@@ -1263,6 +1279,7 @@
   }
 
   navLoginBtn.addEventListener('click', (e)=>{ e.preventDefault(); openAuth('login'); });
+  document.getElementById('navLoginMobileBtn').addEventListener('click', (e)=>{ e.preventDefault(); openAuth('login'); });
   document.getElementById('authClose').addEventListener('click', closeAuth);
   authOverlay.addEventListener('click', (e)=>{ if(e.target === authOverlay) closeAuth(); });
   document.querySelectorAll('[data-auth-tab]').forEach(el=>{
