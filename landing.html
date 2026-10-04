@@ -407,6 +407,17 @@
 
   /* ---------- FEATURE + PHONE (compétitions) ---------- */
   .feature-section{ padding: 100px 32px 50px; text-align:center; }
+  /* Halos décoratifs supplémentaires, répartis à gauche / à droite (jamais au centre).
+     Ils débordent de leur section pour ne pas être coupés. */
+  .feature-section, .testi-section, .faq-section{ position:relative; overflow-x:clip; }
+  .feature-section::before, .testi-section::before, .faq-section::before{
+    content:''; position:absolute; z-index:0; pointer-events:none; width:820px; height:680px;
+  }
+  .feature-section > *, .testi-section > *, .faq-section > *{ position:relative; z-index:1; }
+  .feature-section::before{ left:-300px; top:0; height:560px; background: radial-gradient(ellipse 330px 280px at 50% 50%, rgba(255,122,69,0.10), transparent 70%); }
+  .testi-section::before{ right:-300px; top:12%; background: radial-gradient(ellipse 330px 280px at 50% 50%, rgba(240,225,50,0.085), transparent 70%); }
+  .faq-section::before{ left:-300px; top:6%; background: radial-gradient(ellipse 330px 280px at 50% 50%, rgba(255,150,60,0.095), transparent 70%); }
+
   .feature-section h2{ font-size: clamp(28px,4.4vw,48px); font-weight:800; text-transform:uppercase; max-width:720px; margin:0 auto; }
   .feature-section h2 .lime{ background: linear-gradient(90deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
   .feature-section > .wrap > p{ max-width:480px; margin: 20px auto 0; color: var(--text-sec); font-size:15px; line-height:1.6; }
