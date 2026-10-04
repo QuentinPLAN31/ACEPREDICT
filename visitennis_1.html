@@ -6907,6 +6907,15 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   // ---------- Routage des pages ----------
   function go(name){
+    // En quittant "Nouvelle analyse", on efface le résultat affiché : il reste
+    // consultable dans l'historique (sinon il traîne sous le formulaire).
+    const prev = document.querySelector('.page.active');
+    if(prev && prev.id === 'page-matchs' && name !== 'matchs'){
+      const rb = document.getElementById('analyseResult');
+      if(rb){ rb.style.display = 'none'; rb.innerHTML = ''; }
+      const am = document.getElementById('analyseMsg');
+      if(am){ am.textContent = ''; am.innerHTML = ''; }
+    }
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + name).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
