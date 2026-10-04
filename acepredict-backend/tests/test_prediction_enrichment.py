@@ -4,6 +4,7 @@ dégradation gracieuse du commentaire IA (services/ai_narrative.py) sans clé
 configurée. Utilise une vraie base SQLite en mémoire (pas de mock sur les
 requêtes SQLAlchemy) pour que les jointures/filtres soient réellement testés.
 """
+import pytest
 from datetime import datetime, timedelta
 
 from sqlalchemy import create_engine, StaticPool
@@ -111,6 +112,7 @@ def test_no_h2h_history_omits_h2h_key():
 
 # -------------------------------------------------------------- fatigue ---
 
+@pytest.mark.skipif(not prediction.FATIGUE_ENABLED, reason='charge de matchs désactivée')
 def test_fatigue_counts_matches_in_window():
     db = make_db()
     p1, p2 = make_players(db)

@@ -79,6 +79,11 @@ H2H_MAX_ADJUSTMENT = 0.06
 # que le modèle favorise justement le joueur le plus chargé, on resserre sa
 # probabilité vers 50/50 par prudence — même esprit que l'ajustement météo.
 FATIGUE_WINDOW_DAYS = 14
+# Désactivé (2026-10) : la charge de matchs repose sur la table Match, alimentée
+# par un CSV quotidien en retard (ATP) et sans aucune source pour le WTA -> le
+# nombre affiché était faux. À remettre à True quand une source de résultats à
+# jour existera.
+FATIGUE_ENABLED = False
 FATIGUE_LOAD_GAP_TRIGGER = 2
 FATIGUE_FACTOR = 0.95
 
@@ -279,7 +284,7 @@ def _fatigue(db: Optional[Session], player_id, reference_date: Optional[datetime
     FATIGUE_WINDOW_DAYS jours avant la date du match analysé (ou avant
     aujourd'hui si aucune date n'est précisée), et jours de repos depuis le
     dernier match. None si aucun match récent en base pour ce joueur."""
-    if db is None:
+    if db is None or not FATIGUE_ENABLED:
         return None
     ref = reference_date or datetime.utcnow()
     window_start = ref - timedelta(days=FATIGUE_WINDOW_DAYS)
