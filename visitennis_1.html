@@ -1302,7 +1302,7 @@
   .bracket-p:not(.winner) .name{ color: var(--text-dim); }
   .bracket-vs{ color: var(--text-dim); font-size:10.5px; flex-shrink:0; }
   .bracket-score{ color: var(--text-dim); font-weight:700; font-variant-numeric:tabular-nums; flex-shrink:0; font-size:11.5px; }
-  .bracket-p.winner .name{ color: var(--accent); font-weight:700; }
+  .bracket-p.winner .name, .match-row .m-player.winner .clickable-name{ background: linear-gradient(90deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; font-weight:700; }
 
           .bracket-p .b-flag{ width:18px; height:18px; border-radius:999px; background: var(--accent-dim); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; overflow:hidden; }
     .bracket-p.winner .score{ color: var(--accent); }
@@ -6247,9 +6247,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(countRank) countRank.textContent = compMatchesRaw.length;
     matchesWrap.innerHTML = sortedMatches.length ? sortedMatches.map((m, idx)=>
       '<div class="match-row">' +
-        '<span class="m-player"><span class="m-flag">' + countryFlag(m.player1_country) + '</span><span class="clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span></span>' +
+        '<span class="m-player' + (m.winner_id && String(m.winner_id) === String(m.player1_id) ? ' winner' : '') + '"><span class="m-flag">' + countryFlag(m.player1_country) + '</span><span class="clickable-name" data-player-name="' + (m.player1_name || '').replace(/"/g,'&quot;') + '">' + m.player1_name + '</span></span>' +
         '<span class="m-score">' + (m.score || '—') + '</span>' +
-        '<span class="m-player right"><span class="m-flag">' + countryFlag(m.player2_country) + '</span><span class="clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span></span>' +
+        '<span class="m-player right' + (m.winner_id && String(m.winner_id) === String(m.player2_id) ? ' winner' : '') + '"><span class="m-flag">' + countryFlag(m.player2_country) + '</span><span class="clickable-name" data-player-name="' + (m.player2_name || '').replace(/"/g,'&quot;') + '">' + m.player2_name + '</span></span>' +
         '<span class="m-date">' + compRoundLabel(m.round) + (m.date ? ('<br>' + new Date(m.date).toLocaleDateString(currentLang === 'es' ? 'es-ES' : 'fr-FR', {day:'numeric', month:'short'})) : '') + '</span>' +
         '<button class="upr-btn upr-btn-sm" data-idx="' + idx + '" type="button">' + t('btn.analyze') + '</button>' +
       '</div>'
