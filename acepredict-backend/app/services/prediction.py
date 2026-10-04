@@ -479,8 +479,8 @@ def build_prediction(
             if factor < 1.0:
                 adjusted = round(0.5 + (probability - 0.5) * factor, 4)
                 detail["weather_adjustment"] = {
-                    "note": "Conditions de jeu difficiles (" + "; ".join(notes) + ") — le match devient plus "
-                            "ouvert, l'avantage du favori est légèrement réduit.",
+                    "note": "; ".join(notes).capitalize() + " : le jeu devient moins prévisible, "
+                            "l'avantage du favori est légèrement réduit.",
                     "probability_before_weather": round(probability, 4),
                 }
                 probability = adjusted

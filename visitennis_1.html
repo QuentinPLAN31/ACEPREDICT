@@ -3062,6 +3062,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'favorite.balanced': 'Match très équilibré',
       'weather.title': 'Météo ({desc})',
       'weather.wind': 'Vent',
+      'wx.wind_strong': 'Vent fort',
+      'wx.wind_moderate': 'Vent modéré',
+      'wx.hot': 'Forte chaleur',
+      'wx.cold': 'Froid',
+      'wx.rain': 'Pluie',
+      'wx.effect': 'le jeu devient moins prévisible, l\'avantage du favori est légèrement réduit.',
       'weather.section_title': 'Conditions de jeu',
       'weather.temp': 'Température',
       'weather.humidity': 'Humidité',
@@ -3533,6 +3539,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'favorite.balanced': 'Partido muy equilibrado',
       'weather.title': 'Clima ({desc})',
       'weather.wind': 'Viento',
+      'wx.wind_strong': 'Viento fuerte',
+      'wx.wind_moderate': 'Viento moderado',
+      'wx.hot': 'Mucho calor',
+      'wx.cold': 'Frío',
+      'wx.rain': 'Lluvia',
+      'wx.effect': 'el juego se vuelve menos predecible y la ventaja del favorito se reduce ligeramente.',
       'weather.section_title': 'Condiciones de juego',
       'weather.temp': 'Temperatura',
       'weather.humidity': 'Humedad',
@@ -4004,6 +4016,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'favorite.balanced': 'Very even match',
       'weather.title': 'Weather ({desc})',
       'weather.wind': 'Wind',
+      'wx.wind_strong': 'Strong wind',
+      'wx.wind_moderate': 'Moderate wind',
+      'wx.hot': 'Very hot',
+      'wx.cold': 'Cold',
+      'wx.rain': 'Rain',
+      'wx.effect': 'play becomes less predictable and the favorite\'s edge is slightly reduced.',
       'weather.section_title': 'Playing conditions',
       'weather.temp': 'Temperature',
       'weather.humidity': 'Humidity',
@@ -5442,6 +5460,19 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     return 'cloud';
   }
 
+  // Phrase d'explication de l'effet météo, construite ici (dans la langue de
+  // l'utilisateur) à partir des valeurs, plutôt que d'afficher un texte brut du serveur.
+  function weatherNoteText(w){
+    const parts = [];
+    const wind = w.wind_kmh, temp = w.temp_c, desc = String(w.description || '').toLowerCase();
+    if(wind != null && wind >= 30) parts.push(t('wx.wind_strong') + ' (' + wind + ' km/h)');
+    else if(wind != null && wind >= 15) parts.push(t('wx.wind_moderate') + ' (' + wind + ' km/h)');
+    if(temp != null && temp >= 32) parts.push(t('wx.hot') + ' (' + temp + '°C)');
+    else if(temp != null && temp <= 5) parts.push(t('wx.cold') + ' (' + temp + '°C)');
+    if(/rain|drizzle|shower|thunder|pluie|averse|lluvia/.test(desc)) parts.push(t('wx.rain'));
+    return (parts.length ? parts.join(' · ') + ' : ' : '') + t('wx.effect');
+  }
+
   function renderWeatherBlock(detail){
     const w = detail.weather;
     if(!w) return '';
@@ -5463,7 +5494,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         tile('drop', t('weather.humidity'), w.humidity_pct + '%', false) +
       '</div>';
     const adj = detail.weather_adjustment;
-    if(adj) body += '<div class="wx-note">' + adj.note + '</div>';
+    if(adj) body += '<div class="wx-note">' + weatherNoteText(w) + '</div>';
     return resSection('blue', t('weather.section_title'), body);
   }
 
