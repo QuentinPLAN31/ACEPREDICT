@@ -312,6 +312,7 @@
   .court-visual{
     position:absolute; inset:0; z-index:0;
     background:
+      linear-gradient(180deg, var(--bg-2) 0%, transparent 160px),
       linear-gradient(180deg, transparent 0%, rgba(19,26,22,0.2) 55%, var(--bg) 100%),
       radial-gradient(ellipse 900px 500px at 50% 40%, rgba(96,180,90,0.16), transparent 70%);
   }
@@ -321,7 +322,6 @@
      droite, avec un léger filet en haut -- visuellement distinct du halo vert. */
   .sources-section .court-visual{
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 18%),
       radial-gradient(ellipse 620px 360px at 88% 18%, rgba(255,122,69,0.09), transparent 70%),
       radial-gradient(ellipse 520px 300px at 8% 92%, rgba(215,242,44,0.05), transparent 70%);
   }
@@ -357,7 +357,7 @@
   .dl-line{ margin-top: 18px; color: var(--accent); opacity:.75; font-size:13.5px; line-height:1.6; }
 
   /* ---------- TESTIMONIALS ---------- */
-  .testi-section{ padding: 90px 32px; text-align:center; background: var(--bg-2); }
+  .testi-section{ padding: 90px 32px; text-align:center; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 24%, var(--bg-2) 76%, var(--bg) 100%); }
   .avatar-row{ display:flex; justify-content:center; margin-bottom: 34px; }
   .avatar{
     width:46px; height:46px; border-radius:999px; border: 2px solid var(--bg-2);
@@ -448,7 +448,7 @@
   .faq-a p{ padding: 16px 0 0 50px; color: var(--text-sec); font-size:14.5px; line-height:1.6; max-width:600px; }
 
   /* ---------- FOOTER ---------- */
-  footer{ border-top:1px solid var(--line); padding: 44px 32px; }
+  footer{ background: linear-gradient(180deg, transparent 0%, rgba(12,17,14,0.55) 100%); padding: 56px 32px 44px; }
   .foot-wrap{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
   .foot-links{ display:flex; gap:26px; color: var(--text-sec); font-size:13.5px; }
   .foot-copy{ color: var(--text-dim); font-size:12.5px; }
