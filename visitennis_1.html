@@ -559,8 +559,8 @@
 
   /* ===== Sections de l'analyse : cartes à titre coloré, une couleur par type ===== */
   .res-sec{ --sec-c: var(--accent); margin-top:24px; text-align:left; }
-  .res-lime{ --sec-c:#c6f432; } .res-orange{ --sec-c:#ff9a55; } .res-violet{ --sec-c:#b794f6; }
-  .res-teal{ --sec-c:#3ed6a0; } .res-rose{ --sec-c:#ff6b81; } .res-slate{ --sec-c:#9fb0c3; } .res-bare{ --sec-c:#c6f432; }
+  /* Palette limitée à celle de l'app : vert lime, orange du dégradé des boutons, neutre. */
+  .res-lime, .res-bare{ --sec-c:var(--accent); } .res-orange{ --sec-c:#ff9938; } .res-slate{ --sec-c:rgba(255,255,255,0.62); }
   .res-sec-head{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }
   .res-sec-dot{ width:8px; height:8px; border-radius:50%; background:var(--sec-c); box-shadow:0 0 0 3px color-mix(in srgb, var(--sec-c) 22%, transparent); flex-shrink:0; }
   .res-sec-title{ font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--sec-c); }
@@ -5240,7 +5240,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // laisser noyée plus bas dans l'analyse.
   function renderCroisementBlock(bullets){
     if(!bullets || !bullets.length) return '';
-    return resSection('violet', t('analysis.interpretation'),
+    return resSection('lime', t('analysis.interpretation'),
       '<ul class="result-narrative-list numbered">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>');
   }
 
@@ -5324,7 +5324,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // l'une des deux nouvelles sections demandées pour enrichir l'analyse.
   function renderConseilTactiqueBlock(bullets){
     if(!bullets || !bullets.length) return '';
-    return resSection('teal', t('analysis.conseil_tactique'),
+    return resSection('orange', t('analysis.conseil_tactique'),
       '<div class="conseil-tactique-wrap">' + bullets.map(function(b){
         return '<div class="conseil-tactique-card"><span class="conseil-tactique-icon">🎾</span>' +
           '<span class="conseil-tactique-text">' + b + '</span></div>';
@@ -5352,7 +5352,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         '<div class="result-narrative-section-label">' + s.label + '</div>' + body +
       '</div>';
     }).join('');
-    return resSection('rose', t('analysis.analyse_approfondie'), '<div class="result-narrative">' + html + '</div>');
+    return resSection('lime', t('analysis.analyse_approfondie'), '<div class="result-narrative">' + html + '</div>');
   }
 
   function renderTournamentBlock(detail){
