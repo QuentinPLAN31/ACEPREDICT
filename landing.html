@@ -353,6 +353,25 @@
   .ready-text{ font-family: var(--font-h); font-weight:700; font-size:14px; background: linear-gradient(90deg,#3a5c3d,var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .dl-line{ margin-top: 18px; color: var(--accent); opacity:.75; font-size:13.5px; line-height:1.6; }
 
+
+  /* ---------- SHOWCASE : terrain au premier plan, telephone en travers derriere ---------- */
+  .showcase{ position:relative; max-width: 860px; margin: 56px auto 0; padding: 70px 0 90px; }
+  .showcase .court-visual-wrap{
+    z-index:3; max-width: 700px; margin: 0 auto;
+    background: rgba(10,15,11,0.74); border-radius: 12px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.05);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  }
+  .showcase-phone{
+    position:absolute; z-index:1; top:-50px; right:-7%; width: 300px;
+    opacity:.95;
+  }
+  .showcase-phone .phone-mockup{ transform: rotate(12deg); cursor:pointer; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.6)); }
+  .showcase .float-badge{ width: 92px; height: 92px; z-index:4; }
+  .showcase .float-badge.b1{ top: 2%; left: 1%; right:auto; bottom:auto; }
+  .showcase .float-badge.b2{ top: -2%; right: 3%; left:auto; bottom:auto; }
+  .showcase .float-badge.b4{ bottom: 4%; right: 0%; left:auto; top:auto; }
+
   /* ---------- TESTIMONIALS ---------- */
   .testi-section{ padding: 90px 32px; text-align:center; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 24%, var(--bg-2) 76%, var(--bg) 100%); }
   .avatar-row{ display:flex; justify-content:center; margin-bottom: 34px; }
@@ -479,6 +498,9 @@
     .faq-section{ padding: 64px 18px 90px; }
     footer{ padding: 34px 18px; }
 
+    .showcase{ padding: 40px 0 150px; }
+    .showcase-phone{ width: 190px; right: -8%; top: 10px; }
+    .showcase .float-badge{ width: 64px; height: 64px; }
     /* Hero : le mockup de telephone est trop grand sur mobile, on le reduit. */
     .hero .phone-stage{ max-width: 70%; }
 
@@ -622,13 +644,6 @@
   </div>
 
   <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs analysés la semaine dernière</span></div>
-
-  <div class="phone-stage reveal">
-    <div class="float-badge b1"><img src="assets/players/alcaraz.jpg" alt="Carlos Alcaraz" loading="lazy"></div>
-    <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
-    <div class="float-badge b4"><img src="assets/players/djokovic.jpg" alt="Novak Djokovic" loading="lazy"></div>
-    <img class="phone-mockup" src="assets/mockups/hero-analyse.png" alt="TennisMind - Analyse de match" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
-  </div>
 </section>
 
 <section class="court-section">
@@ -636,7 +651,14 @@
   <div class="wrap">
     <h2 class="court-h2 reveal"><span class="lime">Alcaraz</span> 3 - 1 Sinner</h2>
     <p class="court-p reveal" data-i18n="court_p">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</p>
-    <div class="court-visual-wrap reveal">
+    <div class="showcase">
+      <div class="showcase-phone reveal">
+        <img class="phone-mockup" src="assets/mockups/hero-analyse.png" alt="TennisMind - Analyse de match" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
+      </div>
+      <div class="float-badge b1"><img src="assets/players/alcaraz.jpg" alt="Carlos Alcaraz" loading="lazy"></div>
+      <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
+      <div class="float-badge b4"><img src="assets/players/djokovic.jpg" alt="Novak Djokovic" loading="lazy"></div>
+      <div class="court-visual-wrap reveal">
       <svg class="court-lines" viewBox="0 0 640 380" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
         <rect x="40" y="20" width="560" height="340" rx="4"/>
         <line x1="40" y1="70" x2="600" y2="70"/>
@@ -656,6 +678,7 @@
           <div class="score-cap" data-i18n="score_cap2">Victoire Sinner</div>
         </div>
       </div>
+    </div>
     </div>
     <div class="ready-pill reveal" style="padding-left:20px;">
       <span class="ready-text" data-i18n="live_update">Données mises à jour toutes les 15 minutes</span>
