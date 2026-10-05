@@ -434,7 +434,7 @@
   /* Halos décoratifs supplémentaires, répartis à gauche / à droite (jamais au centre).
      Ils débordent de leur section pour ne pas être coupés. */
   .feature-section, .testi-section, .faq-section{ position:relative; overflow-x:clip; }
-  .hero, .court-section, .sources-section, .showcase{ overflow-x:clip; }
+  .hero, .court-section, .sources-section{ overflow-x:clip; }
   body{ overscroll-behavior-x:none; touch-action:pan-y pinch-zoom; }
   .feature-section::before, .testi-section::before, .faq-section::before{
     content:''; position:absolute; z-index:0; pointer-events:none; width:820px; height:680px;
@@ -508,8 +508,8 @@
     .showcase{ padding: 16px 0 0; display:flex; flex-direction:column; }
     .showcase .court-visual-wrap{ order:1; width:100%; }
     .showcase-phone{ order:2; }
-    .showcase-phone{ position:relative; left:auto; top:auto; width: 230px; margin: -30px auto 0; }
-    .showcase .court-visual-wrap{ max-width: 100%; aspect-ratio: 640 / 520; }
+    .showcase-phone{ position:relative; left:auto; top:auto; width: 230px; margin: -36px auto 0; }
+    .showcase .court-visual-wrap{ max-width: none; width:120%; margin-left:-10%; aspect-ratio: 640 / 380; }
     .showcase .court-lines{ stroke-width: 5; opacity:.55; }
     .showcase .court-lines *{ vector-effect: non-scaling-stroke; }
     .showcase .court-lines{ stroke-width: 3; }
@@ -523,7 +523,7 @@
     .showcase{ margin-top: 6px; }
     .showcase .court-visual-wrap{ margin-top: 0; }
     .showcase .float-badge.b1{ top: 3%; } .showcase .float-badge.b2{ top: 1%; }
-    .showcase .float-badge{ width: 64px; height: 64px; }
+    .showcase .float-badge{ width: 83px; height: 83px; }
     /* Hero : le mockup de telephone est trop grand sur mobile, on le reduit. */
     .hero .phone-stage{ max-width: 70%; }
 
