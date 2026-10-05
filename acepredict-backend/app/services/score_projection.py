@@ -113,22 +113,9 @@ def build_score_projection(
     surface: Optional[str],
     best_of_5: bool,
 ) -> dict:
-    n = 3 if best_of_5 else 2
-    dist = score_distribution(win_probability, n)
-
-    scenarios = []
-    for d in dist:
-        player = winner if d["side"] == "favorite" else loser
-        scenarios.append({
-            "winner_id": str(player.id),
-            "winner_name": player.name,
-            "side": d["side"],
-            "score": d["score"],
-            "probability": round(d["probability"], 4),
-        })
-
-    expected_sets = sum(d["sets"] * d["probability"] for d in dist)
-
+    """Projection pour le format du match (`best_of`), plus la même projection pour
+    l'autre format sous `alt` -- permet à l'utilisateur de basculer entre
+    "2 sets gagnants" (Bo3) et "3 sets gagnants" (Bo5) sans nouvel appel."""
     stats = []
     if db is not None:
         for p in (winner, loser):
@@ -143,19 +130,36 @@ def build_score_projection(
         gps = DEFAULT_GAMES_PER_SET
         source = "default"
 
-    expected_games = expected_sets * gps
-    return {
-        "best_of": 5 if best_of_5 else 3,
-        "scenarios": scenarios[:4],
-        "most_likely": scenarios[0],
-        "total_games": {
-            "expected": round(expected_games),
-            "low": max(0, round(expected_games - GAMES_MARGIN)),
-            "high": round(expected_games + GAMES_MARGIN),
-            "games_per_set": round(gps, 2),
-            "source": source,
-            "players_with_history": len(stats),
-        },
-        "note": "Projection du modèle (probabilité de victoire + statistiques de jeux des joueurs), "
-                "pas une certitude.",
-    }
+    def _view(n: int) -> dict:
+        dist = score_distribution(win_probability, n)
+        scenarios = []
+        for d in dist:
+            player = winner if d["side"] == "favorite" else loser
+            scenarios.append({
+                "winner_id": str(player.id),
+                "winner_name": player.name,
+                "side": d["side"],
+                "score": d["score"],
+                "probability": round(d["probability"], 4),
+            })
+        expected_sets = sum(d["sets"] * d["probability"] for d in dist)
+        expected_games = expected_sets * gps
+        return {
+            "best_of": 5 if n == 3 else 3,
+            "scenarios": scenarios[:4],
+            "most_likely": scenarios[0],
+            "total_games": {
+                "expected": round(expected_games),
+                "low": max(0, round(expected_games - GAMES_MARGIN)),
+                "high": round(expected_games + GAMES_MARGIN),
+                "games_per_set": round(gps, 2),
+                "source": source,
+                "players_with_history": len(stats),
+            },
+        }
+
+    main = _view(3 if best_of_5 else 2)
+    main["alt"] = _view(2 if best_of_5 else 3)
+    main["note"] = ("Projection du modèle (probabilité de victoire + statistiques de jeux des joueurs), "
+                    "pas une certitude.")
+    return main

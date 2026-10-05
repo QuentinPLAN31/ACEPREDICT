@@ -58,3 +58,16 @@ def test_projection_uses_real_game_counts_from_history():
     assert tg["source"] == "history"
     assert tg["games_per_set"] == pytest.approx(13.0)
     assert tg["expected"] > 26  # beaucoup plus que la moyenne générique (~9.6/set)
+
+
+def test_projection_includes_alternate_format():
+    from app.services import score_projection
+    w = SimpleNamespace(id="a", name="A")
+    l = SimpleNamespace(id="b", name="B")
+    r = score_projection.build_score_projection(None, w, l, 0.7, None, False)
+    assert r["best_of"] == 3 and {s["score"] for s in r["scenarios"]} <= {"2-0", "2-1"}
+    alt = r["alt"]
+    assert alt["best_of"] == 5 and {s["score"] for s in alt["scenarios"]} <= {"3-0", "3-1", "3-2"}
+    assert abs(sum(s["probability"] for s in alt["scenarios"]) - 1) < 0.05 or len(alt["scenarios"]) == 4
+    r5 = score_projection.build_score_projection(None, w, l, 0.7, None, True)
+    assert r5["best_of"] == 5 and r5["alt"]["best_of"] == 3

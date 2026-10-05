@@ -616,6 +616,11 @@
   .wx-tile::before{ content:''; position:absolute; left:0; right:0; top:0; height:3px; background:linear-gradient(90deg,#4FC3F7,#3b82f6); }
   .wx-tile.hot::before{ background:linear-gradient(90deg,#ff7a45,#ffb020,#ff5f6d); }
   .wx-tile.hot .wx-ico{ color:#ff9938 !important; }
+  /* Bascule 2 sets gagnants / 3 sets gagnants */
+  .proj-toggle{ display:flex; gap:8px; padding:14px 0 4px; }
+  .proj-toggle button{ flex:1; padding:9px 10px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--text-sec); font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer; transition:all .15s; }
+  .proj-toggle button:hover{ color:var(--text); border-color:rgba(255,255,255,0.25); }
+  .proj-toggle button.active{ background:var(--accent); border-color:var(--accent); color:#14180a; }
   /* Stats de service : 2 tuiles + groupes avec barres */
   .pj-tiles{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; margin-bottom:14px; }
   .pj-groups{ display:grid; grid-template-columns:1.4fr 1fr; gap:14px; align-items:start; }
@@ -3002,6 +3007,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.scenarios_possibles': 'SCÉNARIOS POSSIBLES',
       'analysis.proj_title': 'PROJECTION DE SCORE',
       'analysis.proj_games': 'Games totaux estimés',
+      'analysis.proj_bo3': '2 sets gagnants',
+      'analysis.proj_bo5': '3 sets gagnants',
       'analysis.moment_cle': 'Moment clé à surveiller',
       'analysis.mot_analyste': "Le mot de l'analyste",
       'analysis.conseil_tactique': 'CONSEIL TACTIQUE',
@@ -3479,6 +3486,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.scenarios_possibles': 'ESCENARIOS POSIBLES',
       'analysis.proj_title': 'PROYECCIÓN DE MARCADOR',
       'analysis.proj_games': 'Juegos totales estimados',
+      'analysis.proj_bo3': '2 sets ganadores',
+      'analysis.proj_bo5': '3 sets ganadores',
       'analysis.moment_cle': 'Momento clave a vigilar',
       'analysis.mot_analyste': 'La palabra del analista',
       'analysis.conseil_tactique': 'CONSEJO TÁCTICO',
@@ -3956,6 +3965,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'analysis.scenarios_possibles': 'POSSIBLE SCENARIOS',
       'analysis.proj_title': 'SCORE PROJECTION',
       'analysis.proj_games': 'Estimated total games',
+      'analysis.proj_bo3': '2 winning sets',
+      'analysis.proj_bo5': '3 winning sets',
       'analysis.moment_cle': 'Key moment to watch',
       'analysis.mot_analyste': "The analyst's take",
       'analysis.conseil_tactique': 'TACTICAL TIP',
@@ -5318,27 +5329,41 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     var sp = detail && detail.score_projection;
     if(!sp || !sp.scenarios || !sp.scenarios.length) return '';
     var esc = function(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
-    var maxP = Math.max.apply(null, sp.scenarios.map(function(sc){ return sc.probability; })) || 1;
-    var rows = sp.scenarios.map(function(sc, idx){
-      var pct = Math.round(sc.probability * 1000) / 10;
-      var pctTxt = String(pct).replace('.', currentLang === 'en' ? '.' : ',');
-      var w = Math.max(6, Math.round(sc.probability / maxP * 100));
-      return '<div class="proj-row ' + (sc.side === 'underdog' ? 'dog' : 'fav') + (idx === 0 ? ' top' : '') + '">' +
-        '<div class="proj-rank">' + (idx + 1) + '</div>' +
-        '<div class="proj-main">' +
-          '<div class="proj-line"><span class="proj-name">' + esc(sc.winner_name) + '</span>' +
-            '<span class="proj-score">' + esc(sc.score) + '</span>' +
-            '<span class="proj-pct">' + pctTxt + '%</span></div>' +
-          '<div class="proj-bar"><div class="proj-bar-fill" style="width:' + w + '%"></div></div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-    var tg = sp.total_games, games = '';
-    if(tg){
-      games = '<div class="proj-games"><span class="proj-games-label">' + t('analysis.proj_games') + '</span>' +
-        '<span class="proj-games-value">' + tg.low + ' – ' + tg.high + '</span></div>';
+    // Une vue = les 4 scores les plus probables + la fourchette de games pour un format donné.
+    var viewHtml = function(v, visible){
+      var maxP = Math.max.apply(null, v.scenarios.map(function(sc){ return sc.probability; })) || 1;
+      var rows = v.scenarios.map(function(sc, idx){
+        var pct = Math.round(sc.probability * 1000) / 10;
+        var pctTxt = String(pct).replace('.', currentLang === 'en' ? '.' : ',');
+        var w = Math.max(6, Math.round(sc.probability / maxP * 100));
+        return '<div class="proj-row ' + (sc.side === 'underdog' ? 'dog' : 'fav') + (idx === 0 ? ' top' : '') + '">' +
+          '<div class="proj-rank">' + (idx + 1) + '</div>' +
+          '<div class="proj-main">' +
+            '<div class="proj-line"><span class="proj-name">' + esc(sc.winner_name) + '</span>' +
+              '<span class="proj-score">' + esc(sc.score) + '</span>' +
+              '<span class="proj-pct">' + pctTxt + '%</span></div>' +
+            '<div class="proj-bar"><div class="proj-bar-fill" style="width:' + w + '%"></div></div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      var tg = v.total_games, games = '';
+      if(tg){
+        games = '<div class="proj-games"><span class="proj-games-label">' + t('analysis.proj_games') + '</span>' +
+          '<span class="proj-games-value">' + tg.low + ' – ' + tg.high + '</span></div>';
+      }
+      return '<div class="proj-view" data-bo="' + (v.best_of || 3) + '"' + (visible ? '' : ' style="display:none;"') + '>' + rows + games + '</div>';
+    };
+    var main = sp, alt = sp.alt && sp.alt.scenarios && sp.alt.scenarios.length ? sp.alt : null;
+    var toggle = '';
+    if(alt){
+      var views = [main, alt].sort(function(x, y){ return (x.best_of || 3) - (y.best_of || 3); });
+      toggle = '<div class="proj-toggle" role="group">' + views.map(function(v){
+        return '<button type="button" data-bo="' + v.best_of + '" class="' + (v === main ? 'active' : '') + '">' +
+          t(v.best_of === 5 ? 'analysis.proj_bo5' : 'analysis.proj_bo3') + '</button>';
+      }).join('') + '</div>';
     }
-    return resSection('lime', t('analysis.proj_title'), '<div class="proj-card">' + rows + games + '</div>');
+    var body = toggle + '<div class="proj-card">' + viewHtml(main, true) + (alt ? viewHtml(alt, false) : '') + '</div>';
+    return resSection('lime', t('analysis.proj_title'), body);
   }
 
   function renderScenariosBlock(scenarios){
@@ -7177,6 +7202,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   }
   document.querySelectorAll('[data-page]').forEach(el=>{
     el.addEventListener('click', ()=> go(el.getAttribute('data-page')));
+  });
+
+  // Bascule du format dans la projection de score (délégation : le bloc est rendu dynamiquement).
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest ? e.target.closest('.proj-toggle button') : null;
+    if(!btn) return;
+    const sec = btn.closest('.res-sec');
+    if(!sec) return;
+    sec.querySelectorAll('.proj-toggle button').forEach(function(b){ b.classList.toggle('active', b === btn); });
+    sec.querySelectorAll('.proj-view').forEach(function(v){ v.style.display = (v.dataset.bo === btn.dataset.bo) ? '' : 'none'; });
   });
 
   // ---------- Démarrage ----------
