@@ -364,7 +364,10 @@
   .showcase-phone{
     position:absolute; z-index:3; top:10px; left:calc(50% - 140px); width: 280px;
   }
-  .showcase-phone .phone-mockup{ transform: rotate(-9deg); cursor:pointer; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.65)); }
+  .phone-rot{ position:relative; transform: rotate(-9deg); filter: drop-shadow(0 30px 60px rgba(0,0,0,0.65)); }
+  /* fond plein derriere le mockup : l'image a des zones transparentes (ilot, coins) */
+  .phone-rot::before{ content:""; position:absolute; inset:1.2% 3%; border-radius:15%; background:#0c110d; z-index:0; }
+  .showcase-phone .phone-mockup{ cursor:pointer; filter:none; z-index:1; }
   .showcase .float-badge{ width: 92px; height: 92px; z-index:4; }
   .showcase .float-badge.b1{ top: 4%; left: 6%; right:auto; bottom:auto; }
   .showcase .float-badge.b2{ top: 2%; right: 6%; left:auto; bottom:auto; }
@@ -496,11 +499,22 @@
     .faq-section{ padding: 64px 18px 90px; }
     footer{ padding: 34px 18px; }
 
-    .showcase{ padding: 40px 0 330px; }
-    .showcase-phone{ width: 200px; left: calc(50% - 100px); top: 175px; }
-    .showcase .score-stat:first-child{ margin-left:0; } .showcase .score-stat:last-child{ margin-right:0; }
+    .showcase{ padding: 16px 0 0; display:flex; flex-direction:column; }
+    .showcase .court-visual-wrap{ order:1; width:100%; }
+    .showcase-phone{ order:2; }
+    .showcase-phone{ position:relative; left:auto; top:auto; width: 230px; margin: -48px auto 0; }
     .showcase .court-visual-wrap{ max-width: 100%; }
-    .showcase .court-lines{ stroke-width: 5; }
+    .showcase .court-lines{ stroke-width: 5; opacity:.55; }
+    .showcase .score-stat:first-child{ margin-left:0; } .showcase .score-stat:last-child{ margin-right:0; }
+    .showcase .score-num{ text-shadow: 0 0 6px #0c110d, 0 0 14px #0c110d, 0 2px 18px #0c110d; }
+    .showcase .score-cap{ color:#e6ece6; text-shadow: 0 0 5px #0c110d, 0 0 12px #0c110d; font-weight:600; }
+    .showcase .float-badge.b4{ bottom: 22%; }
+    .court-section .ready-pill{ margin-top: 36px; }
+    .court-h2{ margin-bottom: -6px; }
+    .court-p{ margin-top: 12px; }
+    .showcase{ margin-top: 6px; }
+    .showcase .court-visual-wrap{ margin-top: 0; }
+    .showcase .float-badge.b1{ top: 3%; } .showcase .float-badge.b2{ top: 1%; }
     .showcase .float-badge{ width: 64px; height: 64px; }
     /* Hero : le mockup de telephone est trop grand sur mobile, on le reduit. */
     .hero .phone-stage{ max-width: 70%; }
@@ -654,7 +668,7 @@
     <p class="court-p reveal" data-i18n="court_p">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</p>
     <div class="showcase">
       <div class="showcase-phone reveal">
-        <img class="phone-mockup" src="assets/mockups/hero-analyse.png" alt="TennisMind - Analyse de match" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
+        <div class="phone-rot"><img class="phone-mockup" src="assets/mockups/hero-analyse.png" alt="TennisMind - Analyse de match" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;"></div>
       </div>
       <div class="float-badge b1"><img src="assets/players/alcaraz.jpg" alt="Carlos Alcaraz" loading="lazy"></div>
       <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
