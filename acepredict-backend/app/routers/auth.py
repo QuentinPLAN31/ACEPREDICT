@@ -194,7 +194,15 @@ def google_auth(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
 
 @router.get("/me", response_model=schemas.UserOut)
 def me(current_user: models.User = Depends(get_current_user)):
-    return current_user
+    q = current_user.quota
+    return schemas.UserOut(
+        id=str(current_user.id),
+        email=current_user.email,
+        full_name=current_user.full_name,
+        plan=current_user.plan.value,
+        created_at=current_user.created_at,
+        bonus_analyses=(q.bonus_analyses or 0) if q else 0,
+    )
 
 
 @router.post("/forgot-password", response_model=schemas.MessageOut)

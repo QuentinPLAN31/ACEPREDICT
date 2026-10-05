@@ -43,6 +43,7 @@ class UserOut(BaseModel):
     full_name: Optional[str] = None
     plan: str
     created_at: datetime
+    bonus_analyses: int = 0
 
     model_config = ConfigDict(from_attributes=True)
 

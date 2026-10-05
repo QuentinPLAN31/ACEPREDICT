@@ -4165,6 +4165,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // Plan gratuit = pas connecté OU currentUser.plan absent/"free" -- utilisé
   // pour flouter les sections premium (résultat d'analyse, fiche joueur).
   function isFreePlan(){ return !currentUser || !currentUser.plan || currentUser.plan === 'free'; }
+  // Accès historique : plan payant OU solde de pack ponctuel > 0
+  function hasHistoryAccess(){ return !isFreePlan() || (currentUser && (currentUser.bonus_analyses || 0) > 0); }
 
   // ---------- Parrainage : capture du ?ref=CODE dans l'URL du lien partage ----------
   (function captureReferralCode(){
@@ -7140,7 +7142,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       // flouté derrière le paywall en plan gratuit (cf. isFreePlan()), visible
       // pour tout compte payant -- le reste ci-dessus (niveau, surfaces, stats
       // de service, style de jeu) reste toujours visible pour tout le monde.
-      '<div class="locked-wrap' + (isFreePlan() ? ' is-locked' : '') + '">' +
+      '<div class="locked-wrap' + (!hasHistoryAccess() ? ' is-locked' : '') + '">' +
         '<div class="locked-overlay">' +
           '<div class="locked-overlay-title">' + t('player.locked_title') + '</div>' +
           '<div class="locked-progress"><div class="locked-progress-fill"></div></div>' +
