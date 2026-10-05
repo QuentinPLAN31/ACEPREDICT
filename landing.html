@@ -355,18 +355,20 @@
 
 
   /* ---------- SHOWCASE : terrain au premier plan, telephone en travers derriere ---------- */
-  .showcase{ position:relative; max-width: 860px; margin: 56px auto 0; padding: 70px 0 150px; }
-  .showcase .court-visual-wrap{ z-index:3; max-width: 620px; margin: 0 auto 0 4%; }
-  .showcase .court-lines{ opacity:1; stroke: rgba(255,255,255,0.85); stroke-width: 4; }
-  .showcase .score-num{ text-shadow: 0 4px 24px rgba(0,0,0,0.6); }
+  .showcase{ position:relative; max-width: 980px; margin: 56px auto 0; padding: 60px 0 130px; }
+  .showcase .court-visual-wrap{ z-index:1; max-width: 900px; margin: 0 auto; }
+  .showcase .court-lines{ opacity:1; stroke: rgba(255,255,255,0.8); stroke-width: 4; }
+  .showcase .score-stats{ padding: 0 2%; }
+  .showcase .score-stat:first-child{ justify-self:start; margin-left:6%; }
+  .showcase .score-stat:last-child{ justify-self:end; margin-right:6%; }
   .showcase-phone{
-    position:absolute; z-index:1; top:-70px; right:-4%; width: 340px;
+    position:absolute; z-index:3; top:10px; left:calc(50% - 140px); width: 280px;
   }
-  .showcase-phone .phone-mockup{ transform: rotate(10deg); cursor:pointer; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.6)); }
+  .showcase-phone .phone-mockup{ transform: rotate(-9deg); cursor:pointer; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.65)); }
   .showcase .float-badge{ width: 92px; height: 92px; z-index:4; }
-  .showcase .float-badge.b1{ top: 2%; left: 1%; right:auto; bottom:auto; }
-  .showcase .float-badge.b2{ top: -2%; right: 3%; left:auto; bottom:auto; }
-  .showcase .float-badge.b4{ bottom: 4%; right: 0%; left:auto; top:auto; }
+  .showcase .float-badge.b1{ top: 4%; left: 6%; right:auto; bottom:auto; }
+  .showcase .float-badge.b2{ top: 2%; right: 6%; left:auto; bottom:auto; }
+  .showcase .float-badge.b4{ bottom: 12%; right: 10%; left:auto; top:auto; }
 
   /* ---------- TESTIMONIALS ---------- */
   .testi-section{ padding: 90px 32px; text-align:center; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 24%, var(--bg-2) 76%, var(--bg) 100%); }
@@ -495,8 +497,9 @@
     footer{ padding: 34px 18px; }
 
     .showcase{ padding: 40px 0 330px; }
-    .showcase-phone{ width: 200px; right: -14%; top: 190px; }
-    .showcase .court-visual-wrap{ margin: 0 auto; max-width: 100%; }
+    .showcase-phone{ width: 200px; left: calc(50% - 100px); top: 175px; }
+    .showcase .score-stat:first-child{ margin-left:0; } .showcase .score-stat:last-child{ margin-right:0; }
+    .showcase .court-visual-wrap{ max-width: 100%; }
     .showcase .court-lines{ stroke-width: 5; }
     .showcase .float-badge{ width: 64px; height: 64px; }
     /* Hero : le mockup de telephone est trop grand sur mobile, on le reduit. */
