@@ -211,7 +211,7 @@
   }
   /* Eventail de 3 telephones (hero) : image plus large que haute,
      contrairement au mockup phone unique -- stage dedie plus large. */
-  .phone-fan-stage{ max-width: 920px; }
+  .phone-fan-stage{ max-width: 708px; }
   .phone-fan{ filter: drop-shadow(0 50px 80px rgba(0,0,0,0.55)); }
   .float-badge{
     position:absolute; z-index:3;
@@ -430,7 +430,7 @@
   }
 
   /* ---------- FEATURE + PHONE (compétitions) ---------- */
-  .feature-section{ padding: 100px 32px 50px; text-align:center; }
+  .feature-section{ padding: 100px 32px 10px; text-align:center; }
   /* Halos décoratifs supplémentaires, répartis à gauche / à droite (jamais au centre).
      Ils débordent de leur section pour ne pas être coupés. */
   .feature-section, .testi-section, .faq-section{ position:relative; overflow-x:clip; }
@@ -508,9 +508,11 @@
     .showcase{ padding: 16px 0 0; display:flex; flex-direction:column; }
     .showcase .court-visual-wrap{ order:1; width:100%; }
     .showcase-phone{ order:2; }
-    .showcase-phone{ position:relative; left:auto; top:auto; width: 230px; margin: -48px auto 0; }
-    .showcase .court-visual-wrap{ max-width: 100%; }
+    .showcase-phone{ position:relative; left:auto; top:auto; width: 230px; margin: -70px auto 0; }
+    .showcase .court-visual-wrap{ max-width: 100%; aspect-ratio: 640 / 456; }
     .showcase .court-lines{ stroke-width: 5; opacity:.55; }
+    .showcase .court-lines *{ vector-effect: non-scaling-stroke; }
+    .showcase .court-lines{ stroke-width: 3; }
     .showcase .score-stat:first-child{ margin-left:0; } .showcase .score-stat:last-child{ margin-right:0; }
     .showcase .score-stat:last-child .score-num{ text-shadow: 0 0 6px #0c110d, 0 0 14px #0c110d, 0 2px 18px #0c110d; }
     .showcase .score-cap{ color:#e6ece6; text-shadow: 0 0 5px #0c110d, 0 0 12px #0c110d; font-weight:600; }
@@ -680,7 +682,7 @@
       <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
       <div class="float-badge b4"><img src="assets/players/djokovic.jpg" alt="Novak Djokovic" loading="lazy"></div>
       <div class="court-visual-wrap reveal">
-      <svg class="court-lines" viewBox="0 0 640 380" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
+      <svg class="court-lines" viewBox="0 0 640 380" preserveAspectRatio="none" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
         <rect x="40" y="20" width="560" height="340" rx="4"/>
         <line x1="40" y1="70" x2="600" y2="70"/>
         <line x1="40" y1="310" x2="600" y2="310"/>
@@ -736,7 +738,7 @@
     <h2 class="reveal" data-i18n-html="feature_h2">Des analyses IA pour anticiper <span class="lime">chaque match.</span></h2>
     <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
 
-    <div class="phone-stage phone-fan-stage reveal" style="margin-top:50px;">
+    <div class="phone-stage phone-fan-stage reveal" style="margin-top:34px;">
       <img class="phone-mockup phone-fan" src="assets/mockups/hero-fan.png" alt="TennisMind - Liste des joueurs, fiche joueur et compétitions" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
     </div>
   </div>
