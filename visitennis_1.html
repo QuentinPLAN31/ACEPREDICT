@@ -998,6 +998,11 @@
     .pricing-modal .plans{ grid-template-columns: 1fr; }
   }
 
+  /* Rémunération : onglets Parrainage / Monétisation TikTok */
+  .rem-tabs{display:flex;gap:8px;margin:0 0 22px;padding:5px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);width:max-content;max-width:100%}
+  .rem-tab{appearance:none;border:0;background:transparent;color:inherit;font:inherit;font-weight:600;padding:10px 20px;border-radius:10px;cursor:pointer;opacity:.7}
+  .rem-tab.active{background:var(--accent,#D7F22C);color:#0b110c;opacity:1}
+  .rem-panel{display:none}.rem-panel.active{display:block}
   /* Parrainage */
   .parr-badge{
     display:inline-flex; align-items:center; gap:6px; background: rgba(255,196,84,0.12); color:#FFC454;
@@ -1880,6 +1885,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
      "Google Identity Services") -- chargé en async, la connexion Google
      n'est simplement pas proposée tant qu'il n'a pas fini de charger. -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -1955,13 +1962,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         <span data-i18n="nav.pricing">Pricing</span>
         <span class="badge" data-i18n="nav.pricing_badge">Pro</span>
       </button>
-      <button class="nav-item" data-page="parrainage">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-        <span data-i18n="nav.referral">Parrainage</span>
-      </button>
-      <button class="nav-item" data-page="createur">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2" ry="2"/></svg>
-        <span data-i18n="nav.creator">Monétisation TikTok</span>
+      <button class="nav-item" data-page="remuneration">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.4-.9-1.4-1.4-2.8-1.4-1.7 0-2.8.8-2.8 2s1 1.7 2.8 2.1c1.8.4 2.8.9 2.8 2.1s-1.1 2-2.8 2c-1.4 0-2.5-.5-2.9-1.5M12 6.2v1.6M12 16.2v1.6"/></svg>
+        <span data-i18n="nav.reward">Rémunération</span>
       </button>
     </nav>
 
@@ -2223,8 +2226,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       </div>
     </section>
 
+    <!-- REMUNERATION (Parrainage + Monétisation TikTok) -->
+    <section class="page" id="page-remuneration">
+      <div class="rem-tabs" role="tablist">
+        <button class="rem-tab active" data-rem="parrainage" data-i18n="rem.tab_referral">Parrainage</button>
+        <button class="rem-tab" data-rem="createur" data-i18n="rem.tab_creator">Monétisation TikTok</button>
+      </div>
     <!-- PARRAINAGE -->
-    <section class="page" id="page-parrainage">
+    <div class="rem-panel active" id="page-parrainage">
       <div id="parrLoggedIn">
         <div class="page-head left">
           <span class="parr-badge" data-i18n="page.parrainage.badge">🎁 Programme de parrainage</span>
@@ -2296,10 +2305,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         <p data-i18n="parr.not_logged_sub">Connecte-toi pour obtenir ton lien de parrainage et suivre tes gains</p>
         <button class="btn-primary" onclick="openAuth('login')" data-i18n="btn.login">Se connecter</button>
       </div>
-    </section>
+    </div>
 
     <!-- CREATEUR -->
-    <section class="page" id="page-createur">
+    <div class="rem-panel" id="page-createur">
       <div id="createurLoggedIn">
         <div class="page-head left">
           <h1 class="creator-title"><svg class="creator-title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2" ry="2"/></svg> <span data-i18n="creator.title">Monétise tes réseaux avec</span> <span class="accent">TennisMind</span></h1>
@@ -2364,6 +2373,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         <p data-i18n="creator.not_logged_sub">Connecte-toi pour rejoindre le programme de monétisation TikTok et obtenir ton lien</p>
         <button class="btn-primary" onclick="openAuth('login')" data-i18n="btn.login">Se connecter</button>
       </div>
+    </div>
     </section>
 
     <!-- COMPTE -->
@@ -2677,6 +2687,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nav.pricing_badge': 'Pro',
       'nav.referral': 'Parrainage',
       'nav.creator': 'Monétisation TikTok',
+      'nav.reward': 'Rémunération',
+      'rem.tab_referral': 'Parrainage',
+      'rem.tab_creator': 'Monétisation TikTok',
       'quota.title': 'Analyses du jour',
       'quota.title_month': 'Analyses du mois',
       'quota.limit_reached': 'Limite atteinte • Upgrade pour plus',
@@ -3156,6 +3169,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nav.pricing_badge': 'Pro',
       'nav.referral': 'Referidos',
       'nav.creator': 'Monetización TikTok',
+      'nav.reward': 'Remuneración',
+      'rem.tab_referral': 'Referidos',
+      'rem.tab_creator': 'Monetización TikTok',
       'quota.title': 'Análisis del día',
       'quota.title_month': 'Análisis del mes',
       'quota.limit_reached': 'Límite alcanzado • Mejora tu plan para más',
@@ -3635,6 +3651,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'nav.pricing_badge': 'Pro',
       'nav.referral': 'Referrals',
       'nav.creator': 'TikTok Monetization',
+      'nav.reward': 'Rewards',
+      'rem.tab_referral': 'Referrals',
+      'rem.tab_creator': 'TikTok Monetization',
       'quota.title': "Today's analyses",
       'quota.title_month': "This month's analyses",
       'quota.limit_reached': 'Limit reached • Upgrade for more',
@@ -7176,7 +7195,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   }
 
   // ---------- Routage des pages ----------
+  function setRemTab(t){
+    document.querySelectorAll('.rem-tab').forEach(b=>b.classList.toggle('active', b.dataset.rem===t));
+    document.querySelectorAll('.rem-panel').forEach(p=>p.classList.toggle('active', p.id==='page-'+t));
+  }
+  document.querySelectorAll('.rem-tab').forEach(b=>b.addEventListener('click',()=>setRemTab(b.dataset.rem)));
   function go(name){
+    let remTab = null;
+    if(name === 'parrainage' || name === 'createur'){ remTab = name; name = 'remuneration'; }
     // En quittant "Nouvelle analyse", on efface le résultat affiché : il reste
     // consultable dans l'historique (sinon il traîne sous le formulaire).
     document.getElementById('page-matchs').classList.remove('view-history');
@@ -7199,8 +7225,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(name === 'competitions') loadCompetitionsList();
     if(name === 'joueursdir') loadJoueursDirList(document.getElementById('joueursDirSearchInput').value.trim());
     if(name === 'joueur') loadPlayerProfilePage(pendingProfilePlayerName);
-    if(name === 'parrainage' && isLoggedIn()) loadReferrals();
-    if(name === 'createur' && isLoggedIn()) loadCreatorLink();
+    if(name === 'remuneration'){
+      setRemTab(remTab || (document.querySelector('.rem-tab.active')||{}).dataset?.rem || 'parrainage');
+      if(isLoggedIn()){ loadReferrals(); loadCreatorLink(); }
+    }
   }
   document.querySelectorAll('[data-page]').forEach(el=>{
     el.addEventListener('click', ()=> go(el.getAttribute('data-page')));
