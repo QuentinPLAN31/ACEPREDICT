@@ -401,6 +401,17 @@ class MatchPage(Base):
     finished_at = Column(DateTime, nullable=True, index=True)
 
 
+class PlayerPhoto(Base):
+    """Cache de la miniature Wikipédia d'un joueur (pages SEO) : évite tout
+    appel réseau à l'affichage. url vide = cherché sans succès (retenté
+    après 30 jours)."""
+    __tablename__ = "player_photos"
+
+    player_id = Column(UUIDType, ForeignKey("players.id"), primary_key=True)
+    url = Column(String, nullable=True)
+    fetched_at = Column(DateTime, default=datetime.utcnow)
+
+
 # ----------------------------------------------------------- analyses -----
 
 class Analysis(Base):

@@ -219,3 +219,14 @@ def test_retro_big_matches_on_evergreen_page(seeded):
     db.commit(); db.close()
     h = client.get("/seo/fr/tournoi/shanghai").text
     assert "analyse et résultat" in h and "pas un pronostic publié" in h and "7-6 6-4" in h
+
+
+def test_evergreen_shows_matches_before_intro_and_photo_cache(seeded):
+    h = client.get("/seo/fr/tournoi/shanghai").text
+    assert h.index("analyse et résultat") < h.index("Le tournoi en bref")
+    db = TestingSessionLocal()
+    a, b, when = seeded
+    pl = db.get(models.Player, a)
+    assert seo_pages.photo_for(db, pl) == seo_pages.PLACEHOLDER_IMG  # fetch_photo stubbé -> None, mis en cache
+    assert db.get(models.PlayerPhoto, str(a)) is not None
+    db.close()

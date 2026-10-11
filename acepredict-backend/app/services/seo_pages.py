@@ -132,6 +132,42 @@ def fetch_photo(name: str) -> Optional[str]:
         return None
 
 
+def photo_map(db: Session, player_ids) -> dict:
+    ids = [str(i) for i in player_ids]
+    if not ids:
+        return {}
+    return {r.player_id: r.url for r in db.query(models.PlayerPhoto).filter(models.PlayerPhoto.player_id.in_(ids)).all() if r.url}
+
+
+def photo_for(db: Session, player) -> str:
+    """Miniature en cache, sinon récupération (une fois) puis mise en cache."""
+    row = db.get(models.PlayerPhoto, str(player.id))
+    if row and (row.url or (row.fetched_at and row.fetched_at > datetime.utcnow() - timedelta(days=30))):
+        return row.url or PLACEHOLDER_IMG
+    url = fetch_photo(player.name)
+    if row:
+        row.url, row.fetched_at = url or "", datetime.utcnow()
+    else:
+        db.add(models.PlayerPhoto(player_id=str(player.id), url=url or "", fetched_at=datetime.utcnow()))
+    db.commit()
+    return url or PLACEHOLDER_IMG
+
+
+def fill_photos(db: Session, limit: int = 15) -> int:
+    """Remplit le cache pour les joueurs du top 100 (quelques-uns par passage)."""
+    from app.services import seo_extra
+    n = 0
+    have = {r.player_id for r in db.query(models.PlayerPhoto.player_id).all()}
+    for p in seo_extra.top_players(db):
+        if str(p.id) in have:
+            continue
+        photo_for(db, p)
+        n += 1
+        if n >= limit:
+            break
+    return n
+
+
 # ------------------------------------------------------------ player data --
 def _num(v) -> Optional[float]:
     try:
@@ -340,8 +376,8 @@ def build_snapshot(db: Session, fx: models.Fixture) -> dict:
         "fav_id": str(res["predicted_winner_id"]),
         "rank1": f"N°{p1.current_rank} mondial" if p1.current_rank else "",
         "rank2": f"N°{p2.current_rank} mondial" if p2.current_rank else "",
-        "img1": fetch_photo(p1.name) or PLACEHOLDER_IMG,
-        "img2": fetch_photo(p2.name) or PLACEHOLDER_IMG,
+        "img1": photo_for(db, p1),
+        "img2": photo_for(db, p2),
         "tournoi": fx.tournament_name or "Tournoi",
         "round_label": round_label(fx.round),
         "surface": surface, "ville": fx.city or fx.tournament_name or "",
@@ -498,6 +534,11 @@ def sync_match_pages(db: Session, now: Optional[datetime] = None) -> dict:
             db.rollback()
             stats["errors"] += 1
             log.warning("Page SEO ignorée (%s): %s", getattr(fx, "id", "?"), e)
+    try:
+        stats["photos"] = fill_photos(db)
+    except Exception as e:
+        db.rollback()
+        log.warning("Photos SEO KO: %s", e)
     try:
         stats["enriched"] = enrich_snapshots(db)
     except Exception as e:

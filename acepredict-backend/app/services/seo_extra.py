@@ -191,7 +191,12 @@ def past_big_matches(db: Session, slug: str):
         out.append({"p1": w.name if fav_w else l.name, "p2": l.name if fav_w else w.name,
                     "pct": P.display_pct(raw), "tournoi": f"{_tour(w)} {year}",
                     "round": {"F": "finale", "SF": "demi-finale", "QF": "quart de finale"}[m.round],
-                    "done": True, "ok": fav_w, "score": m.score, "time": "", "img1": "", "img2": ""})
+                    "done": True, "ok": fav_w, "score": m.score, "time": "",
+                    "_ids": (w.id, l.id) if fav_w else (l.id, w.id)})
+    photos = P.photo_map(db, [i for r in out for i in r["_ids"]])
+    for r in out:
+        a, b = r.pop("_ids")
+        r["img1"], r["img2"] = photos.get(str(a), P.PLACEHOLDER_IMG), photos.get(str(b), P.PLACEHOLDER_IMG)
     return out
 
 
@@ -218,24 +223,26 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
     tot = sum(1 for p in pages if p.finished_at)
     crumbs = [("Accueil", "/"), ("Tournois", "/fr/tournois"), (t["name"], path)]
     h = _crumb_html(crumbs)
-    h += f'<h1>Pronostics {html.escape(t["name"])} : favoris, probabilités et résultats</h1>'
+    h += f'<h1>Pronostics {html.escape(t["name"])} : matchs, probabilités et résultats</h1>'
     h += f'<div class="chips"><span class="chip">{html.escape(t["level"])}</span><span class="chip surf" style="--surf:var(--{t["surface"]})">{surf.capitalize()}</span><span class="chip">{html.escape(t["city"])}</span><span class="chip">{html.escape(t["when"])}</span></div>'
     fmt = ("Chez les messieurs, les matchs se jouent au meilleur des 5 sets, ce qui avantage le joueur le plus complet : sur la durée, le favori est moins exposé à un coup de chaud." if t["bo5"]
            else "Les matchs se jouent au meilleur des 3 sets, un format où un seul set raté peut suffire à faire basculer un match.")
-    h += f'<section class="card analysis"><h2>Le tournoi en bref</h2><p>{html.escape(t["blurb"])}</p><p>{fmt}</p><p>TennisMind calcule pour chaque match une probabilité de victoire à partir du niveau de chaque joueur sur {surf}, de sa forme récente, du face-à-face et des conditions de jeu. Les pronostics sont publiés avant le match puis comparés au résultat réel.</p></section>'
+    fin = finals_section(pages)
+    retro_rows = past_big_matches(db, slug)
+    if up:
+        h += '<section class="card"><h2>Prochains matchs et pronostics</h2>' + R._grouped(up) + '</section>'
+    h += fin
+    h += retro_section(retro_rows)
+    if dn:
+        h += '<section class="card"><h2>Derniers résultats</h2>' + R._grouped(dn) + '</section>'
+    if tot:
+        h += f'<section class="card"><h2>Fiabilité sur ce tournoi</h2><div class="proj"><div><b>{R.fr(round(100*ok/tot,1))} %</b><small>pronostics justes</small></div><div><b>{ok}/{tot}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
+    if not (up or dn or fin or retro_rows):
+        h += f'<section class="card"><p class="pend">Les pronostics de {html.escape(t["name"])} seront publiés ici dès que le tableau sera connu, avant chaque match.</p></section>'
     fav = ''.join(_fav_table(db, t["surface"], tour, f"Favoris {'messieurs' if tour == 'atp' else 'dames'} selon TennisMind") for tour in t["tours"])
     if fav:
         h += f'<section class="card"><h2>Les favoris sur {surf} selon TennisMind</h2><p class="pend" style="margin:0 0 6px">Classement par niveau TennisMind sur {surf}, parmi les 150 premiers mondiaux.</p>{fav}</section>'
-    h += finals_section(pages)
-    h += retro_section(past_big_matches(db, slug))
-    if tot:
-        h += f'<section class="card"><h2>Fiabilité sur ce tournoi</h2><div class="proj"><div><b>{R.fr(round(100*ok/tot,1))} %</b><small>pronostics justes</small></div><div><b>{ok}/{tot}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
-    if up:
-        h += '<section class="card"><h2>Prochains matchs</h2>' + R._grouped(up) + '</section>'
-    if dn:
-        h += '<section class="card"><h2>Derniers résultats</h2>' + R._grouped(dn) + '</section>'
-    if not up and not dn:
-        h += f'<section class="card"><p class="pend">Les pronostics de {html.escape(t["name"])} seront publiés ici dès que le tableau sera connu, avant chaque match.</p></section>'
+    h += f'<section class="card analysis"><h2>Le tournoi en bref</h2><p>{html.escape(t["blurb"])}</p><p>{fmt}</p><p>TennisMind calcule pour chaque match une probabilité de victoire à partir du niveau de chaque joueur sur {surf}, de sa forme récente, du face-à-face et des conditions de jeu. Les pronostics sont publiés avant le match puis comparés au résultat réel.</p></section>'
     faq = [(f"Sur quelle surface se joue {t['name']} ?", f"{t['name']} se joue sur {surf}, à {t['city']}, généralement en {t['when']}."),
            (f"Comment TennisMind pronostique-t-il {t['name']} ?", f"Chaque match est évalué avec le niveau des joueurs sur {surf}, leur forme récente, leur historique face à face et la météo, puis comparé à l'historique des matchs ATP et WTA.")]
     h += '<section class="card"><h2>Questions fréquentes</h2>' + ''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q, a in faq) + '</section>'
@@ -325,7 +332,7 @@ def render_player(db: Session, slug: str) -> Optional[str]:
     since = datetime.utcnow() - timedelta(days=365)
     season = P.record(db, p.id, since)
     tr = P.player_traits(db, p.id)
-    photo = _player_photo(pages, p.id)
+    photo = _player_photo(pages, p.id) or P.photo_map(db, [p.id]).get(str(p.id))
     crumbs = [("Accueil", "/"), ("Joueurs", "/fr/joueurs"), (p.name, path)]
     h = _crumb_html(crumbs) + f'<h1>Pronostic {html.escape(p.name)} : classement, forme et prochains matchs</h1>'
     chips = f'<span class="chip">{tour} · N°{p.current_rank}</span>'
