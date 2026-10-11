@@ -226,9 +226,9 @@ def render(d,state):
 <div class="bar"><i style="width:{d['pct1']}%"></i></div><div class="legend"><span>{p1}</span><span>{p2}</span></div>"""
     if state=='after':
         ok=d['winner']==fav
-        h+=f"""<div class="res"><span class="badge {'ok' if ok else 'ko'}">{('Analyse juste' if ok else 'Analyse ratée') if retro else ('Pronostic juste' if ok else 'Pronostic raté')}</span><p class="pend" style="margin:0;flex:1 1 240px">{("Analyse calculée après le match avec les niveaux actuels des joueurs : ce n'est pas un pronostic publié avant la rencontre et elle n'entre pas dans le bilan public.") if retro else ("Pronostic publié le "+d['publie']+" avant le match, non modifié depuis.")} <a href="/fr/bilan">Voir le bilan complet →</a></p></div>"""
+        h+=f"""<div class="res"><span class="badge {'ok' if ok else 'ko'}">{('Analyse juste' if ok else 'Analyse ratée') if retro else ('Pronostic juste' if ok else 'Pronostic raté')}</span><p class="pend" style="margin:0;flex:1 1 240px">{"" if retro else ("Pronostic publié le "+d['publie']+" avant le match.")} <a href="/fr/bilan">Voir le bilan complet →</a></p></div>"""
     else:
-        h+=f"""<div class="res"><div class="pend">Match prévu le {d['date_long']} à {d['heure']}. Cette page affichera le résultat réel et la justesse du pronostic juste après la rencontre.</div></div>"""
+        h+=f"""<div class="res"><div class="pend">Match prévu le {d['date_long']} à {d['heure']}.</div></div>"""
     h+="</section>"+scores_card(d,state,fav,p1,p2)+CTA_HTML
     h+=f"""<section class="card"><h2>Chiffres clés : {p1} contre {p2}</h2>{stats_table(d,p1,p2,surf)}</section>
 {weather_section(d)}

@@ -84,7 +84,7 @@ def test_page_route_before_and_no_fake_data(seeded):
     h = r.text
     assert "Pronostic Alexander Zverev – Quentin Halys" in h
     assert 'rel="canonical"' in h and "FAQPage" in h and "SportsEvent" in h
-    assert "Cette page affichera le résultat réel" in h
+    assert "Match prévu le" in h
     assert "Court couvert" in h  # fixture indoor -> section météo couverte
     assert "Elo" not in h
 
@@ -225,7 +225,7 @@ def test_retro_big_matches_are_clickable_pages_and_not_in_bilan(seeded):
     slug = db.query(models.MatchPage).filter(models.MatchPage.match_key.like("retro|%")).one().slug
     db.close()
     h = client.get("/seo/fr/tournoi/shanghai").text
-    assert "analyse et résultat" in h and f"/fr/pronostic/{slug}" in h and "pas un pronostic publié" in h
+    assert "analyse et résultat" in h and f"/fr/pronostic/{slug}" in h
     page = client.get(f"/seo/fr/pronostic/{slug}").text
     assert "Analyse juste" in page or "Analyse ratée" in page
     assert "SportsEvent" not in page and "7-6 6-4" in page

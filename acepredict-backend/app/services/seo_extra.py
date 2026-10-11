@@ -147,7 +147,7 @@ def finals_section(pages) -> str:
     ok = sum(1 for x in done if str(x.result_winner_id) == str(x.snapshot.get("fav_id")))
     head = ''
     if done:
-        head = f'<p class="pend" style="margin:0 0 14px">Sur les phases finales déjà jouées, {ok} pronostic{"s" if ok > 1 else ""} sur {len(done)} {"sont justes" if ok > 1 else "est juste"}.</p>'
+        head = ''
     return ('<section class="card"><h2>Phases finales : pronostics et résultats</h2>' + head
             + ''.join(R._row(P._row(x)) for x in sel) + '</section>')
 
@@ -257,8 +257,7 @@ def retro_sections(db: Session, slug: str) -> str:
     pages = _retro_pages(db, slug)
     if not pages:
         return ''
-    note = ('<p class="pend" style="margin:0 0 14px">Analyse du modèle (niveau des joueurs sur la surface), calculée après coup avec leurs niveaux actuels : '
-            'ce n\'est pas un pronostic publié avant le match et elle n\'entre pas dans le bilan public.</p>')
+    note = ''
     finals = [x for x in pages if x.round == "F"]
     latest_year = max(x.scheduled_time.year for x in pages)
     others = [x for x in pages if x.round != "F" and x.scheduled_time.year == latest_year]
@@ -266,7 +265,6 @@ def retro_sections(db: Session, slug: str) -> str:
     if finals:
         ok = sum(1 for x in finals if str(x.result_winner_id) == str(x.snapshot.get("fav_id")))
         h += ('<section class="card"><h2>Les dernières finales : analyse et résultat</h2>' + note
-              + f'<p class="pend" style="margin:0 0 14px">Le modèle désigne le bon vainqueur sur {ok} finale{"s" if ok > 1 else ""} sur {len(finals)}.</p>'
               + R._grouped([P._row(x) for x in finals]) + '</section>')
     if others:
         rows = []
@@ -317,8 +315,8 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
             h += '<section class="card"><h2>Prochains pronostics</h2>' + R._grouped([P._row(x) for x in nxt]) + '<p style="margin:14px 0 0"><a class="btn ghost" href="/fr/pronostics">Voir tous les pronostics</a></p></section>'
     fav = ''.join(_fav_table(db, t["surface"], tour, f"Favoris {'messieurs' if tour == 'atp' else 'dames'} selon TennisMind") for tour in t["tours"])
     if fav:
-        h += f'<section class="card"><h2>Qui est le plus fort sur {surf} ?</h2><p class="pend" style="margin:0 0 6px">La note sur 100 mesure le niveau d\'un joueur sur {surf} selon TennisMind : plus elle est haute, plus il est redoutable sur cette surface. Elle est calculée sur ses résultats passés.</p>{fav}</section>'
-    h += f'<section class="card analysis"><h2>Le tournoi en bref</h2><p>{html.escape(t["blurb"])}</p><p>{fmt}</p><p>TennisMind calcule pour chaque match une probabilité de victoire à partir du niveau de chaque joueur sur {surf}, de sa forme récente, du face-à-face et des conditions de jeu. Les pronostics sont publiés avant le match puis comparés au résultat réel.</p></section>'
+        h += f'<section class="card"><h2>Qui est le plus fort sur {surf} ?</h2>{fav}</section>'
+    h += f'<section class="card analysis"><h2>Le tournoi en bref</h2><p>{html.escape(t["blurb"])}</p><p>{fmt}</p></section>'
     faq = [(f"Sur quelle surface se joue {t['name']} ?", f"{t['name']} se joue sur {surf}, à {t['city']}, généralement en {t['when']}."),
            (f"Comment TennisMind pronostique-t-il {t['name']} ?", f"Chaque match est évalué avec le niveau des joueurs sur {surf}, leur forme récente, leur historique face à face et la météo, puis comparé à l'historique des matchs ATP et WTA.")]
     h += '<section class="card"><h2>Questions fréquentes</h2>' + ''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q, a in faq) + '</section>'
