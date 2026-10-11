@@ -209,16 +209,27 @@ def test_finals_section_on_tournament_pages(seeded):
     assert "Phases finales" in h and "Finale" in h
 
 
-def test_retro_big_matches_on_evergreen_page(seeded):
+def test_retro_big_matches_are_clickable_pages_and_not_in_bilan(seeded):
+    from app.services import seo_extra
     db = TestingSessionLocal()
     a, b, when = seeded
     comp = models.Competition(name="Shanghai Masters", category="masters_1000", tour="atp", surface="hard", season=when.year)
     db.add(comp); db.commit()
     db.add(models.Match(player1_id=b, player2_id=a, winner_id=b, score="7-6 6-4", round="F", competition_id=comp.id,
                         tourney_date=datetime.utcnow() - timedelta(days=20), surface="hard"))
-    db.commit(); db.close()
+    db.commit()
+    before = seo_pages.accuracy(db)
+    assert seo_extra.sync_retro_pages(db) == 1
+    assert seo_extra.sync_retro_pages(db) == 0
+    assert seo_pages.accuracy(db) == before  # l'analyse rétrospective n'entre jamais dans le bilan
+    slug = db.query(models.MatchPage).filter(models.MatchPage.match_key.like("retro|%")).one().slug
+    db.close()
     h = client.get("/seo/fr/tournoi/shanghai").text
-    assert "analyse et résultat" in h and "pas un pronostic publié" in h and "7-6 6-4" in h
+    assert "analyse et résultat" in h and f"/fr/pronostic/{slug}" in h and "pas un pronostic publié" in h
+    page = client.get(f"/seo/fr/pronostic/{slug}").text
+    assert "Analyse juste" in page or "Analyse ratée" in page
+    assert "SportsEvent" not in page and "7-6 6-4" in page
+    assert slug not in client.get("/seo/fr/pronostics").text  # absent des listes de pronostics en direct
 
 
 def test_evergreen_shows_matches_before_intro_and_photo_cache(seeded):

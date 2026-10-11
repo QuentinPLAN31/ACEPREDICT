@@ -153,7 +153,7 @@ def photo_for(db: Session, player) -> str:
     return url or PLACEHOLDER_IMG
 
 
-def fill_photos(db: Session, limit: int = 15) -> int:
+def fill_photos(db: Session, limit: int = 40) -> int:
     """Remplit le cache pour les joueurs du top 100 (quelques-uns par passage)."""
     from app.services import seo_extra
     n = 0
@@ -535,6 +535,12 @@ def sync_match_pages(db: Session, now: Optional[datetime] = None) -> dict:
             stats["errors"] += 1
             log.warning("Page SEO ignorée (%s): %s", getattr(fx, "id", "?"), e)
     try:
+        from app.services import seo_extra
+        stats["retro"] = seo_extra.sync_retro_pages(db)
+    except Exception as e:
+        db.rollback()
+        log.warning("Pages rétrospectives KO: %s", e)
+    try:
         stats["photos"] = fill_photos(db)
     except Exception as e:
         db.rollback()
@@ -558,7 +564,7 @@ def sync_match_pages(db: Session, now: Optional[datetime] = None) -> dict:
 
 # ----------------------------------------------------------------- render --
 def accuracy(db: Session, tournament_slug: Optional[str] = None) -> Optional[dict]:
-    q = db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None))
+    q = db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None), ~models.MatchPage.match_key.like("retro|%"))
     if tournament_slug:
         q = q.filter(models.MatchPage.tournament_slug == tournament_slug)
     pages = q.all()
@@ -572,10 +578,12 @@ def _row(pg: models.MatchPage) -> dict:
     s = pg.snapshot
     sched = to_paris(pg.scheduled_time)
     done = pg.finished_at is not None
+    retro = (pg.match_key or "").startswith("retro|")
     return {
         "slug": pg.slug, "p1": s["p1"], "p2": s["p2"], "pct": max(s["pct1"], s["pct2"]),
-        "tournoi": s["tournoi"], "round": s.get("round_label", ""), "time": sched.strftime("%H:%M") if sched else "",
-        "day": f"{JOURS[sched.weekday()]} {sched.day} {MOIS[sched.month - 1]}" if sched else "",
+        "tournoi": s["tournoi"], "round": s.get("round_label", ""),
+        "time": "" if retro else (sched.strftime("%H:%M") if sched else ""),
+        "day": (f"Édition {sched.year}" if retro else (f"{JOURS[sched.weekday()]} {sched.day} {MOIS[sched.month - 1]}" if sched else "")),
         "img1": s.get("img1", ""), "img2": s.get("img2", ""),
         "done": done, "ok": done and str(pg.result_winner_id) == str(s["fav_id"]), "score": pg.result_score,
     }
@@ -618,7 +626,7 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
     # Autres pronostics du même jour (liens internes)
     day_start = sched.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc).replace(tzinfo=None)
     others = (db.query(models.MatchPage)
-              .filter(models.MatchPage.id != pg.id,
+              .filter(models.MatchPage.id != pg.id, ~models.MatchPage.match_key.like("retro|%"),
                       models.MatchPage.scheduled_time >= day_start - timedelta(hours=1),
                       models.MatchPage.scheduled_time < day_start + timedelta(hours=25))
               .order_by(models.MatchPage.scheduled_time).limit(4).all())
@@ -649,6 +657,11 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
         "traits": s.get("traits") or {}, "tease": None,
         "winner": None, "score": None, "actual": None,
     }
+    if (pg.match_key or "").startswith("retro|"):
+        d["retro"] = True
+        d["year"] = sched.year
+        d["date_long"] = f"Édition {sched.year}"
+        d["heure"] = ""
     if done:
         winner_is_p1 = str(pg.result_winner_id) == str(pg.player1_id)
         d["winner"] = s["p1"] if winner_is_p1 else s["p2"]
@@ -672,16 +685,16 @@ def render_page(db: Session, pg: models.MatchPage) -> str:
 
 def render_hub(db: Session) -> str:
     now = datetime.utcnow()
-    up = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.is_(None),
+    up = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.is_(None), ~models.MatchPage.match_key.like("retro|%"),
                                             models.MatchPage.scheduled_time >= now - timedelta(hours=6))
           .order_by(models.MatchPage.scheduled_time).limit(60).all())
-    rec = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None))
+    rec = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None), ~models.MatchPage.match_key.like("retro|%"))
            .order_by(models.MatchPage.scheduled_time.desc()).limit(60).all())
     return seo_render.hub_page([_row(p) for p in up], [_row(p) for p in rec], accuracy(db))
 
 
 def render_bilan(db: Session) -> str:
-    rec = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None))
+    rec = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None), ~models.MatchPage.match_key.like("retro|%"))
            .order_by(models.MatchPage.scheduled_time.desc()).limit(100).all())
     return seo_render.bilan_page(accuracy(db), [_row(p) for p in rec])
 

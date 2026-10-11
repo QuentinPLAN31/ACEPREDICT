@@ -108,26 +108,29 @@ def _crumb_html(items):
 # ------------------------------------------------------------ tournaments --
 def _favorites(db: Session, surface: str, tour: str, n: int = 8):
     f = SURF_FIELD[surface]
+    col = getattr(models.Player, f)
     q = (db.query(models.Player)
          .filter(models.Player.tour == tour, models.Player.current_rank.isnot(None),
                  models.Player.current_rank <= 150,
-                 models.Player.data_confidence != models.DataConfidenceEnum.insufficient)
-         .order_by(getattr(models.Player, f).desc()).limit(n))
+                 models.Player.data_confidence.in_([models.DataConfidenceEnum.high, models.DataConfidenceEnum.medium]),
+                 col.isnot(None), col != 1500.0)
+         .order_by(col.desc()).limit(n))
     return q.all()
 
 
 def _fav_table(db, surface, tour, title):
+    ps = _favorites(db, surface, tour)
+    if len(ps) < 3:
+        return ''
     rows = []
-    for i, p in enumerate(_favorites(db, surface, tour), 1):
+    for i, p in enumerate(ps, 1):
         name = html.escape(p.name)
         if player_page_ok(p):
             name = f'<a href="/fr/joueur/{player_slug(p)}">{name}</a>'
         lv = _elo_to_level_pct(getattr(p, SURF_FIELD[surface]))
-        rows.append(f'<tr><td>{i}</td><td style="text-align:left">{name}</td><td>N°{p.current_rank}</td><td>{lv} / 100</td></tr>')
-    if not rows:
-        return ''
-    return (f'<h3 style="font-size:15px;margin:18px 0 8px">{title}</h3><table><tr><th>#</th><th style="text-align:left">Joueur</th><th>Classement</th>'
-            f'<th>Niveau sur {SURF_LABEL[surface]}</th></tr>' + ''.join(rows) + '</table>')
+        rows.append(f'<tr><td>{i}</td><td style="text-align:left">{name}</td><td>{lv} / 100</td></tr>')
+    return (f'<h3 style="font-size:15px;margin:18px 0 8px">{title}</h3><table><tr><th>#</th><th style="text-align:left">Joueur</th>'
+            f'<th>Note sur {SURF_LABEL[surface]}</th></tr>' + ''.join(rows) + '</table>')
 
 
 FINAL_ROUNDS = {"finale": 0, "demi-finale": 1, "quart de finale": 2}
@@ -154,60 +157,126 @@ def _edition_pages(db: Session, t: dict):
     names = [n for (n,) in db.query(models.MatchPage.tournament_name).distinct().all() if evergreen_for(n) == slug]
     if not names:
         return []
-    return (db.query(models.MatchPage).filter(models.MatchPage.tournament_name.in_(names))
+    return (db.query(models.MatchPage).filter(models.MatchPage.tournament_name.in_(names), ~models.MatchPage.match_key.like("retro|%"))
             .order_by(models.MatchPage.scheduled_time).all())
 
 
-def past_big_matches(db: Session, slug: str):
-    """Finales, demies et quarts de la dernière édition connue (table Match).
-    Analyse RÉTROSPECTIVE : calculée après coup avec les niveaux actuels des
-    joueurs (pas de niveau avant-match en base), donc jamais présentée comme
-    un pronostic publié ni comptée dans le bilan public."""
-    from app.services.elo import expected_score
-    since = datetime.utcnow() - timedelta(days=420)
+def _retro_selection(db: Session, slug: str):
+    since = datetime.utcnow() - timedelta(days=365 * 7)
     rows = (db.query(models.Match, models.Competition)
             .join(models.Competition, models.Match.competition_id == models.Competition.id)
             .filter(models.Match.round.in_(["F", "SF", "QF"]), models.Match.winner_id.isnot(None),
                     models.Match.tourney_date >= since).all())
-    rows = [(m, c) for m, c in rows if evergreen_for(c.name) == slug]
+    rows = [(m, c) for m, c in rows if evergreen_for(c.name) == slug and m.tourney_date]
     if not rows:
         return []
-    year = max(m.tourney_date for m, _ in rows).year
-    rank = {"F": 0, "SF": 1, "QF": 2}
-    out = []
-    for m, c in sorted(rows, key=lambda x: (rank[x[0].round], x[0].tourney_date)):
-        if m.tourney_date.year != year:
-            continue
-        w = db.get(models.Player, m.winner_id)
-        l = db.get(models.Player, m.player2_id if m.winner_id == m.player1_id else m.player1_id)
-        if not w or not l:
-            continue
-        surf = (m.surface.value if m.surface else (c.surface.value if c.surface else T[slug]["surface"]))
-        f = SURF_FIELD.get(surf, "elo_overall")
-        ew, el = getattr(w, f, None) or 1500.0, getattr(l, f, None) or 1500.0
-        pw = expected_score(ew, el)
-        fav_w = pw >= 0.5
-        raw = round(max(pw, 1 - pw) * 1000) / 10
-        out.append({"p1": w.name if fav_w else l.name, "p2": l.name if fav_w else w.name,
-                    "pct": P.display_pct(raw), "tournoi": f"{_tour(w)} {year}",
-                    "round": {"F": "finale", "SF": "demi-finale", "QF": "quart de finale"}[m.round],
-                    "done": True, "ok": fav_w, "score": m.score, "time": "",
-                    "_ids": (w.id, l.id) if fav_w else (l.id, w.id)})
-    photos = P.photo_map(db, [i for r in out for i in r["_ids"]])
-    for r in out:
-        a, b = r.pop("_ids")
-        r["img1"], r["img2"] = photos.get(str(a), P.PLACEHOLDER_IMG), photos.get(str(b), P.PLACEHOLDER_IMG)
-    return out
+    years = sorted({m.tourney_date.year for m, _ in rows}, reverse=True)
+    latest = years[0]
+    sel = [(m, c) for m, c in rows if (m.round == "F" and m.tourney_date.year in years[:6])
+           or (m.tourney_date.year == latest and m.round in ("SF", "QF"))]
+    order = {"F": 0, "SF": 1, "QF": 2}
+    return sorted(sel, key=lambda x: (-x[0].tourney_date.year, order[x[0].round]))
 
 
-def retro_section(rows, year_label="") -> str:
-    if not rows:
+def build_retro_snapshot(db: Session, m, slug: str):
+    """Snapshot d'une analyse RÉTROSPECTIVE : niveaux actuels des joueurs sur la
+    surface (pas de niveau avant-match en base), jamais comptée dans le bilan."""
+    from app.services.elo import expected_score
+    t = T[slug]
+    w = db.get(models.Player, m.winner_id)
+    l = db.get(models.Player, m.player2_id if m.winner_id == m.player1_id else m.player1_id)
+    if not w or not l:
+        return None
+    surf = m.surface.value if m.surface else t["surface"]
+    if surf not in SURF_FIELD:
+        surf = t["surface"]
+    f = SURF_FIELD[surf]
+    pw = expected_score(getattr(w, f) or 1500.0, getattr(l, f) or 1500.0)
+    fav_w = pw >= 0.5
+    raw_fav = round(max(pw, 1 - pw) * 1000) / 10
+    disp = P.display_pct(raw_fav)
+    pct1, pct2 = (disp, round(100 - disp, 1)) if fav_w else (round(100 - disp, 1), disp)
+    raw1, raw2 = (raw_fav, round(100 - raw_fav, 1)) if fav_w else (round(100 - raw_fav, 1), raw_fav)
+    best_of = 5 if (t["bo5"] and w.tour == models.TourEnum.atp) else 3
+    n = 3 if best_of == 5 else 2
+    scores = []
+    for sc in [x for x in P.score_projection.score_distribution(max(pw, 1 - pw), n) if x["side"] == "favorite"][:2]:
+        scores.append([sc["score"], P.typical_scoreline(n, int(sc["score"].split("-")[1]), 10.0), f"{round(sc['probability'] * 100)} %"])
+    snap = {
+        "p1": w.name, "p2": l.name, "pct1": pct1, "pct2": pct2, "raw1": raw1, "raw2": raw2,
+        "fav_id": str(w.id if fav_w else l.id), "rank1": "", "rank2": "",
+        "img1": P.photo_for(db, w), "img2": P.photo_for(db, l),
+        "tournoi": t["name"], "round_label": {"F": "finale", "SF": "demi-finale", "QF": "quart de finale"}[m.round],
+        "surface": surf, "ville": t["city"], "tier": t["level"], "best_of": best_of, "scores": scores, "wx": None,
+        "traits": {"p1": {}, "p2": {}}, "levels": {"1": _elo_to_level_pct(getattr(w, f)), "2": _elo_to_level_pct(getattr(l, f))},
+        "form": {"1": [], "2": []}, "h2h": None, "surf_wr": [None, None], "weather_adjusted": False, "tease": None,
+        "rk": [None, None], "retro": True,
+    }
+    snap["analyse"] = P._analysis(snap)
+    return snap, w, l
+
+
+def sync_retro_pages(db: Session, limit: int = 40) -> int:
+    """Crée (quelques-unes par passage) les pages d'analyse rétrospective des
+    grands matchs des tournois evergreen."""
+    created = 0
+    for slug in T:
+        for m, c in _retro_selection(db, slug):
+            key = f"retro|{m.id}"
+            if db.query(models.MatchPage.id).filter(models.MatchPage.match_key == key).first():
+                continue
+            built = build_retro_snapshot(db, m, slug)
+            if not built:
+                continue
+            snap, w, l = built
+            year = m.tourney_date.year
+            base = "-".join([P.slugify(w.name), P.slugify(l.name), slug, str(year), P.slugify(snap["round_label"])])
+            pg = models.MatchPage(
+                slug=P._unique_slug(db, base, m.round), match_key=key, player1_id=w.id, player2_id=l.id,
+                tour=w.tour.value, tournament_name=T[slug]["name"], tournament_slug=f"{slug}-{year}",
+                round=m.round, scheduled_time=m.tourney_date, snapshot=snap,
+                published_at=datetime.utcnow(), modified_at=datetime.utcnow(),
+                result_winner_id=m.winner_id, result_score=m.score, finished_at=datetime.utcnow())
+            db.add(pg)
+            db.commit()
+            created += 1
+            if created >= limit:
+                return created
+    return created
+
+
+def _retro_pages(db: Session, slug: str):
+    t = T[slug]
+    names = [t["name"]]
+    return (db.query(models.MatchPage)
+            .filter(models.MatchPage.match_key.like("retro|%"), models.MatchPage.tournament_slug.like(f"{slug}-____"))
+            .order_by(models.MatchPage.scheduled_time.desc()).all())
+
+
+def retro_sections(db: Session, slug: str) -> str:
+    pages = _retro_pages(db, slug)
+    if not pages:
         return ''
-    ok = sum(1 for r in rows if r["ok"])
-    return ('<section class="card"><h2>Les grands matchs de la dernière édition : analyse et résultat</h2>'
-            f'<p class="pend" style="margin:0 0 14px">Analyse du modèle (niveau des joueurs sur la surface), calculée après coup avec leurs niveaux actuels : '
-            f'ce n\'est pas un pronostic publié avant le match et elle n\'entre pas dans le bilan public. Le modèle désigne le bon vainqueur sur {ok} match{"s" if ok > 1 else ""} sur {len(rows)}.</p>'
-            + ''.join(R._row(r) for r in rows) + '</section>')
+    note = ('<p class="pend" style="margin:0 0 14px">Analyse du modèle (niveau des joueurs sur la surface), calculée après coup avec leurs niveaux actuels : '
+            'ce n\'est pas un pronostic publié avant le match et elle n\'entre pas dans le bilan public.</p>')
+    finals = [x for x in pages if x.round == "F"]
+    latest_year = max(x.scheduled_time.year for x in pages)
+    others = [x for x in pages if x.round != "F" and x.scheduled_time.year == latest_year]
+    h = ''
+    if finals:
+        ok = sum(1 for x in finals if str(x.result_winner_id) == str(x.snapshot.get("fav_id")))
+        h += ('<section class="card"><h2>Les dernières finales : analyse et résultat</h2>' + note
+              + f'<p class="pend" style="margin:0 0 14px">Le modèle désigne le bon vainqueur sur {ok} finale{"s" if ok > 1 else ""} sur {len(finals)}.</p>'
+              + R._grouped([P._row(x) for x in finals]) + '</section>')
+    if others:
+        rows = []
+        for x in others:
+            r = P._row(x)
+            r["day"] = {"demi-finale": "Demi-finales", "quart de finale": "Quarts de finale"}.get(x.snapshot.get("round_label"), "")
+            rows.append(r)
+        rows.sort(key=lambda r: 0 if r["day"] == "Demi-finales" else 1)
+        h += f'<section class="card"><h2>Édition {latest_year} : demi-finales et quarts de finale</h2>' + note + R._grouped(rows) + '</section>'
+    return h
 
 
 def render_evergreen(db: Session, slug: str) -> Optional[str]:
@@ -228,25 +297,25 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
     fmt = ("Chez les messieurs, les matchs se jouent au meilleur des 5 sets, ce qui avantage le joueur le plus complet : sur la durée, le favori est moins exposé à un coup de chaud." if t["bo5"]
            else "Les matchs se jouent au meilleur des 3 sets, un format où un seul set raté peut suffire à faire basculer un match.")
     fin = finals_section(pages)
-    retro_rows = past_big_matches(db, slug)
+    retro_html = retro_sections(db, slug)
     if up:
         h += '<section class="card"><h2>Prochains matchs et pronostics</h2>' + R._grouped(up) + '</section>'
     h += fin
-    h += retro_section(retro_rows)
+    h += retro_html
     if dn:
         h += '<section class="card"><h2>Derniers résultats</h2>' + R._grouped(dn) + '</section>'
     if tot:
         h += f'<section class="card"><h2>Fiabilité sur ce tournoi</h2><div class="proj"><div><b>{R.fr(round(100*ok/tot,1))} %</b><small>pronostics justes</small></div><div><b>{ok}/{tot}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
-    if not (up or dn or fin or retro_rows):
+    if not (up or dn or fin or retro_html):
         h += f'<section class="card"><p class="pend">Les pronostics de {html.escape(t["name"])} seront publiés ici dès que le tableau sera connu, avant chaque match.</p></section>'
     fav = ''.join(_fav_table(db, t["surface"], tour, f"Favoris {'messieurs' if tour == 'atp' else 'dames'} selon TennisMind") for tour in t["tours"])
     if fav:
-        h += f'<section class="card"><h2>Les favoris sur {surf} selon TennisMind</h2><p class="pend" style="margin:0 0 6px">Classement par niveau TennisMind sur {surf}, parmi les 150 premiers mondiaux.</p>{fav}</section>'
+        h += f'<section class="card"><h2>Qui est le plus fort sur {surf} ?</h2><p class="pend" style="margin:0 0 6px">La note sur 100 mesure le niveau d\'un joueur sur {surf} selon TennisMind : plus elle est haute, plus il est redoutable sur cette surface. Elle est calculée sur ses résultats passés.</p>{fav}</section>'
     h += f'<section class="card analysis"><h2>Le tournoi en bref</h2><p>{html.escape(t["blurb"])}</p><p>{fmt}</p><p>TennisMind calcule pour chaque match une probabilité de victoire à partir du niveau de chaque joueur sur {surf}, de sa forme récente, du face-à-face et des conditions de jeu. Les pronostics sont publiés avant le match puis comparés au résultat réel.</p></section>'
     faq = [(f"Sur quelle surface se joue {t['name']} ?", f"{t['name']} se joue sur {surf}, à {t['city']}, généralement en {t['when']}."),
            (f"Comment TennisMind pronostique-t-il {t['name']} ?", f"Chaque match est évalué avec le niveau des joueurs sur {surf}, leur forme récente, leur historique face à face et la météo, puis comparé à l'historique des matchs ATP et WTA.")]
     h += '<section class="card"><h2>Questions fréquentes</h2>' + ''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q, a in faq) + '</section>'
-    h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Un match en tête ?</span><h2>Analyse n\'importe quel match gratuitement</h2><p>Deux joueurs, une surface : probabilité et score projeté en quelques secondes.</p></div><a class="btn dark" href="{R.APP}">Essayer TennisMind</a></section>'
+    h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Connais le gagnant avant le match</span><h2>Découvre qui va gagner, avant le coup d\'envoi</h2><p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div><a class="btn dark" href="{R.APP}">Prédire un match gratuitement</a></section>'
     ld = {"@context": "https://schema.org", "@graph": [
         {"@type": "WebPage", "@id": BASE + path, "url": BASE + path, "name": f"Pronostics {t['name']}", "inLanguage": "fr"},
         _crumbs(crumbs),
@@ -366,7 +435,7 @@ def render_player(db: Session, slug: str) -> Optional[str]:
     faq = [(f"Quel est le classement de {p.name} ?", f"{p.name} est n°{p.current_rank} au classement {tour}."),
            (f"Sur quelle surface {p.name} est-il le plus à l'aise ?", f"D'après le niveau TennisMind, sa meilleure surface est le {SURF_LABEL[best]}.")]
     h += '<section class="card"><h2>Questions fréquentes</h2>' + ''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q, a in faq) + '</section>'
-    h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Un match en tête ?</span><h2>Analyse n\'importe quel match gratuitement</h2><p>Deux joueurs, une surface : probabilité et score projeté en quelques secondes.</p></div><a class="btn dark" href="{R.APP}">Essayer TennisMind</a></section>'
+    h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Connais le gagnant avant le match</span><h2>Découvre qui va gagner, avant le coup d\'envoi</h2><p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div><a class="btn dark" href="{R.APP}">Prédire un match gratuitement</a></section>'
     ld = {"@context": "https://schema.org", "@graph": [
         {"@type": "ProfilePage", "@id": BASE + path, "url": BASE + path, "name": f"Pronostic {p.name}", "inLanguage": "fr",
          "mainEntity": {"@type": "Person", "name": p.name, "jobTitle": "Joueur de tennis professionnel"}},
