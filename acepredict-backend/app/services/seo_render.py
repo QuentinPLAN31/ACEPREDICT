@@ -262,11 +262,16 @@ def _row(p):
         mid=f'<div class="pv {"ok" if p.get("ok") else "ko"}">{"✓" if p.get("ok") else "✗"} {html.escape(p.get("score") or "")}<small>{fr(p["pct"])} %</small></div>'
     else:
         mid=f'<div class="pv">{fr(p["pct"])} %</div>'
-    sub=" · ".join(x for x in (p.get("tournoi",""),p.get("time","")) if x)
-    return (f'<a class="mrow" href="/fr/pronostic/{p["slug"]}"><div class="t"><b>{html.escape(p["p1"])} – {html.escape(p["p2"])}</b>'
+    rnd=(p.get("round") or "")
+    rnd=rnd[:1].upper()+rnd[1:] if rnd in ("finale","demi-finale","quart de finale") else ""
+    sub=" · ".join(x for x in (rnd,p.get("tournoi",""),p.get("time","")) if x)
+    im1=f'<img src="{p["img1"]}" alt="{html.escape(p["p1"])}" width="44" height="56" loading="lazy" referrerpolicy="no-referrer">' if p.get("img1") else ''
+    im2=f'<img src="{p["img2"]}" alt="{html.escape(p["p2"])}" width="44" height="56" loading="lazy" referrerpolicy="no-referrer">' if p.get("img2") else ''
+    link=f'href="/fr/pronostic/{p["slug"]}"' if p.get("slug") else ''
+    tag="a" if link else "div"
+    return (f'<{tag} class="mrow" {link}><div class="t"><b>{html.escape(p["p1"])} – {html.escape(p["p2"])}</b>'
             f'<small>{html.escape(sub)}</small></div>'
-            f'<div class="pp"><img src="{p.get("img1","")}" alt="{html.escape(p["p1"])}" width="44" height="56" loading="lazy" referrerpolicy="no-referrer">{mid}'
-            f'<img src="{p.get("img2","")}" alt="{html.escape(p["p2"])}" width="44" height="56" loading="lazy" referrerpolicy="no-referrer"></div></a>')
+            f'<div class="pp">{im1}{mid}{im2}</div></{tag}>')
 
 
 def _grouped(rows):
@@ -319,11 +324,12 @@ def bilan_page(acc, rows, by_month=None):
                       "/fr/bilan", crumb + h, ld)
 
 
-def tournoi_page(name, slug, upcoming, done, acc):
+def tournoi_page(name, slug, upcoming, done, acc, finals=''):
     crumb = f'<nav class="crumb"><a href="/">Accueil</a> › <a href="/fr/pronostics">Pronostics</a> › {html.escape(name)}</nav>'
     h = f'<h1>Pronostics {html.escape(name)}</h1>'
     if acc and acc["total"]:
         h += f'<p style="color:var(--ts);margin:0 0 22px">Sur ce tournoi, {acc["ok"]} pronostics sur {acc["total"]} déjà vérifiés sont justes ({fr(acc["pct"])} %).</p>'
+    h += finals
     if upcoming:
         h += '<section class="card"><h2>Matchs à venir</h2>' + _grouped(upcoming) + '</section>'
     if done:

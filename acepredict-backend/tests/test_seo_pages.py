@@ -196,3 +196,26 @@ def test_match_page_links_to_player_and_tournament(seeded):
     db.close()
     h = client.get(f"/seo/fr/pronostic/{slug}").text
     assert "/fr/joueur/alexander-zverev" in h and "Pour aller plus loin" in h
+
+
+def test_finals_section_on_tournament_pages(seeded):
+    db = TestingSessionLocal()
+    pg = db.query(models.MatchPage).one()
+    snap = dict(pg.snapshot); snap["round_label"] = "finale"; pg.snapshot = snap; db.commit()
+    db.close()
+    assert "Phases finales : pronostics et résultats" in client.get("/seo/fr/tournoi/shanghai").text
+    ts = TestingSessionLocal().query(models.MatchPage).one().tournament_slug
+    h = client.get(f"/seo/fr/tournoi/{ts}").text
+    assert "Phases finales" in h and "Finale" in h
+
+
+def test_retro_big_matches_on_evergreen_page(seeded):
+    db = TestingSessionLocal()
+    a, b, when = seeded
+    comp = models.Competition(name="Shanghai Masters", category="masters_1000", tour="atp", surface="hard", season=when.year)
+    db.add(comp); db.commit()
+    db.add(models.Match(player1_id=b, player2_id=a, winner_id=b, score="7-6 6-4", round="F", competition_id=comp.id,
+                        tourney_date=datetime.utcnow() - timedelta(days=20), surface="hard"))
+    db.commit(); db.close()
+    h = client.get("/seo/fr/tournoi/shanghai").text
+    assert "analyse et résultat" in h and "pas un pronostic publié" in h and "7-6 6-4" in h

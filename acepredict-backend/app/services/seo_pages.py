@@ -533,7 +533,7 @@ def _row(pg: models.MatchPage) -> dict:
     done = pg.finished_at is not None
     return {
         "slug": pg.slug, "p1": s["p1"], "p2": s["p2"], "pct": max(s["pct1"], s["pct2"]),
-        "tournoi": s["tournoi"], "time": sched.strftime("%H:%M") if sched else "",
+        "tournoi": s["tournoi"], "round": s.get("round_label", ""), "time": sched.strftime("%H:%M") if sched else "",
         "day": f"{JOURS[sched.weekday()]} {sched.day} {MOIS[sched.month - 1]}" if sched else "",
         "img1": s.get("img1", ""), "img2": s.get("img2", ""),
         "done": done, "ok": done and str(pg.result_winner_id) == str(s["fav_id"]), "score": pg.result_score,
@@ -656,7 +656,8 @@ def render_tournoi(db: Session, slug: str) -> Optional[str]:
     name = pages[0].tournament_name or slug
     up = [_row(p) for p in pages if p.finished_at is None]
     dn = [_row(p) for p in reversed(pages) if p.finished_at is not None]
-    return seo_render.tournoi_page(name, slug, up, dn, accuracy(db, slug))
+    from app.services import seo_extra
+    return seo_render.tournoi_page(name, slug, up, dn, accuracy(db, slug), seo_extra.finals_section(pages))
 
 
 def render_sitemap(db: Session) -> str:
