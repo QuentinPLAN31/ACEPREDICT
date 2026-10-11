@@ -541,7 +541,7 @@ def sync_match_pages(db: Session, now: Optional[datetime] = None) -> dict:
         db.rollback()
         log.warning("Pages rétrospectives KO: %s", e)
     try:
-        stats["photos"] = fill_photos(db)
+        stats["photos"] = fill_photos(db, limit=80)
     except Exception as e:
         db.rollback()
         log.warning("Photos SEO KO: %s", e)

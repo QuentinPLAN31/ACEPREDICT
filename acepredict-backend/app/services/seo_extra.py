@@ -329,20 +329,29 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
                         path, h, ld)
 
 
+def _tcards(items):
+    return '<div class="tgrid">' + ''.join(
+        f'<a class="tcard" style="--surf:var(--{t["surface"]})" href="/fr/tournoi/{s}"><span class="lv">{html.escape(t["level"])}</span>'
+        f'<b>{html.escape(t["name"])}</b><span class="meta">{html.escape(t["city"])} · {SURF_LABEL[t["surface"]].capitalize()}</span>'
+        f'<span class="meta">{html.escape(t["when"].capitalize())}</span><span class="go">Voir les pronostics →</span></a>' for s, t in items) + '</div>'
+
+
 def render_tournois(db: Session) -> str:
     crumbs = [("Accueil", "/"), ("Tournois", "/fr/tournois")]
-    h = _crumb_html(crumbs) + '<h1>Pronostics des grands tournois de tennis</h1>'
-    h += '<p style="color:var(--ts);margin:0 0 22px">Grands Chelems et Masters 1000 : favoris, probabilités de victoire et résultats, mis à jour tout au long de la saison.</p>'
+    h = _crumb_html(crumbs)
+    h += ('<section class="hero"><h1>Pronostics des grands tournois de tennis</h1>'
+          '<p>Grands Chelems et Masters 1000 : favoris, probabilités de victoire et résultats, mis à jour tout au long de la saison.</p>'
+          '<div class="hs"><a class="btn" href="/fr/pronostics/aujourdhui">Pronostics du jour</a><a class="btn ghost" href="/fr/joueurs">Joueurs</a></div></section>')
     for title, lvl in (("Grands Chelems", "Grand Chelem"), ("Masters 1000", None)):
         items = [(s, t) for s, t in T.items() if (t["level"] == "Grand Chelem") == (lvl is not None)]
-        h += f'<section class="card"><h2>{title}</h2><div class="rel">' + ''.join(
-            f'<a href="/fr/tournoi/{s}">{html.escape(t["name"])}<span>{SURF_LABEL[t["surface"]].capitalize()} · {html.escape(t["when"])}</span></a>' for s, t in items) + '</div></section>'
+        h += f'<section class="card"><h2>{title}</h2>' + _tcards(items) + '</section>'
+    known = set(T)
     eds = {}
-    for slug, name, mod in db.query(models.MatchPage.tournament_slug, models.MatchPage.tournament_name, models.MatchPage.modified_at).all():
-        if slug:
+    for slug, name in db.query(models.MatchPage.tournament_slug, models.MatchPage.tournament_name).all():
+        if slug and slug not in known and not evergreen_for(name or ""):
             eds[slug] = name
     if eds:
-        h += '<section class="card"><h2>Tournois en cours ou récents</h2><div class="rel">' + ''.join(
+        h += '<section class="card"><h2>Autres tournois en cours ou récents</h2><div class="rel">' + ''.join(
             f'<a href="/fr/tournoi/{s}">{html.escape(n or s)}<span>Voir les matchs</span></a>' for s, n in sorted(eds.items())) + '</div></section>'
     return R.page_shell("Pronostics des grands tournois de tennis | TennisMind",
                         "Pronostics des Grands Chelems et Masters 1000 : favoris selon TennisMind, probabilités de victoire et résultats réels.",
@@ -366,13 +375,28 @@ def find_player(db: Session, slug: str):
 
 def render_joueurs(db: Session) -> str:
     crumbs = [("Accueil", "/"), ("Joueurs", "/fr/joueurs")]
-    h = _crumb_html(crumbs) + '<h1>Pronostics par joueur : ATP et WTA</h1>'
-    h += '<p style="color:var(--ts);margin:0 0 22px">Fiche de chaque joueur du top 100 : classement, niveau par surface, forme, prochains pronostics et derniers résultats.</p>'
+    allp = top_players(db)
+    photos = P.photo_map(db, [p.id for p in allp])
+    h = _crumb_html(crumbs)
+    h += ('<section class="hero"><h1>Pronostics par joueur : ATP et WTA</h1>'
+          '<p>Fiche de chaque joueur du top 100 : classement, niveau par surface, forme, prochains pronostics et derniers résultats.</p>'
+          '<div class="hs"><a class="btn" href="/fr/pronostics/aujourdhui">Pronostics du jour</a><a class="btn ghost" href="/fr/tournois">Tournois</a></div></section>')
     for tour, lab in (("atp", "Messieurs (ATP)"), ("wta", "Dames (WTA)")):
-        ps = [p for p in top_players(db) if p.tour.value == tour]
-        if ps:
-            h += f'<section class="card"><h2>{lab}</h2><div class="rel">' + ''.join(
-                f'<a href="/fr/joueur/{player_slug(p)}">{html.escape(p.name)}<span>N°{p.current_rank}</span></a>' for p in ps) + '</div></section>'
+        seen, cards = set(), []
+        for p in allp:
+            if p.tour.value != tour:
+                continue
+            sl = player_slug(p)
+            if sl in seen:
+                continue
+            seen.add(sl)
+            img = photos.get(str(p.id)) or P.PLACEHOLDER_IMG
+            cards.append(
+                f'<a class="pcard{" top3" if p.current_rank <= 3 else ""}" href="/fr/joueur/{sl}"><span class="rk">N°{p.current_rank}</span>'
+                f'<img src="{html.escape(img)}" alt="{html.escape(p.name)}" width="92" height="92" loading="lazy" referrerpolicy="no-referrer">'
+                f'<b>{html.escape(p.name)}</b><small>Voir la fiche</small></a>')
+        if cards:
+            h += f'<section class="card"><h2>{lab}</h2><div class="pgrid">' + ''.join(cards) + '</div></section>'
     return R.page_shell("Pronostics tennis par joueur : fiches ATP et WTA | TennisMind",
                         "Fiches des joueurs ATP et WTA : classement, niveau par surface, forme récente, prochains pronostics et résultats.",
                         "/fr/joueurs", h, {"@context": "https://schema.org", "@type": "CollectionPage", "name": "Joueurs de tennis", "url": BASE + "/fr/joueurs", "inLanguage": "fr"})
