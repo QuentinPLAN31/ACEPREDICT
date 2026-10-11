@@ -221,7 +221,7 @@ def forgot_password(
         user.reset_token_expires_at = expires_at
         db.commit()
 
-        reset_link = f"{settings.frontend_base_url}/visitennis_1.html?reset_token={raw_token}"
+        reset_link = f"{settings.frontend_base_url}/app?reset_token={raw_token}"
         # En tâche de fond : l'envoi (réseau SMTP) ne doit jamais ralentir ni
         # faire échouer la réponse HTTP, ni permettre de mesurer le délai de
         # réponse pour deviner si l'e-mail existait (timing attack).

@@ -43,8 +43,8 @@ def create_checkout(
         url = stripe_service.create_checkout_session(
             user_email=current_user.email,
             plan=payload.plan,
-            success_url=f"{settings.frontend_base_url}/visitennis_1.html?checkout=success",
-            cancel_url=f"{settings.frontend_base_url}/visitennis_1.html?checkout=cancel",
+            success_url=f"{settings.frontend_base_url}/app?checkout=success",
+            cancel_url=f"{settings.frontend_base_url}/app?checkout=cancel",
         )
     except ValueError:
         # STRIPE_PRICE_* absent/vide dans .env : détecté avant le moindre appel réseau.

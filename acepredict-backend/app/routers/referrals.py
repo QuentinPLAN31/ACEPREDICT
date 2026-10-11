@@ -45,7 +45,7 @@ def my_referrals(
         # toujours vers localhost, inutilisable pour quiconque hors de cette
         # machine. Cf. README "Synchronisation des données" -- même logique
         # que le reste de ce backend : une seule source de vérité par valeur.
-        "referral_link": f"{settings.frontend_base_url}/visitennis_1.html?ref={current_user.referral_code}",
+        "referral_link": f"{settings.frontend_base_url}/app?ref={current_user.referral_code}",
         "stats": {
             "filleuls_abonnes": len(subscribed),
             "filleuls_inscrits": len(referrals),

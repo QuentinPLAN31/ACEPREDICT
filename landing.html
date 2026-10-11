@@ -190,9 +190,22 @@
     cursor:pointer; font-family:inherit; white-space:nowrap;
   }
 
-  .stat-line{ margin: 30px auto 0; color: var(--text-sec); font-size: 14.5px; }
-  .stat-line b{ color: var(--accent); font-variant-numeric: tabular-nums; }
-  .stat-line b.n2{ color: var(--text); }
+  .stat-line{
+    margin: 38px auto 0; max-width: 560px; padding: 30px 28px 26px; text-align:center;
+    color: var(--text-sec); font-size: 17px; line-height:1.5;
+    background: linear-gradient(180deg, rgba(215,242,44,0.09), rgba(215,242,44,0.02));
+    border: 1px solid rgba(215,242,44,0.28); border-radius: 18px;
+    box-shadow: 0 0 0 6px rgba(215,242,44,0.05), 0 24px 60px -20px rgba(215,242,44,0.22);
+  }
+  .stat-line b{ font-variant-numeric: tabular-nums; }
+  .stat-line b:first-child{
+    display:block; font-family: 'Unbounded', Inter, sans-serif; font-weight: 900;
+    font-size: clamp(60px, 13vw, 108px); line-height: 1; letter-spacing: -2px; margin-bottom: 10px;
+    background: linear-gradient(135deg, #D7F22C, #f6ff8a 60%, #D7F22C);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+  }
+  .stat-line b.n2{ color: #fff; font-size: 1.25em; font-weight: 800; }
+  @media(max-width:520px){ .stat-line{ margin: 30px 16px 0; padding: 24px 18px 20px; font-size: 15px; } }
 
   /* ---------- PHONE MOCK ---------- */
   .phone-stage{
@@ -670,7 +683,7 @@
 
   <div class="search-hero reveal">
     <input type="text" placeholder="Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)" data-i18n-placeholder="hero_search_ph">
-    <button data-i18n="btn_analyser" onclick="window.location.href='visitennis_1.html?auth=register'">Analyser</button>
+    <button data-i18n="btn_analyser" onclick="window.location.href='/app?auth=register'">Analyser</button>
   </div>
 
   <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs analysés la semaine dernière</span></div>
@@ -683,7 +696,7 @@
     <p class="court-p reveal" data-i18n="court_p">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</p>
     <div class="showcase">
       <div class="showcase-phone reveal">
-        <div class="phone-rot"><img class="phone-mockup" src="assets/mockups/hero-analyse.png" alt="TennisMind - Analyse de match" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;"></div>
+        <div class="phone-rot"><img class="phone-mockup" src="assets/mockups/hero-analyse.png" alt="TennisMind - Analyse de match" onclick="window.location.href='/app'" style="cursor:pointer;"></div>
       </div>
       <div class="float-badge b1"><img src="assets/players/alcaraz.jpg" alt="Carlos Alcaraz" loading="lazy"></div>
       <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
@@ -746,7 +759,7 @@
     <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
 
     <div class="phone-stage phone-fan-stage reveal" style="margin-top:34px;">
-      <img class="phone-mockup phone-fan" src="assets/mockups/hero-fan.png" alt="TennisMind - Liste des joueurs, fiche joueur et compétitions" onclick="window.location.href='visitennis_1.html'" style="cursor:pointer;">
+      <img class="phone-mockup phone-fan" src="assets/mockups/hero-fan.png" alt="TennisMind - Liste des joueurs, fiche joueur et compétitions" onclick="window.location.href='/app'" style="cursor:pointer;">
     </div>
   </div>
 </section>
@@ -1430,7 +1443,7 @@
       if(!res.ok) throw new Error(data.detail || 'Connexion Google impossible — réessaie.');
       localStorage.setItem('tennismind_token', data.access_token);
       setAuthMsg(msg, 'success', 'Connecté, redirection...');
-      window.location.href = 'visitennis_1.html';
+      window.location.href = '/app';
     } catch(err){
       setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
     }
@@ -1465,7 +1478,7 @@
       const data = await apiLogin(email, password);
       localStorage.setItem('tennismind_token', data.access_token);
       setAuthMsg(msg, 'success', 'Connecté, redirection...');
-      window.location.href = 'visitennis_1.html';
+      window.location.href = '/app';
     } catch(err){
       setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
     } finally {
@@ -1495,7 +1508,7 @@
       const data = await apiLogin(email, password);
       localStorage.setItem('tennismind_token', data.access_token);
       setAuthMsg(msg, 'success', 'Compte créé, redirection...');
-      window.location.href = 'visitennis_1.html';
+      window.location.href = '/app';
     } catch(err){
       setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
     } finally {
