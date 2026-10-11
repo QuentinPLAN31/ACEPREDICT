@@ -423,6 +423,11 @@
   .testi-role{ color: var(--accent); font-size:12.5px; opacity:.85; }
   .testi-x{ margin-left:auto; width:34px; height:34px; border-radius:999px; background:#fff; color:#0c110e; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; flex-shrink:0; }
 
+  .seo-section{ padding: 70px 32px 40px; }
+  .seo-section::before{ display:none; }
+  .seo-k{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+  .seo-btn{ display:inline-block; margin-top:28px; padding:15px 26px; border-radius:12px; background:var(--accent); color:#0b110c; font-weight:800; font-size:15px; text-decoration:none; }
+  @media(max-width:760px){ .seo-section{ padding:50px 18px 24px; } }
   .voir-tous{
     display:inline-block; margin: 30px auto 0; background:#fff; color:#0c110e;
     border:none; border-radius:999px; padding: 14px 34px; font-weight:700; font-size:14px;
@@ -746,6 +751,15 @@
   </div>
 </section>
 
+<section class="feature-section seo-section">
+  <div class="wrap">
+    <span class="seo-k reveal" data-i18n="seo_k">Pronostics du jour</span>
+    <h2 class="reveal" data-i18n-html="seo_h2">Les matchs <span class="lime">en un coup d'œil.</span></h2>
+    <p class="reveal" data-i18n="seo_p">Probabilité de victoire, score probable et résultat réel de chaque match ATP et WTA, publiés avant le coup d'envoi.</p>
+    <a class="seo-btn reveal" href="/fr/pronostics" data-i18n="seo_btn">Voir les pronostics</a>
+  </div>
+</section>
+
 <section class="testi-section">
   <div class="wrap">
     <div class="avatar-row reveal">
@@ -859,7 +873,7 @@
 <footer>
   <div class="wrap foot-wrap">
     <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M 11.07,1.11 L 11.14,1.32 L 11.25,1.54 L 11.50,1.75 L 11.78,1.97 L 12.04,2.19 L 12.29,2.40 L 12.47,2.62 L 12.65,2.83 L 12.83,3.05 L 12.97,3.26 L 13.11,3.48 L 13.22,3.70 L 13.29,3.91 L 13.37,4.13 L 13.44,4.34 L 13.47,4.56 L 13.51,4.77 L 13.55,4.99 L 13.55,5.21 L 13.55,5.42 L 13.55,5.64 L 13.51,5.85 L 13.47,6.07 L 13.44,6.28 L 13.40,6.50 L 13.37,6.72 L 13.29,6.93 L 13.22,7.15 L 13.15,7.36 L 13.08,7.58 L 13.01,7.79 L 12.93,8.01 L 12.83,8.23 L 12.75,8.44 L 12.65,8.66 L 12.54,8.87 L 12.43,9.09 L 12.32,9.30 L 12.22,9.52 L 12.11,9.74 L 12.00,9.95 L 11.89,10.17 L 11.78,10.38 L 11.68,10.60 L 11.53,10.81 L 11.42,11.03 L 11.32,11.25 L 11.17,11.46 L 11.07,11.68 L 10.96,11.89 L 10.85,12.11 L 10.71,12.32 L 10.60,12.54 L 10.49,12.75 L 10.38,12.97 L 10.24,13.19 L 10.13,13.40 L 10.02,13.62 L 9.92,13.83 L 9.81,14.05 L 9.74,14.26 L 9.63,14.48 L 9.52,14.70 L 9.41,14.91 L 9.34,15.13 L 9.23,15.34 L 9.16,15.56 L 9.09,15.77 L 9.02,15.99 L 8.94,16.21 L 8.87,16.42 L 8.80,16.64 L 8.76,16.85 L 8.69,17.07 L 8.66,17.28 L 8.62,17.50 L 8.58,17.72 L 8.55,17.93 L 8.55,18.15 L 8.51,18.36 L 8.51,18.58 L 8.51,18.79 L 8.51,19.01 L 8.55,19.23 L 8.55,19.44 L 8.58,19.66 L 8.62,19.87 L 8.69,20.09 L 8.73,20.30 L 8.80,20.52 L 8.87,20.74 L 8.98,20.95 L 9.09,21.17 L 9.20,21.38 L 9.30,21.60 L 9.45,21.81 L 9.59,22.03 L 9.77,22.25 L 9.95,22.46 L 10.13,22.68 L 10.31,22.86 L 12.90,22.86 L 12.86,22.68 L 12.72,22.46 L 12.50,22.25 L 12.22,22.03 L 11.96,21.81 L 11.71,21.60 L 11.53,21.38 L 11.32,21.17 L 11.17,20.95 L 10.99,20.74 L 10.89,20.52 L 10.78,20.30 L 10.67,20.09 L 10.60,19.87 L 10.53,19.66 L 10.49,19.44 L 10.45,19.23 L 10.42,19.01 L 10.42,18.79 L 10.42,18.58 L 10.42,18.36 L 10.45,18.15 L 10.45,17.93 L 10.53,17.72 L 10.56,17.50 L 10.60,17.28 L 10.67,17.07 L 10.71,16.85 L 10.78,16.64 L 10.85,16.42 L 10.96,16.21 L 11.03,15.99 L 11.10,15.77 L 11.21,15.56 L 11.32,15.34 L 11.39,15.13 L 11.50,14.91 L 11.60,14.70 L 11.71,14.48 L 11.82,14.26 L 11.93,14.05 L 12.04,13.83 L 12.18,13.62 L 12.29,13.40 L 12.40,13.19 L 12.50,12.97 L 12.65,12.75 L 12.75,12.54 L 12.86,12.32 L 13.01,12.11 L 13.11,11.89 L 13.22,11.68 L 13.33,11.46 L 13.47,11.25 L 13.58,11.03 L 13.69,10.81 L 13.80,10.60 L 13.91,10.38 L 14.01,10.17 L 14.12,9.95 L 14.23,9.74 L 14.34,9.52 L 14.44,9.30 L 14.52,9.09 L 14.62,8.87 L 14.70,8.66 L 14.80,8.44 L 14.88,8.23 L 14.95,8.01 L 15.02,7.79 L 15.09,7.58 L 15.16,7.36 L 15.20,7.15 L 15.27,6.93 L 15.31,6.72 L 15.34,6.50 L 15.38,6.28 L 15.42,6.07 L 15.42,5.85 L 15.45,5.64 L 15.45,5.42 L 15.45,5.21 L 15.45,4.99 L 15.45,4.77 L 15.42,4.56 L 15.38,4.34 L 15.34,4.13 L 15.31,3.91 L 15.24,3.70 L 15.16,3.48 L 15.09,3.26 L 15.02,3.05 L 14.91,2.83 L 14.80,2.62 L 14.66,2.40 L 14.55,2.19 L 14.41,1.97 L 14.23,1.75 L 14.05,1.54 L 13.87,1.32 L 13.65,1.11 Z" fill="var(--bg)"/></svg></span><span class="brand-name">TennisMind</span></div>
-    <div class="foot-links"><a href="#" data-i18n="foot_pricing">Pricing</a><a href="mailto:tennismindsupport@gmail.com" data-i18n="foot_support">Support</a><a href="legal/mentions-legales.html">Mentions légales</a><a href="legal/cgu-cgv.html">CGU / CGV</a><a href="legal/politique-confidentialite.html" data-i18n="foot_privacy">Confidentialité</a></div>
+    <div class="foot-links"><a href="/fr/pronostics">Pronostics</a><a href="#" data-i18n="foot_pricing">Pricing</a><a href="mailto:tennismindsupport@gmail.com" data-i18n="foot_support">Support</a><a href="legal/mentions-legales.html">Mentions légales</a><a href="legal/cgu-cgv.html">CGU / CGV</a><a href="legal/politique-confidentialite.html" data-i18n="foot_privacy">Confidentialité</a></div>
     <div class="foot-copy" data-i18n="foot_copy">© 2026 TennisMind. Toutes les analyses sont fournies à titre informatif uniquement.</div>
   </div>
 </footer>
@@ -956,6 +970,10 @@
     "voir_tous": "Voir tous",
     "feature_h2": "Des analyses IA pour anticiper <span class=\"lime\">chaque match.</span>",
     "feature_p": "Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.",
+    "seo_k": "Pronostics du jour",
+    "seo_h2": "Les matchs <span class=\"lime\">en un coup d'œil.</span>",
+    "seo_p": "Probabilité de victoire, score probable et résultat réel de chaque match ATP et WTA, publiés avant le coup d'envoi.",
+    "seo_btn": "Voir les pronostics",
     "p_h1_comp": "Compétitions",
     "p_sub2": "Découvre les compétitions en cours",
     "p_sub_accent2": "Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.",
@@ -1026,6 +1044,10 @@
     "voir_tous": "See all",
     "feature_h2": "AI analysis to anticipate <span class=\"lime\">every match.</span>",
     "feature_p": "Probabilities, scenarios and key data to understand how a match will unfold before the first point.",
+    "seo_k": "Today's predictions",
+    "seo_h2": "Every match <span class=\"lime\">at a glance.</span>",
+    "seo_p": "Win probability, likely score and real result for every ATP and WTA match, published before the first point.",
+    "seo_btn": "See predictions",
     "p_h1_comp": "Competitions",
     "p_sub2": "Discover ongoing competitions",
     "p_sub_accent2": "Our AI analyzes tournaments and gives you insights on players, rankings and upcoming matches.",
@@ -1096,6 +1118,10 @@
     "voir_tous": "Ver todos",
     "feature_h2": "Análisis de IA para anticipar <span class=\"lime\">cada partido.</span>",
     "feature_p": "Probabilidades, escenarios y datos clave para entender el desarrollo de un partido antes del primer punto.",
+    "seo_k": "Pronósticos del día",
+    "seo_h2": "Los partidos <span class=\"lime\">de un vistazo.</span>",
+    "seo_p": "Probabilidad de victoria, marcador probable y resultado real de cada partido ATP y WTA, publicados antes de empezar.",
+    "seo_btn": "Ver pronósticos",
     "p_h1_comp": "Competiciones",
     "p_sub2": "Descubre las competiciones en curso",
     "p_sub_accent2": "Nuestra IA analiza los torneos y te da información sobre jugadores, clasificaciones y próximos partidos.",
@@ -1166,6 +1192,10 @@
     "voir_tous": "Alle anzeigen",
     "feature_h2": "KI-Analysen, um <span class=\"lime\">jedes Match</span> vorherzusehen.",
     "feature_p": "Wahrscheinlichkeiten, Szenarien und Schlüsseldaten, um den Verlauf eines Matches schon vor dem ersten Punkt zu verstehen.",
+    "seo_k": "Tipps des Tages",
+    "seo_h2": "Alle Matches <span class=\"lime\">auf einen Blick.</span>",
+    "seo_p": "Siegwahrscheinlichkeit, wahrscheinliches Ergebnis und echtes Resultat jedes ATP- und WTA-Matches, vor dem ersten Ballwechsel veröffentlicht.",
+    "seo_btn": "Prognosen ansehen",
     "p_h1_comp": "Wettbewerbe",
     "p_sub2": "Entdecke laufende Wettbewerbe",
     "p_sub_accent2": "Unsere KI analysiert Turniere und liefert dir Einblicke zu Spielern, Ranglisten und kommenden Matches.",
@@ -1235,6 +1265,10 @@
     "voir_tous": "Vedi tutti",
     "feature_h2": "Analisi IA per anticipare <span class=\"lime\">ogni partita.</span>",
     "feature_p": "Probabilità, scenari e dati chiave per capire lo svolgimento di una partita ancora prima del primo punto.",
+    "seo_k": "Pronostici del giorno",
+    "seo_h2": "Tutte le partite <span class=\"lime\">in un colpo d'occhio.</span>",
+    "seo_p": "Probabilità di vittoria, punteggio probabile e risultato reale di ogni partita ATP e WTA, pubblicati prima dell'inizio.",
+    "seo_btn": "Vedi i pronostici",
     "p_h1_comp": "Competizioni",
     "p_sub2": "Scopri le competizioni in corso",
     "p_sub_accent2": "La nostra IA analizza i tornei e ti offre approfondimenti su giocatori, classifiche e prossime partite.",

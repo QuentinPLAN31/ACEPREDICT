@@ -174,6 +174,41 @@ def surface_winrate(db: Session, pid, surface: str) -> Optional[int]:
     return round(100 * sum(1 for m in ms if m.winner_id == pid) / len(ms))
 
 
+
+def player_bio(p) -> dict:
+    age = None
+    if getattr(p, "birthdate", None):
+        today = datetime.utcnow()
+        age = today.year - p.birthdate.year - ((today.month, today.day) < (p.birthdate.month, p.birthdate.day))
+    hand = {"R": "Droitier", "L": "Gaucher"}.get((p.hand or "").upper()[:1]) if getattr(p, "hand", None) else None
+    return {"age": age, "taille": p.height_cm or None, "main": hand, "pays": p.country or None}
+
+
+def record(db: Session, pid, since: Optional[datetime] = None) -> Optional[list]:
+    q = db.query(models.Match).filter(or_(models.Match.player1_id == pid, models.Match.player2_id == pid),
+                                      models.Match.winner_id.isnot(None))
+    if since:
+        q = q.filter(models.Match.tourney_date >= since)
+    total = q.count()
+    if total < 3:
+        return None
+    wins = q.filter(models.Match.winner_id == pid).count()
+    return [wins, total - wins]
+
+
+def extra_stats(db: Session, fx_or_pg_p1, fx_or_pg_p2, surface: str) -> dict:
+    """Chiffres complémentaires (omis individuellement s'ils manquent)."""
+    a, b = fx_or_pg_p1, fx_or_pg_p2
+    since = datetime.utcnow() - timedelta(days=365)
+    lv = lambda p: _elo_to_level_pct(p.elo_overall)
+    return {
+        "bio": [player_bio(a), player_bio(b)],
+        "season": [record(db, a.id, since), record(db, b.id, since)],
+        "career": [record(db, a.id), record(db, b.id)],
+        "elo_all": [lv(a), lv(b)],
+    }
+
+
 def typical_scoreline(n_win: int, n_lose: int, gps: float) -> str:
     """Score en jeux "typique" cohérent avec le résultat en sets et le
     nombre moyen de jeux par set (illustratif, pas une prédiction jeu par jeu)."""
@@ -309,6 +344,7 @@ def build_snapshot(db: Session, fx: models.Fixture) -> dict:
         "surf_wr": [surface_winrate(db, p1.id, surface), surface_winrate(db, p2.id, surface)],
         "weather_adjusted": bool(d.get("weather_adjustment")),
         "rk": [p1.current_rank, p2.current_rank],
+        **extra_stats(db, p1, p2, surface),
     }
     snap["analyse"] = _analysis(snap)
     return snap
@@ -372,6 +408,27 @@ def attach_results(db: Session, now: Optional[datetime] = None) -> list[models.M
     return done
 
 
+
+def enrich_snapshots(db: Session, limit: int = 100) -> int:
+    """Ajoute les chiffres complémentaires aux pages créées avant leur
+    introduction (le pronostic lui-même n'est jamais touché)."""
+    n = 0
+    pages = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.is_(None)).limit(limit).all())
+    for pg in pages:
+        if "bio" in (pg.snapshot or {}):
+            continue
+        p1, p2 = db.get(models.Player, pg.player1_id), db.get(models.Player, pg.player2_id)
+        if not p1 or not p2:
+            continue
+        snap = dict(pg.snapshot)
+        snap.update(extra_stats(db, p1, p2, snap["surface"]))
+        pg.snapshot = snap
+        n += 1
+    if n:
+        db.commit()
+    return n
+
+
 def ping_indexnow(urls: list[str]) -> bool:
     key = settings.indexnow_key
     if not key or not urls:
@@ -421,6 +478,11 @@ def sync_match_pages(db: Session, now: Optional[datetime] = None) -> dict:
             stats["errors"] += 1
             log.warning("Page SEO ignorée (%s): %s", getattr(fx, "id", "?"), e)
     try:
+        stats["enriched"] = enrich_snapshots(db)
+    except Exception as e:
+        db.rollback()
+        log.warning("Enrichissement SEO KO: %s", e)
+    try:
         finished = attach_results(db, now)
         stats["finished"] = len(finished)
         new_urls += [f"{settings.public_site_url.rstrip('/')}/fr/pronostic/{p.slug}" for p in finished]
@@ -450,7 +512,9 @@ def _row(pg: models.MatchPage) -> dict:
     done = pg.finished_at is not None
     return {
         "slug": pg.slug, "p1": s["p1"], "p2": s["p2"], "pct": max(s["pct1"], s["pct2"]),
-        "tournoi": s["tournoi"], "date": fr_date_short(sched).replace(f" {sched.year}", "") if sched else "",
+        "tournoi": s["tournoi"], "time": sched.strftime("%H:%M") if sched else "",
+        "day": f"{JOURS[sched.weekday()]} {sched.day} {MOIS[sched.month - 1]}" if sched else "",
+        "img1": s.get("img1", ""), "img2": s.get("img2", ""),
         "done": done, "ok": done and str(pg.result_winner_id) == str(s["fav_id"]), "score": pg.result_score,
     }
 
@@ -474,7 +538,21 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
         st["h2h"] = [str(s["h2h"]["w1"]), str(s["h2h"]["w2"])]
     if all(v is not None for v in s.get("surf_wr", [None, None])):
         st["surf"] = [str(s["surf_wr"][0]), str(s["surf_wr"][1])]
-
+    for k in ("season", "career"):
+        v = s.get(k)
+        if v and v[0] and v[1]:
+            st[k] = [f"{v[0][0]}-{v[0][1]}", f"{v[1][0]}-{v[1][1]}"]
+    if s.get("elo_all") and None not in s["elo_all"]:
+        st["elo_all"] = [f"{x} / 100" for x in s["elo_all"]]
+    bio = s.get("bio")
+    if bio:
+        for k in ("age", "taille", "main", "pays"):
+            st[k] = [bio[0].get(k), bio[1].get(k)]
+    tr = s.get("traits") or {}
+    for k in ("ace", "ret"):
+        a, b = (tr.get("p1") or {}).get(k), (tr.get("p2") or {}).get(k)
+        if a is not None and b is not None:
+            st["aces" if k == "ace" else "ret"] = [str(a).replace(".", ","), str(b)] if k == "ace" else [a, b]
     # Autres pronostics du même jour (liens internes)
     day_start = sched.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc).replace(tzinfo=None)
     others = (db.query(models.MatchPage)
@@ -482,9 +560,7 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
                       models.MatchPage.scheduled_time >= day_start - timedelta(hours=1),
                       models.MatchPage.scheduled_time < day_start + timedelta(hours=25))
               .order_by(models.MatchPage.scheduled_time).limit(4).all())
-    related = [(f"{o.snapshot['p1']} – {o.snapshot['p2']}",
-                f"{str(max(o.snapshot['pct1'], o.snapshot['pct2'])).replace('.', ',')} %",
-                f"/fr/pronostic/{o.slug}") for o in others]
+    related = [_row(o) for o in others]
 
     d = {
         "img1": s["img1"], "img2": s["img2"], "p1": s["p1"], "p2": s["p2"],
@@ -528,13 +604,13 @@ def render_hub(db: Session) -> str:
                                             models.MatchPage.scheduled_time >= now - timedelta(hours=6))
           .order_by(models.MatchPage.scheduled_time).limit(60).all())
     rec = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None))
-           .order_by(models.MatchPage.finished_at.desc()).limit(30).all())
+           .order_by(models.MatchPage.scheduled_time.desc()).limit(60).all())
     return seo_render.hub_page([_row(p) for p in up], [_row(p) for p in rec], accuracy(db))
 
 
 def render_bilan(db: Session) -> str:
     rec = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None))
-           .order_by(models.MatchPage.finished_at.desc()).limit(100).all())
+           .order_by(models.MatchPage.scheduled_time.desc()).limit(100).all())
     return seo_render.bilan_page(accuracy(db), [_row(p) for p in rec])
 
 

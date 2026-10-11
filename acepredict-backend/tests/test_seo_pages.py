@@ -125,3 +125,24 @@ def test_render_edge_cases():
              best_of=5, scores=[], wx=None, traits={}, tournoi_slug="t", winner="B", score="6-4 RET", actual={"sets": "—"})
     assert "Finale" in seo_render.render(d, "before")
     assert "Pronostic raté" in seo_render.render(d, "after")
+
+
+def test_hub_has_past_button_date_separators_and_portraits(seeded):
+    h = client.get("/seo/fr/pronostics").text
+    assert "Voir les matchs passés" in h
+    assert 'class="dh"' in h and 'class="mrow"' in h and "<img" in h
+
+
+def test_more_stats_rows_when_data_exists(seeded):
+    db = TestingSessionLocal()
+    a, b, when = seeded
+    pa = db.get(models.Player, a); pa.height_cm = 198; pa.hand = "R"; pa.birthdate = datetime(1997, 4, 22)
+    db.commit()
+    pg = db.query(models.MatchPage).one()
+    snap = dict(pg.snapshot); snap.pop("bio", None); pg.snapshot = snap; pg.finished_at = None; db.commit()
+    assert seo_pages.enrich_snapshots(db) == 1
+    db.refresh(pg)
+    d, _ = seo_pages.build_context(db, pg)
+    assert d["st"]["taille"][0] == 198 and d["st"]["main"][0] == "Droitier"
+    assert "198 cm" in seo_render.render(d, "before")
+    db.close()

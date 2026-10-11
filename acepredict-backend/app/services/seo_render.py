@@ -48,6 +48,7 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:26px 0 40px;font
 .sct{padding:16px 14px!important}.sct .sn{display:block;font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--td);font-weight:800}.sct .sp{font-family:Unbounded,Inter,sans-serif;font-weight:900;font-size:34px;line-height:1.1;margin:6px 0 2px;background:linear-gradient(135deg,#ff7a45,#ffb020,#ff5f6d);-webkit-background-clip:text;color:transparent}.sct.near{border:2px solid var(--clay)!important;background:rgba(255,138,61,.10)}.sct.near em{color:var(--clay)}
 .lockbox{position:relative;overflow:hidden;border-radius:14px;margin:0 0 18px;min-height:230px;background:linear-gradient(135deg,#ff7a45 0%,#ffb020 45%,#D7F22C 100%)}.lk-blur{position:absolute;inset:0;padding:24px;filter:blur(7px);opacity:1}.lk-row i{display:block;height:16px;border-radius:4px;background:rgba(11,17,12,.55);margin-bottom:14px}.lk-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.lk-tiles div{background:rgba(255,255,255,.55);border-radius:10px;padding:22px 8px;text-align:center}.lk-tiles b{font-size:26px;color:#0b110c}
 .lk-cta{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:34px 22px;min-height:230px;color:#fff}.lk-pan{background:rgba(11,17,12,.80);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:22px 20px;max-width:440px;display:flex;flex-direction:column;align-items:center;gap:10px;backdrop-filter:blur(2px)}.lk-cta h2{margin:0;font-size:clamp(18px,4.5vw,24px);color:#fff;text-transform:none;letter-spacing:-.2px;line-height:1.25}.lk-cta p{margin:0;font-size:14px;color:#e8efe8;max-width:440px}.lk-cta svg{color:var(--acc)}.sct{display:flex!important;align-items:center;justify-content:space-between;gap:14px;padding:18px 18px!important}.sct .sl{min-width:0}.sct .sn{display:block;font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--ts);font-weight:700;margin-bottom:6px}.sct b.sg{display:block;font-family:Unbounded,Inter,sans-serif;font-weight:900;font-size:clamp(22px,6vw,30px);line-height:1.15;margin:0;letter-spacing:0;color:#fff;white-space:nowrap}.sct .sp{font-size:19px!important;font-weight:800;margin:0!important;text-align:right;white-space:nowrap;font-family:Inter,sans-serif!important}.sct .sp::after{content:"";display:block}.sct em{margin-top:8px!important}.sc2g{grid-template-columns:1fr 1fr}@media(max-width:620px){.sc2g{grid-template-columns:1fr}}.lockcard{position:relative;overflow:hidden;padding:0}.lk-body{padding:22px 22px 28px;min-height:420px;filter:blur(6px);user-select:none;pointer-events:none}.lk-body h2{margin-bottom:14px}.fac{margin-top:14px}.fh{font-size:13px;color:var(--ts);font-weight:700;margin-bottom:10px}.fr{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:14px}.fr span{width:110px;color:#dfe7df}.fr i{display:block;height:14px;border-radius:3px;background:linear-gradient(90deg,#ff7a45,#ffb020,#D7F22C)}.al{margin:14px 0 0;color:#dfe7df;font-size:14px}.lk-over{position:absolute;inset:0;display:flex;align-items:flex-start;justify-content:center;padding:18px 16px;background:rgba(15,22,18,.2)}.lk-pan{background:rgba(11,17,12,.88);border:1px solid var(--line2);border-radius:12px;padding:20px 20px;max-width:380px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}.lk-pan svg{color:var(--acc)}.lk-pan b{font-size:17px;line-height:1.3}.lk-pan span{font-size:13.5px;color:var(--ts)}.lk-pan .btn{margin-top:6px}.tpl{background:#2a1f10;color:#ffb020;font-size:12px;text-align:center;padding:6px;font-weight:700}
+details.past{border:0;padding:0;margin:0 0 22px}details.past summary{display:inline-block;list-style:none;cursor:pointer}details.past summary::after{content:none!important}.dh{font-size:12.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ts);font-weight:800;margin:20px 0 10px}.dh:first-child{margin-top:0}.mrow{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#182519;border:1px solid var(--line);border-radius:14px;padding:12px 16px;text-decoration:none;margin-bottom:10px}.mrow:hover{border-color:var(--line2)}.mrow .t{min-width:0}.mrow .t b{display:block;font-size:15px;font-weight:700}.mrow .t small{color:var(--td);font-size:12.5px;font-weight:500}.mrow .pp{display:flex;align-items:center;gap:10px;flex:none}.mrow img{width:44px;height:56px;border-radius:8px;object-fit:cover;object-position:50% 12%;background:#1f2e22;border:1px solid var(--line2);display:block}.mrow .pv{font-family:Unbounded,Inter,sans-serif;font-weight:800;font-size:15px;min-width:58px;text-align:center;color:var(--clay);white-space:nowrap}.mrow .pv.ok{color:var(--grass)}.mrow .pv.ko{color:var(--bad)}.mrow .pv small{display:block;font-family:Inter,sans-serif;font-size:11px;font-weight:600;color:var(--ts)}@media(max-width:520px){.mrow{padding:10px 12px}.mrow img{width:38px;height:48px}.mrow .pv{min-width:48px;font-size:13px}}
 @media(max-width:520px){.card{padding:18px}.pl .ph{width:92px;height:116px}.pl b{font-size:16px}}
 """
 BRAND='<span class="brand-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M 11.07,1.11 L 11.14,1.32 L 11.25,1.54 L 11.50,1.75 L 11.78,1.97 L 12.04,2.19 L 12.29,2.40 L 12.47,2.62 L 12.65,2.83 L 12.83,3.05 L 12.97,3.26 L 13.11,3.48 L 13.22,3.70 L 13.29,3.91 L 13.37,4.13 L 13.44,4.34 L 13.47,4.56 L 13.51,4.77 L 13.55,4.99 L 13.55,5.21 L 13.55,5.42 L 13.55,5.64 L 13.51,5.85 L 13.47,6.07 L 13.44,6.28 L 13.40,6.50 L 13.37,6.72 L 13.29,6.93 L 13.22,7.15 L 13.15,7.36 L 13.08,7.58 L 13.01,7.79 L 12.93,8.01 L 12.83,8.23 L 12.75,8.44 L 12.65,8.66 L 12.54,8.87 L 12.43,9.09 L 12.32,9.30 L 12.22,9.52 L 12.11,9.74 L 12.00,9.95 L 11.89,10.17 L 11.78,10.38 L 11.68,10.60 L 11.53,10.81 L 11.42,11.03 L 11.32,11.25 L 11.17,11.46 L 11.07,11.68 L 10.96,11.89 L 10.85,12.11 L 10.71,12.32 L 10.60,12.54 L 10.49,12.75 L 10.38,12.97 L 10.24,13.19 L 10.13,13.40 L 10.02,13.62 L 9.92,13.83 L 9.81,14.05 L 9.74,14.26 L 9.63,14.48 L 9.52,14.70 L 9.41,14.91 L 9.34,15.13 L 9.23,15.34 L 9.16,15.56 L 9.09,15.77 L 9.02,15.99 L 8.94,16.21 L 8.87,16.42 L 8.80,16.64 L 8.76,16.85 L 8.69,17.07 L 8.66,17.28 L 8.62,17.50 L 8.58,17.72 L 8.55,17.93 L 8.55,18.15 L 8.51,18.36 L 8.51,18.58 L 8.51,18.79 L 8.51,19.01 L 8.55,19.23 L 8.55,19.44 L 8.58,19.66 L 8.62,19.87 L 8.69,20.09 L 8.73,20.30 L 8.80,20.52 L 8.87,20.74 L 8.98,20.95 L 9.09,21.17 L 9.20,21.38 L 9.30,21.60 L 9.45,21.81 L 9.59,22.03 L 9.77,22.25 L 9.95,22.46 L 10.13,22.68 L 10.31,22.86 L 12.90,22.86 L 12.86,22.68 L 12.72,22.46 L 12.50,22.25 L 12.22,22.03 L 11.96,21.81 L 11.71,21.60 L 11.53,21.38 L 11.32,21.17 L 11.17,20.95 L 10.99,20.74 L 10.89,20.52 L 10.78,20.30 L 10.67,20.09 L 10.60,19.87 L 10.53,19.66 L 10.49,19.44 L 10.45,19.23 L 10.42,19.01 L 10.42,18.79 L 10.42,18.58 L 10.42,18.36 L 10.45,18.15 L 10.45,17.93 L 10.53,17.72 L 10.56,17.50 L 10.60,17.28 L 10.67,17.07 L 10.71,16.85 L 10.78,16.64 L 10.85,16.42 L 10.96,16.21 L 11.03,15.99 L 11.10,15.77 L 11.21,15.56 L 11.32,15.34 L 11.39,15.13 L 11.50,14.91 L 11.60,14.70 L 11.71,14.48 L 11.82,14.26 L 11.93,14.05 L 12.04,13.83 L 12.18,13.62 L 12.29,13.40 L 12.40,13.19 L 12.50,12.97 L 12.65,12.75 L 12.75,12.54 L 12.86,12.32 L 13.01,12.11 L 13.11,11.89 L 13.22,11.68 L 13.33,11.46 L 13.47,11.25 L 13.58,11.03 L 13.69,10.81 L 13.80,10.60 L 13.91,10.38 L 14.01,10.17 L 14.12,9.95 L 14.23,9.74 L 14.34,9.52 L 14.44,9.30 L 14.52,9.09 L 14.62,8.87 L 14.70,8.66 L 14.80,8.44 L 14.88,8.23 L 14.95,8.01 L 15.02,7.79 L 15.09,7.58 L 15.16,7.36 L 15.20,7.15 L 15.27,6.93 L 15.31,6.72 L 15.34,6.50 L 15.38,6.28 L 15.42,6.07 L 15.42,5.85 L 15.45,5.64 L 15.45,5.42 L 15.45,5.21 L 15.45,4.99 L 15.45,4.77 L 15.42,4.56 L 15.38,4.34 L 15.34,4.13 L 15.31,3.91 L 15.24,3.70 L 15.16,3.48 L 15.09,3.26 L 15.02,3.05 L 14.91,2.83 L 14.80,2.62 L 14.66,2.40 L 14.55,2.19 L 14.41,1.97 L 14.23,1.75 L 14.05,1.54 L 13.87,1.32 L 13.65,1.11 Z" fill="var(--bg)"/></svg></span>'
@@ -111,12 +112,25 @@ def stats_table(d,p1,p2,surf):
     rows=[]
     def row(a,lab,b): rows.append(f'<tr><td>{a}</td><td>{lab}</td><td>{b}</td></tr>')
     def form(f): return '<span class="form">'+''.join(f'<span class="{"w" if c in "VW" else "l"}">{c}</span>' for c in f)+'</span>'
-    if st.get('rank'): row(st['rank'][0],d.get('rank_label','Classement'),st['rank'][1])
-    if st.get('elo'): row(st['elo'][0],f"Niveau TennisMind sur {surf.lower()}",st['elo'][1])
+    def pair(k,lab,fmt=lambda x:x):
+        v=st.get(k)
+        if v and (v[0] is not None or v[1] is not None):
+            row(fmt(v[0]) if v[0] is not None else '—',lab,fmt(v[1]) if v[1] is not None else '—')
+    pair('rank',d.get('rank_label','Classement'))
+    pair('elo',f"Niveau TennisMind sur {surf.lower()}")
+    pair('elo_all','Niveau TennisMind (toutes surfaces)')
+    pair('season','Bilan sur 12 mois (V-D)')
+    pair('surf',f"Victoires sur {surf.lower()} (12 mois)",lambda x:f"{x} %")
+    pair('career','Bilan en carrière (V-D)')
     f=st.get('form')
     if f and f[0] and f[1]: row(form(f[0]),'Forme (5 derniers)',form(f[1]))
-    if st.get('h2h'): row(st['h2h'][0],'Face-à-face',st['h2h'][1])
-    if st.get('surf'): row(f"{st['surf'][0]} %",f"Victoires sur {surf.lower()} (saison)",f"{st['surf'][1]} %")
+    pair('h2h','Face-à-face')
+    pair('aces','Aces par match')
+    pair('ret','Points gagnés au retour',lambda x:f"{x} %")
+    pair('age','Âge',lambda x:f"{x} ans")
+    pair('taille','Taille',lambda x:f"{x} cm")
+    pair('main','Main')
+    pair('pays','Pays')
     if not rows: return '<p class="pend">Statistiques détaillées bientôt disponibles pour ce match.</p>'
     return f'<table><caption class="sr">Statistiques comparées</caption><tr><th scope="col">{p1}</th><th scope="col"></th><th scope="col">{p2}</th></tr>'+''.join(rows)+'</table>'
 
@@ -163,7 +177,7 @@ def footer_html():
 def related_html(d):
     r=d.get('related') or []
     if not r: return ''
-    return '<section class="card"><h2>Autres pronostics tennis du jour</h2><div class="rel">'+''.join(f'<a href="{u}">{html.escape(a)}<span>{b}</span></a>' for a,b,u in r)+'</div></section>'
+    return '<section class="card"><h2>Autres pronostics tennis du jour</h2>'+''.join(_row(x) for x in r)+'</section>'
 
 def render(d,state):
     p1,p2=d['p1'],d['p2'];fav=p1 if d['pct1']>=d['pct2'] else p2;pf=max(d['pct1'],d['pct2'])
@@ -237,14 +251,27 @@ def page_shell(title, desc, path, body, ld=None, robots="index,follow,max-image-
 
 
 def _row(p):
-    """p: dict(slug,p1,p2,pct,fav,date,tournoi,done,ok,score)"""
-    tag = ''
+    """p: dict(slug,p1,p2,pct,tournoi,time,done,ok,score,img1,img2)"""
     if p.get('done'):
-        tag = f'<span style="color:{"var(--grass)" if p.get("ok") else "var(--bad)"}">{"✓" if p.get("ok") else "✗"} {html.escape(p.get("score") or "")}</span>'
+        mid=f'<div class="pv {"ok" if p.get("ok") else "ko"}">{"✓" if p.get("ok") else "✗"} {html.escape(p.get("score") or "")}<small>{fr(p["pct"])} %</small></div>'
     else:
-        tag = f'<span>{fr(p["pct"])} %</span>'
-    return (f'<a href="/fr/pronostic/{p["slug"]}"><div>{html.escape(p["p1"])} – {html.escape(p["p2"])}'
-            f'<br><small style="color:var(--td);font-weight:500">{html.escape(p.get("tournoi",""))} · {p.get("date","")}</small></div>{tag}</a>')
+        mid=f'<div class="pv">{fr(p["pct"])} %</div>'
+    sub=" · ".join(x for x in (p.get("tournoi",""),p.get("time","")) if x)
+    return (f'<a class="mrow" href="/fr/pronostic/{p["slug"]}"><div class="t"><b>{html.escape(p["p1"])} – {html.escape(p["p2"])}</b>'
+            f'<small>{html.escape(sub)}</small></div>'
+            f'<div class="pp"><img src="{p.get("img1","")}" alt="{html.escape(p["p1"])}" width="44" height="56" loading="lazy" referrerpolicy="no-referrer">{mid}'
+            f'<img src="{p.get("img2","")}" alt="{html.escape(p["p2"])}" width="44" height="56" loading="lazy" referrerpolicy="no-referrer"></div></a>')
+
+
+def _grouped(rows):
+    """Lignes groupées par jour, avec un intitulé de date (pas de trait)."""
+    out=[];last=None
+    for p in rows:
+        day=p.get("day","")
+        if day and day!=last:
+            out.append(f'<div class="dh">{html.escape(day)}</div>');last=day
+        out.append(_row(p))
+    return "".join(out)
 
 
 def hub_page(upcoming, recent, acc):
@@ -254,9 +281,10 @@ def hub_page(upcoming, recent, acc):
     if acc:
         h += f'<section class="card"><h2>Taux de réussite</h2><div class="proj"><div><b>{fr(acc["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc["ok"]}/{acc["total"]}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
     if upcoming:
-        h += '<section class="card"><h2>Matchs à venir</h2><div class="rel">' + ''.join(_row(p) for p in upcoming) + '</div></section>'
+        h += '<section class="card"><h2>Matchs à venir</h2>' + _grouped(upcoming) + '</section>'
     if recent:
-        h += '<section class="card"><h2>Derniers résultats</h2><div class="rel">' + ''.join(_row(p) for p in recent) + '</div></section>'
+        h += ('<details class="past"><summary class="btn ghost">Voir les matchs passés</summary>'
+              '<section class="card" style="margin-top:16px"><h2>Matchs passés</h2>' + _grouped(recent) + '</section></details>')
     if not upcoming and not recent:
         h += '<section class="card"><p class="pend">Les prochains pronostics arrivent très bientôt.</p></section>'
     h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Un autre match en tête ?</span><h2>Analyse n\'importe quel match gratuitement</h2><p>Deux joueurs, une surface : probabilité et score projeté en quelques secondes.</p></div><a class="btn dark" href="{APP}">Essayer TennisMind</a></section>'
@@ -275,7 +303,7 @@ def bilan_page(acc, rows, by_month=None):
     else:
         h += '<section class="card"><p class="pend">Le bilan s\'affichera dès les premiers matchs terminés.</p></section>'
     if rows:
-        h += '<section class="card"><h2>Derniers matchs vérifiés</h2><div class="rel">' + ''.join(_row(p) for p in rows) + '</div></section>'
+        h += '<section class="card"><h2>Derniers matchs vérifiés</h2>' + _grouped(rows) + '</section>'
     ld = {"@context": "https://schema.org", "@type": "WebPage", "name": "Bilan public des pronostics tennis", "url": BASE + "/fr/bilan", "inLanguage": "fr"}
     return page_shell("Bilan public des pronostics tennis | TennisMind",
                       "Taux de réussite réel des pronostics tennis TennisMind : chaque pronostic publié avant le match, comparé au résultat.",
@@ -288,9 +316,9 @@ def tournoi_page(name, slug, upcoming, done, acc):
     if acc and acc["total"]:
         h += f'<p style="color:var(--ts);margin:0 0 22px">Sur ce tournoi, {acc["ok"]} pronostics sur {acc["total"]} déjà vérifiés sont justes ({fr(acc["pct"])} %).</p>'
     if upcoming:
-        h += '<section class="card"><h2>Matchs à venir</h2><div class="rel">' + ''.join(_row(p) for p in upcoming) + '</div></section>'
+        h += '<section class="card"><h2>Matchs à venir</h2>' + _grouped(upcoming) + '</section>'
     if done:
-        h += '<section class="card"><h2>Résultats</h2><div class="rel">' + ''.join(_row(p) for p in done) + '</div></section>'
+        h += '<section class="card"><h2>Résultats</h2>' + _grouped(done) + '</section>'
     ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": f"Pronostics {name}", "url": f"{BASE}/fr/tournoi/{slug}", "inLanguage": "fr"}
     return page_shell(f"Pronostics {name} : probabilités et résultats | TennisMind",
                       f"Pronostics du tournoi {name} : probabilité de victoire de chaque match, score probable et résultat réel.",
