@@ -369,6 +369,38 @@ class Fixture(Base):
     )
 
 
+class MatchPage(Base):
+    """
+    Page SEO publique d'un match (/fr/pronostic/<slug>). Le pronostic est
+    FIGE à la création (snapshot JSON) : il ne change jamais ensuite, seul le
+    résultat réel est ajouté après le match -- d'où une table à part plutôt
+    qu'une lecture de Fixture (purgée après le match, cf. sync_hourly).
+    match_key (tour|tournoi|tour de rôle|joueurs triés) rend la création
+    idempotente.
+    """
+    __tablename__ = "match_pages"
+
+    id = Column(UUIDType, primary_key=True, default=gen_uuid)
+    slug = Column(String, nullable=False, unique=True, index=True)
+    match_key = Column(String, nullable=False, unique=True, index=True)
+    player1_id = Column(UUIDType, ForeignKey("players.id"), nullable=False)
+    player2_id = Column(UUIDType, ForeignKey("players.id"), nullable=False)
+    tour = Column(String, nullable=True)
+    tournament_name = Column(String, nullable=True)
+    tournament_slug = Column(String, nullable=True, index=True)
+    round = Column(String, nullable=True)
+    scheduled_time = Column(DateTime, nullable=True, index=True)
+
+    snapshot = Column(JSONType, nullable=False)
+
+    published_at = Column(DateTime, default=datetime.utcnow)
+    modified_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    result_winner_id = Column(UUIDType, ForeignKey("players.id"), nullable=True)
+    result_score = Column(String, nullable=True)
+    finished_at = Column(DateTime, nullable=True, index=True)
+
+
 # ----------------------------------------------------------- analyses -----
 
 class Analysis(Base):

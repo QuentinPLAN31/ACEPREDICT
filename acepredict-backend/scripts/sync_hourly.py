@@ -85,12 +85,19 @@ def _parse_scheduled_time(raw: Optional[str]) -> Optional[datetime]:
         return None
 
 
-def _external_id_for(tour: str, p1_name: str, p2_name: str, scheduled_time_raw: Optional[str]) -> str:
-    """LiveTennisAPI ne renvoie pas d'id de match stable dans la liste large
-    (get_upcoming_list) — on dérive un identifiant déterministe à partir de
-    (tour, joueurs, horaire programmé), suffisant pour un upsert idempotent
-    d'une exécution horaire à l'autre (cf. Fixture.external_id)."""
-    basis = f"{tour}|{p1_name.strip().lower()}|{p2_name.strip().lower()}|{scheduled_time_raw or ''}"
+def _external_id_for(tour: str, p1_name: str, p2_name: str, scheduled_time_raw: Optional[str],
+                     tournament_id: Optional[str] = None, round_: Optional[str] = None) -> str:
+    """Identifiant déterministe d'un match (LiveTennisAPI ne renvoie pas d'id
+    stable dans la liste large). Quand le tournoi et le tour sont connus, la clé
+    est (tour ATP/WTA, tournoi, round, PAIRE de joueurs non ordonnée) et ignore
+    l'horaire : un match déplacé (nouvel horaire, changement de court) ou dont
+    les joueurs sont inversés reste LE MÊME match au lieu d'être dupliqué.
+    Sans tournoi/round, on retombe sur l'ancienne clé (horaire inclus)."""
+    a, b = sorted([p1_name.strip().lower(), p2_name.strip().lower()])
+    if tournament_id or round_:
+        basis = f"{tour}|{tournament_id or ''}|{(round_ or '').strip().lower()}|{a}|{b}"
+    else:
+        basis = f"{tour}|{a}|{b}|{scheduled_time_raw or ''}"
     return "ltapi:" + hashlib.sha1(basis.encode("utf-8")).hexdigest()[:24]
 
 
@@ -211,10 +218,9 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
             continue
 
         scheduled_time_raw = m.get("scheduled_time")
-        external_id = _external_id_for(tour, p1_name, p2_name, scheduled_time_raw)
-        seen_external_ids.add(external_id)
-
         tournament_id = m.get("tournament_id")
+        external_id = _external_id_for(tour, p1_name, p2_name, scheduled_time_raw, tournament_id, m.get("round"))
+        seen_external_ids.add(external_id)
         city = None
         if tournament_id:
             if tournament_id not in city_cache:
@@ -228,9 +234,27 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
             city = city_cache[tournament_id]
 
         fixture = db.query(models.Fixture).filter(models.Fixture.external_id == external_id).first()
+        # Anciennes lignes (clé avec horaire) ou joueurs inversés : même match
+        # = même tour + même paire (ordre indifférent) + même tournoi + même round.
+        same_match = [
+            f for f in db.query(models.Fixture).filter(
+                models.Fixture.tour == tour,
+                ((models.Fixture.player1_id == p1.id) & (models.Fixture.player2_id == p2.id))
+                | ((models.Fixture.player1_id == p2.id) & (models.Fixture.player2_id == p1.id)),
+            ).all()
+            if (f.tournament_id_external or None) == (tournament_id or None)
+            and (f.round or None) == (m.get("round") or None)
+        ]
+        if not fixture and same_match:
+            fixture = same_match[0]
+            fixture.external_id = external_id
         if not fixture:
             fixture = models.Fixture(external_id=external_id, source="livetennisapi")
             db.add(fixture)
+        for dup in same_match:
+            if dup is not fixture:
+                db.delete(dup)
+                stats["pruned"] = stats.get("pruned", 0) + 1
 
         fixture.player1_id = p1.id
         fixture.player2_id = p2.id
@@ -314,7 +338,16 @@ def run(db: Session | None = None) -> dict:
     owns_session = db is None
     db = db or SessionLocal()
     try:
-        return asyncio.run(_run_async(db))
+        report = asyncio.run(_run_async(db))
+        # Pages SEO par match (non bloquant : une erreur ici ne doit jamais
+        # faire échouer la synchronisation des fixtures).
+        try:
+            from app.services.seo_pages import sync_match_pages
+            report["seo_pages"] = sync_match_pages(db)
+        except Exception as e:  # noqa: BLE001
+            db.rollback()
+            report["seo_pages"] = {"error": str(e)}
+        return report
     finally:
         if owns_session:
             db.close()
@@ -322,6 +355,8 @@ def run(db: Session | None = None) -> dict:
 
 def main():
     report = run()
+    if report.get("seo_pages"):
+        print(f"[sync_hourly] pages SEO : {report['seo_pages']}")
     if not report["configured"]:
         print("[sync_hourly] LIVETENNISAPI_KEY non configurée -- rien à synchroniser.")
         return

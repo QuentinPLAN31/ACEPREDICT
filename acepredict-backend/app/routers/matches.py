@@ -70,6 +70,22 @@ def _annotate_analyzable(db: Session, matches: list[dict]) -> list[dict]:
     return annotated
 
 
+def _dedupe_fixtures(fixtures):
+    """Garde-fou en lecture : un même match (tournoi + round + paire de joueurs,
+    ordre indifférent) ne doit apparaître qu'une fois, même si la base contient
+    encore des doublons (horaire modifié par la source entre deux synchros).
+    On garde la ligne synchronisée en dernier."""
+    best = {}
+    for f in fixtures:
+        key = (f.tour, f.tournament_id_external or f.tournament_name, f.round,
+               frozenset((str(f.player1_id), str(f.player2_id))))
+        cur = best.get(key)
+        if cur is None or (f.synced_at or datetime.min) >= (cur.synced_at or datetime.min):
+            best[key] = f
+    kept = {id(v) for v in best.values()}
+    return [f for f in fixtures if id(f) in kept]
+
+
 @router.get("/upcoming", response_model=list[schemas.UpcomingMatchOut])
 def upcoming_matches(
     player1_id: str,
@@ -92,6 +108,7 @@ def upcoming_matches(
         .order_by(models.Fixture.scheduled_time.asc())
         .all()
     )
+    fixtures = _dedupe_fixtures(fixtures)
 
     return [
         {
@@ -131,7 +148,7 @@ def upcoming_matches_list(
             & (models.Fixture.scheduled_time <= now + UPCOMING_HORIZON),
         )
     )
-    fixtures = query.order_by(models.Fixture.scheduled_time.asc()).limit(limit).all()
+    fixtures = _dedupe_fixtures(query.order_by(models.Fixture.scheduled_time.asc()).limit(limit).all())
 
     matches = []
     for f in fixtures:

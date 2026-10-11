@@ -1,5 +1,11 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/landing.html" }
+    { "source": "/", "destination": "/landing.html" },
+    { "source": "/fr/pronostic/:slug", "destination": "https://acepredict-production.up.railway.app/seo/fr/pronostic/:slug" },
+    { "source": "/fr/pronostics", "destination": "https://acepredict-production.up.railway.app/seo/fr/pronostics" },
+    { "source": "/fr/bilan", "destination": "https://acepredict-production.up.railway.app/seo/fr/bilan" },
+    { "source": "/fr/tournoi/:slug", "destination": "https://acepredict-production.up.railway.app/seo/fr/tournoi/:slug" },
+    { "source": "/sitemap.xml", "destination": "https://acepredict-production.up.railway.app/seo/sitemap.xml" },
+    { "source": "/seo/indexnow-key.txt", "destination": "https://acepredict-production.up.railway.app/seo/indexnow-key.txt" }
   ]
 }

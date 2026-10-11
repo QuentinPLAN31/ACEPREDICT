@@ -97,6 +97,10 @@ class Settings(BaseSettings):
     frontend_base_url: str = "http://localhost:5500"
 
     # Misc
+    # SEO : clé IndexNow (fichier /seo/indexnow-key.txt) et base publique du site
+    indexnow_key: str = ""
+    public_site_url: str = "https://app-tennismind.com"
+
     env: str = "development"
     # "null" = origine envoyée par un navigateur quand landing.html/visitennis_1.html
     # sont ouverts directement en double-cliquant (file://), sans serveur local —

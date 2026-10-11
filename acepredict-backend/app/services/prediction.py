@@ -342,6 +342,7 @@ def build_prediction(
     tournament_name: Optional[str] = None,
     weather: Optional[dict] = None,
     market: Optional[dict] = None,
+    with_narrative: bool = True,
 ) -> dict:
     """
     match_city n'est plus utilisé ici pour aller chercher la météo (cf.
@@ -506,13 +507,14 @@ def build_prediction(
 
     # Commentaire d'analyse en langage naturel (optionnel — cf. ai_narrative.py) :
     # explique les chiffres ci-dessus, n'influence jamais la probabilité elle-même.
-    detail["ai_narrative"] = ai_narrative.generate_narrative({
-        **detail,
-        "player1_name": player1.name,
-        "player2_name": player2.name,
-        "winner_name": winner.name,
-        "win_probability": probability,
-    })
+    if with_narrative:
+        detail["ai_narrative"] = ai_narrative.generate_narrative({
+            **detail,
+            "player1_name": player1.name,
+            "player2_name": player2.name,
+            "winner_name": winner.name,
+            "win_probability": probability,
+        })
 
     return {
         "predicted_winner_id": winner.id,
