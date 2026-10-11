@@ -56,6 +56,14 @@ PLACEHOLDER_IMG = (
 
 
 # ------------------------------------------------------------------ utils --
+def display_pct(raw: float) -> float:
+    """Même repondération que l'application (visitennis_1.html::displayConfidencePct) :
+    la probabilité réelle [50, 99] est étirée vers [70, 98] pour l'affichage."""
+    clamped = min(99.0, max(50.0, raw))
+    ratio = (clamped - 50.0) / (99.0 - 50.0)
+    return round((70.0 + ratio * (98.0 - 70.0)) * 10) / 10
+
+
 def slugify(txt: str) -> str:
     t = unicodedata.normalize("NFKD", txt or "").encode("ascii", "ignore").decode("ascii").lower()
     return re.sub(r"[^a-z0-9]+", "-", t).strip("-")
@@ -245,9 +253,10 @@ def _analysis(snap: dict) -> list[str]:
     fi = "1" if fav == p["p1"] else "2"
     oi = "2" if fi == "1" else "1"
     pf = max(p["pct1"], p["pct2"])
+    rf = max(p.get("raw1", p["pct1"]), p.get("raw2", p["pct2"]))
     rank_txt = {"1": p.get("rank1"), "2": p.get("rank2")}
     surf = {"hard": "surface dure", "clay": "terre battue", "grass": "gazon"}[p["surface"]]
-    lab = "grand favori" if pf >= 80 else ("favori" if pf >= 65 else ("léger favori" if pf >= 55 else "à peine favori"))
+    lab = "grand favori" if rf >= 80 else ("favori" if rf >= 65 else ("léger favori" if rf >= 55 else "à peine favori"))
     s1 = f"{fav} aborde ce {p['round_label']} du {p['tournoi']} en {lab} ({str(pf).replace('.', ',')} %)."
     lv = p.get("levels") or {}
     if lv.get(fi) is not None and lv.get(oi) is not None:
@@ -272,8 +281,8 @@ def _analysis(snap: dict) -> list[str]:
             parts.append(f"{lead} mène {a}-{b} dans leurs confrontations directes.")
     if parts:
         paras.append(" ".join(parts))
-    tail = f"Avec {str(pf).replace('.', ',')} %, {opp} conserve {str(round(100 - pf, 1)).replace('.', ',')} % de chances : "
-    tail += f"statistiquement, environ un match sur {max(2, round(100 / max(1.0, 100 - pf)))} tourne en sa faveur."
+    tail = f"{opp} n'est jamais hors de portée : "
+    tail += f"statistiquement, environ un match sur {max(2, round(100 / max(1.0, 100 - rf)))} avec ce type d'écart tourne en faveur de l'outsider."
     if p.get("weather_adjusted"):
         tail += " Les conditions météo ont été prises en compte dans le calcul."
     paras.append(tail)
@@ -294,8 +303,10 @@ def build_snapshot(db: Session, fx: models.Fixture) -> dict:
     d = res["detail"]
     pw = float(res["win_probability"])
     fav_is_p1 = str(res["predicted_winner_id"]) == str(p1.id)
-    pct1 = round((pw if fav_is_p1 else 1 - pw) * 100, 1)
-    pct2 = round(100 - pct1, 1)
+    raw_fav = round(max(pw, 0.5) * 1000) / 10
+    disp_fav = display_pct(raw_fav)
+    pct1, pct2 = (disp_fav, round(100 - disp_fav, 1)) if fav_is_p1 else (round(100 - disp_fav, 1), disp_fav)
+    raw1, raw2 = (raw_fav, round(100 - raw_fav, 1)) if fav_is_p1 else (round(100 - raw_fav, 1), raw_fav)
 
     ctx = d.get("tournament_context") or {}
     best_of = 5 if str(ctx.get("format", "")).startswith("Bo5") else 3
@@ -325,7 +336,7 @@ def build_snapshot(db: Session, fx: models.Fixture) -> dict:
             wx["vent_kmh"] = round(wx["vent_kmh"])
 
     snap = {
-        "p1": p1.name, "p2": p2.name, "pct1": pct1, "pct2": pct2,
+        "p1": p1.name, "p2": p2.name, "pct1": pct1, "pct2": pct2, "raw1": raw1, "raw2": raw2,
         "fav_id": str(res["predicted_winner_id"]),
         "rank1": f"N°{p1.current_rank} mondial" if p1.current_rank else "",
         "rank2": f"N°{p2.current_rank} mondial" if p2.current_rank else "",
@@ -409,21 +420,31 @@ def attach_results(db: Session, now: Optional[datetime] = None) -> list[models.M
 
 
 
-def enrich_snapshots(db: Session, limit: int = 100) -> int:
-    """Ajoute les chiffres complémentaires aux pages créées avant leur
-    introduction (le pronostic lui-même n'est jamais touché)."""
+def enrich_snapshots(db: Session, limit: int = 500) -> int:
+    """(1) Convertit les anciens snapshots (pourcentage brut) vers le
+    pourcentage affiché comme dans l'application ; (2) ajoute les chiffres
+    complémentaires aux pages créées avant leur introduction. Le pronostic
+    (favori, probabilité réelle) n'est jamais modifié."""
     n = 0
-    pages = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.is_(None)).limit(limit).all())
+    pages = db.query(models.MatchPage).limit(limit).all()
     for pg in pages:
-        if "bio" in (pg.snapshot or {}):
-            continue
-        p1, p2 = db.get(models.Player, pg.player1_id), db.get(models.Player, pg.player2_id)
-        if not p1 or not p2:
-            continue
-        snap = dict(pg.snapshot)
-        snap.update(extra_stats(db, p1, p2, snap["surface"]))
-        pg.snapshot = snap
-        n += 1
+        snap = dict(pg.snapshot or {})
+        changed = False
+        if "raw1" not in snap:
+            snap["raw1"], snap["raw2"] = snap["pct1"], snap["pct2"]
+            fav1 = snap["pct1"] >= snap["pct2"]
+            disp = display_pct(max(snap["pct1"], snap["pct2"]))
+            snap["pct1"], snap["pct2"] = (disp, round(100 - disp, 1)) if fav1 else (round(100 - disp, 1), disp)
+            snap["analyse"] = _analysis(snap)
+            changed = True
+        if pg.finished_at is None and "bio" not in snap:
+            p1, p2 = db.get(models.Player, pg.player1_id), db.get(models.Player, pg.player2_id)
+            if p1 and p2:
+                snap.update(extra_stats(db, p1, p2, snap["surface"]))
+                changed = True
+        if changed:
+            pg.snapshot = snap
+            n += 1
     if n:
         db.commit()
     return n
@@ -525,7 +546,7 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
     pub = to_paris(pg.published_at) or sched
     done = pg.finished_at is not None
     fav_name = s["p1"] if s["pct1"] >= s["pct2"] else s["p2"]
-    pf = max(s["pct1"], s["pct2"]) / 100
+    pf = max(s.get("raw1", s["pct1"]), s.get("raw2", s["pct2"])) / 100
     tour = (pg.tour or "atp").upper()
     tier = {"Grand Chelem": "Grand Chelem", "Masters 1000 / WTA 1000 / Finals": "1000 / Finals"}.get(s.get("tier"), "")
     rk = s.get("rk") or [None, None]
@@ -564,7 +585,7 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
 
     d = {
         "img1": s["img1"], "img2": s["img2"], "p1": s["p1"], "p2": s["p2"],
-        "pct1": s["pct1"], "pct2": s["pct2"], "rank1": s["rank1"], "rank2": s["rank2"],
+        "raw_pf": pf * 100, "pct1": s["pct1"], "pct2": s["pct2"], "rank1": s["rank1"], "rank2": s["rank2"],
         "rank_label": f"Classement {tour}",
         "tournoi": s["tournoi"], "round": s["round_label"][:1].upper() + s["round_label"][1:],
         "tour_lbl": f"{tour} {tier}".strip(), "surface": s["surface"], "ville": s["ville"],

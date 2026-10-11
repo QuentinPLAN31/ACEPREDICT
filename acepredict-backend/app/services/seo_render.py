@@ -196,7 +196,7 @@ def render(d,state):
           "isPartOf":{"@type":"WebSite","name":"TennisMind","url":base},"primaryImageOfPage":f"{base}/og/{d['slug']}.png"}
     crumbs={"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":u} for i,(n,u) in enumerate([("Accueil",base+"/"),("Pronostics",base+"/fr/pronostics"),(d['tournoi'],base+"/fr/tournoi/"+d['tournoi_slug']),(f"{p1} – {p2}",url)])]}
     fq=[("Comment est calculé ce pronostic ?","TennisMind combine le niveau de chaque joueur sur la surface, la forme récente, le face-à-face, les conditions de jeu et la météo, puis compare le tout à l'historique des matchs ATP."),
-        ("Peut-on se fier à ce pourcentage ?",f"Un pourcentage est une probabilité, pas une certitude : à {fr(pf)} %, le favori perd statistiquement environ un match sur {max(2,round(1/max(0.01,1-pf/100)))}. Pour juger la fiabilité du modèle, le bilan public affiche chaque pronostic publié avant le match, avec son résultat réel et le taux de réussite mis à jour chaque jour.")]
+        ("Peut-on se fier à ce pourcentage ?",f"Un pourcentage est une probabilité, pas une certitude : à {fr(pf)} %, le favori perd statistiquement environ un match sur {max(2,round(1/max(0.01,1-d.get('raw_pf',pf)/100)))}. Pour juger la fiabilité du modèle, le bilan public affiche chaque pronostic publié avant le match, avec son résultat réel et le taux de réussite mis à jour chaque jour.")]
     faq={"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in fq]}
     ld={"@context":"https://schema.org","@graph":[page,ev,crumbs,faq]}
     tz=d.get("tease") or ("19–15","38 %","9 – 4")

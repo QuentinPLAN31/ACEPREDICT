@@ -70,7 +70,8 @@ def test_create_page_and_idempotent(seeded):
     assert again["created"] == 0
     pg = db.query(models.MatchPage).one()
     assert pg.slug.startswith("alexander-zverev-quentin-halys-shanghai-")
-    assert pg.snapshot["pct1"] > 80
+    assert pg.snapshot["pct1"] > 80 and pg.snapshot["raw1"] <= pg.snapshot["pct1"]
+    assert 70 <= pg.snapshot["pct1"] <= 98
     db.close()
 
 
@@ -145,4 +146,24 @@ def test_more_stats_rows_when_data_exists(seeded):
     d, _ = seo_pages.build_context(db, pg)
     assert d["st"]["taille"][0] == 198 and d["st"]["main"][0] == "Droitier"
     assert "198 cm" in seo_render.render(d, "before")
+    db.close()
+
+
+def test_display_pct_matches_app_formula():
+    assert seo_pages.display_pct(50) == 70.0
+    assert seo_pages.display_pct(99) == 98.0
+    assert seo_pages.display_pct(81.1) == 87.8
+
+
+def test_old_snapshot_is_converted_once(seeded):
+    db = TestingSessionLocal()
+    pg = db.query(models.MatchPage).one()
+    snap = dict(pg.snapshot)
+    snap["pct1"], snap["pct2"] = 81.1, 18.9
+    snap.pop("raw1"); snap.pop("raw2")
+    pg.snapshot = snap; db.commit()
+    seo_pages.enrich_snapshots(db)
+    db.refresh(pg)
+    assert pg.snapshot["pct1"] == 87.8 and pg.snapshot["raw1"] == 81.1
+    assert seo_pages.enrich_snapshots(db) == 0
     db.close()
