@@ -307,7 +307,13 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
     if tot:
         h += f'<section class="card"><h2>Fiabilité sur ce tournoi</h2><div class="proj"><div><b>{R.fr(round(100*ok/tot,1))} %</b><small>pronostics justes</small></div><div><b>{ok}/{tot}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
     if not (up or dn or fin or retro_html):
-        h += f'<section class="card"><p class="pend">Les pronostics de {html.escape(t["name"])} seront publiés ici dès que le tableau sera connu, avant chaque match.</p></section>'
+        nxt = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.is_(None), ~models.MatchPage.match_key.like("retro|%"),
+                                                models.MatchPage.scheduled_time >= datetime.utcnow() - timedelta(hours=6))
+               .order_by(models.MatchPage.scheduled_time).limit(10).all())
+        h += (f'<section class="card"><p class="pend" style="margin:0">Aucun match de {html.escape(t["name"])} n\'est programmé pour le moment. '
+              'Voici les prochains pronostics tennis, tournois ATP et WTA confondus.</p></section>')
+        if nxt:
+            h += '<section class="card"><h2>Prochains pronostics</h2>' + R._grouped([P._row(x) for x in nxt]) + '<p style="margin:14px 0 0"><a class="btn ghost" href="/fr/pronostics">Voir tous les pronostics</a></p></section>'
     fav = ''.join(_fav_table(db, t["surface"], tour, f"Favoris {'messieurs' if tour == 'atp' else 'dames'} selon TennisMind") for tour in t["tours"])
     if fav:
         h += f'<section class="card"><h2>Qui est le plus fort sur {surf} ?</h2><p class="pend" style="margin:0 0 6px">La note sur 100 mesure le niveau d\'un joueur sur {surf} selon TennisMind : plus elle est haute, plus il est redoutable sur cette surface. Elle est calculée sur ses résultats passés.</p>{fav}</section>'

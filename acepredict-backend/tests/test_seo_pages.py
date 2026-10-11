@@ -241,3 +241,8 @@ def test_evergreen_shows_matches_before_intro_and_photo_cache(seeded):
     assert seo_pages.photo_for(db, pl) == seo_pages.PLACEHOLDER_IMG  # fetch_photo stubbé -> None, mis en cache
     assert db.get(models.PlayerPhoto, str(a)) is not None
     db.close()
+
+
+def test_empty_evergreen_shows_next_predictions(seeded):
+    h = client.get("/seo/fr/tournoi/roland-garros").text
+    assert "Aucun match de Roland-Garros" in h and "Prochains pronostics" in h and "/fr/pronostic/" in h
