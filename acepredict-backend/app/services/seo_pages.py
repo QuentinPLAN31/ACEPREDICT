@@ -582,6 +582,16 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
                       models.MatchPage.scheduled_time < day_start + timedelta(hours=25))
               .order_by(models.MatchPage.scheduled_time).limit(4).all())
     related = [_row(o) for o in others]
+    from app.services import seo_extra
+    links = []
+    for pid in (pg.player1_id, pg.player2_id):
+        pl = db.get(models.Player, pid)
+        if seo_extra.player_page_ok(pl):
+            links.append((f"Fiche de {pl.name}", f"/fr/joueur/{seo_extra.player_slug(pl)}"))
+    ev = seo_extra.evergreen_for(s.get("tournoi"))
+    if ev:
+        links.append((f"Pronostics {seo_extra.T[ev]['name']}", f"/fr/tournoi/{ev}"))
+    links.append(("Pronostics du jour", "/fr/pronostics/aujourdhui"))
 
     d = {
         "img1": s["img1"], "img2": s["img2"], "p1": s["p1"], "p2": s["p2"],
@@ -593,7 +603,7 @@ def build_context(db: Session, pg: models.MatchPage) -> tuple[dict, str]:
         "iso": sched.isoformat(), "slug": pg.slug,
         "publie": fr_date_pub(pub), "publie_iso": pub.isoformat(),
         "modif_iso": _utc_iso(pg.modified_at), "tournoi_slug": pg.tournament_slug,
-        "st": st, "analyse": s["analyse"], "related": related, "best_of": s["best_of"],
+        "st": st, "analyse": s["analyse"], "related": related, "links": links, "best_of": s["best_of"],
         "scores": [tuple(x) for x in s["scores"]], "wx": s.get("wx"),
         "traits": s.get("traits") or {}, "tease": None,
         "winner": None, "score": None, "actual": None,
@@ -636,6 +646,9 @@ def render_bilan(db: Session) -> str:
 
 
 def render_tournoi(db: Session, slug: str) -> Optional[str]:
+    from app.services import seo_extra
+    if slug in seo_extra.T:
+        return seo_extra.render_evergreen(db, slug)
     pages = (db.query(models.MatchPage).filter(models.MatchPage.tournament_slug == slug)
              .order_by(models.MatchPage.scheduled_time).all())
     if not pages:
@@ -658,4 +671,6 @@ def render_sitemap(db: Session) -> str:
     for slug, mod in (db.query(models.MatchPage.slug, models.MatchPage.modified_at)
                       .order_by(models.MatchPage.scheduled_time.desc()).limit(5000).all()):
         entries.append((f"/fr/pronostic/{slug}", (mod or datetime.utcnow()).date().isoformat(), "hourly"))
+    from app.services import seo_extra
+    entries += seo_extra.sitemap_entries(db)
     return seo_render.sitemap_xml(entries)

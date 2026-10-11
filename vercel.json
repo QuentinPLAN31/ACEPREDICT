@@ -31,6 +31,22 @@
     {
       "source": "/seo/indexnow-key.txt",
       "destination": "https://acepredict-production.up.railway.app/seo/indexnow-key.txt"
+    },
+    {
+      "source": "/fr/tournois",
+      "destination": "https://acepredict-production.up.railway.app/seo/fr/tournois"
+    },
+    {
+      "source": "/fr/joueurs",
+      "destination": "https://acepredict-production.up.railway.app/seo/fr/joueurs"
+    },
+    {
+      "source": "/fr/joueur/:slug",
+      "destination": "https://acepredict-production.up.railway.app/seo/fr/joueur/:slug"
+    },
+    {
+      "source": "/fr/pronostics/:when",
+      "destination": "https://acepredict-production.up.railway.app/seo/fr/pronostics/:when"
     }
   ]
 }

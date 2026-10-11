@@ -170,9 +170,14 @@ def header_html():
 
 def footer_html():
     return f"""<footer><div class="foot-wrap"><a class="brand" href="/">{BRAND}<span class="brand-name">TennisMind</span></a>
-<div class="foot-links"><a href="/fr/pronostics">Pronostics</a><a href="/fr/bilan">Bilan public</a><a href="mailto:tennismindsupport@gmail.com">Support</a><a href="/legal/mentions-legales.html">Mentions légales</a><a href="/legal/cgu-cgv.html">CGU / CGV</a><a href="/legal/politique-confidentialite.html">Confidentialité</a></div>
+<div class="foot-links"><a href="/fr/pronostics">Pronostics</a><a href="/fr/tournois">Tournois</a><a href="/fr/joueurs">Joueurs</a><a href="/fr/bilan">Bilan public</a><a href="mailto:tennismindsupport@gmail.com">Support</a><a href="/legal/mentions-legales.html">Mentions légales</a><a href="/legal/cgu-cgv.html">CGU / CGV</a><a href="/legal/politique-confidentialite.html">Confidentialité</a></div>
 <div class="foot-copy">© 2026 TennisMind. Toutes les analyses sont fournies à titre informatif uniquement.</div></div>
 <p class="foot-note">Les pronostics TennisMind sont des estimations statistiques. Ils ne constituent ni un conseil de pari ni une garantie de résultat. Réservé aux 18 ans et plus. Jouer comporte des risques : endettement, isolement, dépendance. Appelez le 09 74 75 13 13 (appel non surtaxé).</p></footer>"""
+
+def more_html(d):
+    l=d.get('links') or []
+    if not l: return ''
+    return '<section class="card"><h2>Pour aller plus loin</h2><div class="chips" style="margin:0">'+''.join(f'<a class="btn ghost" href="{u}">{html.escape(n)}</a>' for n,u in l)+'</div></section>'
 
 def related_html(d):
     r=d.get('related') or []
@@ -230,6 +235,7 @@ def render(d,state):
 <div class="lk-over"><div class="lk-pan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Analyse détaillée réservée aux inscrits</b><span>Projection jeu par jeu, facteurs clés et alertes avant le match.</span><a class="btn" href="{APP}">Débloquer gratuitement</a></div></div></section>
 <section class="bigcta"><div class="bc-t"><span class="bc-k">Un autre match en tête ?</span><h2>Obtiens la probabilité de n'importe quel match</h2><p>Choisis deux joueurs et une surface : TennisMind calcule en quelques secondes qui est favori, avec le score projeté.</p></div><a class="btn dark" href="{APP}">Analyser un match gratuitement</a></section>
 <section class="card"><h2>Questions fréquentes sur {p1} – {p2}</h2>{''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q,a in fq)}</section>
+{more_html(d)}
 {related_html(d)}
 </article></main>{footer_html()}</body></html>"""
     return h
@@ -280,6 +286,9 @@ def hub_page(upcoming, recent, acc):
     h += '<p style="color:var(--ts);margin:0 0 22px">Chaque match reçoit une probabilité de victoire et un score probable calculés par TennisMind, publiés avant la rencontre puis comparés au résultat réel.</p>'
     if acc:
         h += f'<section class="card"><h2>Taux de réussite</h2><div class="proj"><div><b>{fr(acc["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc["ok"]}/{acc["total"]}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
+    h += ('<section class="card"><h2>Explorer</h2><div class="chips" style="margin:0">'
+          '<a class="btn ghost" href="/fr/pronostics/aujourdhui">Pronostics du jour</a><a class="btn ghost" href="/fr/pronostics/demain">Demain</a>'
+          '<a class="btn ghost" href="/fr/tournois">Tournois</a><a class="btn ghost" href="/fr/joueurs">Joueurs</a></div></section>')
     if upcoming:
         h += '<section class="card"><h2>Matchs à venir</h2>' + _grouped(upcoming) + '</section>'
     if recent:

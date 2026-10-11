@@ -167,3 +167,32 @@ def test_old_snapshot_is_converted_once(seeded):
     assert pg.snapshot["pct1"] == 87.8 and pg.snapshot["raw1"] == 81.1
     assert seo_pages.enrich_snapshots(db) == 0
     db.close()
+
+
+def test_evergreen_tournament_players_and_day_pages(seeded):
+    from app.services import seo_extra
+    assert seo_extra.evergreen_for("Shanghai") == "shanghai"
+    assert seo_extra.evergreen_for("Masters de Paris-Bercy") == "paris-bercy"
+    assert seo_extra.evergreen_for("Jerome Open") is None
+    r = client.get("/seo/fr/tournoi/shanghai")
+    assert r.status_code == 200 and "Pronostics Masters de Shanghai" in r.text and "FAQPage" in r.text
+    assert "Alexander Zverev" in r.text  # favoris par Elo de surface
+    assert client.get("/seo/fr/tournoi/roland-garros").status_code == 200
+    assert client.get("/seo/fr/tournois").status_code == 200
+    j = client.get("/seo/fr/joueurs")
+    assert "alexander-zverev" in j.text
+    p = client.get("/seo/fr/joueur/alexander-zverev")
+    assert p.status_code == 200 and "Pronostic Alexander Zverev" in p.text and "ProfilePage" in p.text
+    assert client.get("/seo/fr/joueur/inconnu").status_code == 404
+    assert client.get("/seo/fr/pronostics/aujourdhui").status_code == 200
+    assert client.get("/seo/fr/pronostics/hier").status_code == 404
+    sm = client.get("/seo/sitemap.xml").text
+    assert "/fr/joueur/alexander-zverev" in sm and "/fr/tournoi/roland-garros" in sm
+
+
+def test_match_page_links_to_player_and_tournament(seeded):
+    db = TestingSessionLocal()
+    slug = db.query(models.MatchPage).one().slug
+    db.close()
+    h = client.get(f"/seo/fr/pronostic/{slug}").text
+    assert "/fr/joueur/alexander-zverev" in h and "Pour aller plus loin" in h

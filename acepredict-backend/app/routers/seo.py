@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.config import settings
 from app.database import get_db
-from app.services import seo_pages, seo_render
+from app.services import seo_extra, seo_pages, seo_render
 
 router = APIRouter(prefix="/seo", tags=["seo"], include_in_schema=False)
 
@@ -46,6 +46,28 @@ def tournoi(slug: str, db: Session = Depends(get_db)):
     if html_ is None:
         return _not_found()
     return HTMLResponse(html_, headers=CACHE)
+
+
+@router.get("/fr/tournois")
+def tournois(db: Session = Depends(get_db)):
+    return HTMLResponse(seo_extra.render_tournois(db), headers=CACHE)
+
+
+@router.get("/fr/joueurs")
+def joueurs(db: Session = Depends(get_db)):
+    return HTMLResponse(seo_extra.render_joueurs(db), headers=CACHE)
+
+
+@router.get("/fr/joueur/{slug}")
+def joueur(slug: str, db: Session = Depends(get_db)):
+    html_ = seo_extra.render_player(db, slug)
+    return HTMLResponse(html_, headers=CACHE) if html_ else _not_found()
+
+
+@router.get("/fr/pronostics/{when}")
+def jour(when: str, db: Session = Depends(get_db)):
+    html_ = seo_extra.render_day(db, when)
+    return HTMLResponse(html_, headers={"Cache-Control": "public, s-maxage=120, stale-while-revalidate=600"}) if html_ else _not_found()
 
 
 @router.get("/sitemap.xml")
