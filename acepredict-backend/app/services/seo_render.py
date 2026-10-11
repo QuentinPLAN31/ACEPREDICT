@@ -229,7 +229,7 @@ def render(d,state):
         h+=f"""<div class="res"><span class="badge {'ok' if ok else 'ko'}">{('Analyse juste' if ok else 'Analyse ratée') if retro else ('Pronostic juste' if ok else 'Pronostic raté')}</span><p class="pend" style="margin:0;flex:1 1 240px">{("Analyse calculée après le match avec les niveaux actuels des joueurs : ce n'est pas un pronostic publié avant la rencontre et elle n'entre pas dans le bilan public.") if retro else ("Pronostic publié le "+d['publie']+" avant le match, non modifié depuis.")} <a href="/fr/bilan">Voir le bilan complet →</a></p></div>"""
     else:
         h+=f"""<div class="res"><div class="pend">Match prévu le {d['date_long']} à {d['heure']}. Cette page affichera le résultat réel et la justesse du pronostic juste après la rencontre.</div></div>"""
-    h+="</section>"+scores_card(d,state,fav,p1,p2)
+    h+="</section>"+scores_card(d,state,fav,p1,p2)+CTA_HTML
     h+=f"""<section class="card"><h2>Chiffres clés : {p1} contre {p2}</h2>{stats_table(d,p1,p2,surf)}</section>
 {weather_section(d)}
 <section class="card analysis"><h2>Analyse du match {p1} – {p2}</h2>{''.join(f'<p>{x}</p>' for x in d['analyse'])}</section>
@@ -238,7 +238,6 @@ def render(d,state):
 <div class="fac"><div class="fh">Facteurs clés du match</div><div class="fr"><span>Service</span><i style="width:82%"></i></div><div class="fr"><span>Retour</span><i style="width:64%"></i></div><div class="fr"><span>Forme récente</span><i style="width:71%"></i></div></div>
 <p class="al">Alerte : le favori perd son service en début de 2e set dans 3 matchs sur 10 sur cette surface…</p></div>
 <div class="lk-over"><div class="lk-pan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Analyse détaillée réservée aux inscrits</b><span>Projection jeu par jeu, facteurs clés et alertes avant le match.</span><a class="btn" href="{APP}">Débloquer gratuitement</a></div></div></section>
-<section class="bigcta"><div class="bc-t"><span class="bc-k">Connais le gagnant avant le match</span><h2>Découvre qui va gagner, avant le premier service</h2><p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div><a class="btn dark" href="{APP}">Prédire un match gratuitement</a></section>
 <section class="card"><h2>Questions fréquentes sur {p1} – {p2}</h2>{''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q,a in fq)}</section>
 {more_html(d)}
 {related_html(d)}
@@ -249,6 +248,11 @@ def render(d,state):
 # --------------------------------------------------------------------------
 # Pages "liste" (hub, bilan, tournoi), sitemap, 404
 # --------------------------------------------------------------------------
+CTA_HTML = (f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Connais le gagnant avant le match</span><h2>Découvre qui va gagner, avant le premier service</h2>'
+            f'<p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div>'
+            f'<a class="btn dark" href="{APP}">Prédire un match gratuitement</a></section>')
+
+
 def page_shell(title, desc, path, body, ld=None, robots="index,follow,max-image-preview:large,max-snippet:-1"):
     url = BASE + path
     ldtag = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>' if ld else ''
@@ -294,6 +298,7 @@ def hub_page(upcoming, recent, acc):
     crumb = '<nav class="crumb"><a href="/">Accueil</a> › Pronostics</nav>'
     h = '<h1>Pronostics tennis : probabilités de victoire ATP &amp; WTA</h1>'
     h += '<p style="color:var(--ts);margin:0 0 22px">Chaque match reçoit une probabilité de victoire et un score probable calculés par TennisMind, publiés avant la rencontre puis comparés au résultat réel.</p>'
+    h += CTA_HTML
     if acc:
         h += f'<section class="card"><h2>Taux de réussite</h2><div class="proj"><div><b>{fr(acc["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc["ok"]}/{acc["total"]}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
     h += ('<section class="card"><h2>Explorer</h2><div class="chips" style="margin:0">'
@@ -306,7 +311,6 @@ def hub_page(upcoming, recent, acc):
               '<section class="card" style="margin-top:16px"><h2>Matchs passés</h2>' + _grouped(recent) + '</section></details>')
     if not upcoming and not recent:
         h += '<section class="card"><p class="pend">Les prochains pronostics arrivent très bientôt.</p></section>'
-    h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Connais le gagnant avant le match</span><h2>Découvre qui va gagner, avant le coup d\'envoi</h2><p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div><a class="btn dark" href="{APP}">Prédire un match gratuitement</a></section>'
     ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": "Pronostics tennis", "url": BASE + "/fr/pronostics", "inLanguage": "fr"}
     return page_shell("Pronostics tennis du jour : probabilités ATP & WTA | TennisMind",
                       "Pronostics tennis ATP et WTA : probabilité de victoire, score probable et résultat réel de chaque match, mis à jour tous les jours.",

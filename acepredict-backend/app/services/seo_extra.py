@@ -294,6 +294,7 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
     h = _crumb_html(crumbs)
     h += f'<h1>Pronostics {html.escape(t["name"])} : matchs, probabilités et résultats</h1>'
     h += f'<div class="chips"><span class="chip">{html.escape(t["level"])}</span><span class="chip surf" style="--surf:var(--{t["surface"]})">{surf.capitalize()}</span><span class="chip">{html.escape(t["city"])}</span><span class="chip">{html.escape(t["when"])}</span></div>'
+    h += R.CTA_HTML
     fmt = ("Chez les messieurs, les matchs se jouent au meilleur des 5 sets, ce qui avantage le joueur le plus complet : sur la durée, le favori est moins exposé à un coup de chaud." if t["bo5"]
            else "Les matchs se jouent au meilleur des 3 sets, un format où un seul set raté peut suffire à faire basculer un match.")
     fin = finals_section(pages)
@@ -321,7 +322,6 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
     faq = [(f"Sur quelle surface se joue {t['name']} ?", f"{t['name']} se joue sur {surf}, à {t['city']}, généralement en {t['when']}."),
            (f"Comment TennisMind pronostique-t-il {t['name']} ?", f"Chaque match est évalué avec le niveau des joueurs sur {surf}, leur forme récente, leur historique face à face et la météo, puis comparé à l'historique des matchs ATP et WTA.")]
     h += '<section class="card"><h2>Questions fréquentes</h2>' + ''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q, a in faq) + '</section>'
-    h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Connais le gagnant avant le match</span><h2>Découvre qui va gagner, avant le coup d\'envoi</h2><p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div><a class="btn dark" href="{R.APP}">Prédire un match gratuitement</a></section>'
     ld = {"@context": "https://schema.org", "@graph": [
         {"@type": "WebPage", "@id": BASE + path, "url": BASE + path, "name": f"Pronostics {t['name']}", "inLanguage": "fr"},
         _crumbs(crumbs),
@@ -415,6 +415,7 @@ def render_player(db: Session, slug: str) -> Optional[str]:
         if bio.get(k):
             chips += f'<span class="chip">{html.escape(fmt.format(bio[k]))}</span>'
     h += f'<div class="chips">{chips}</div>'
+    h += R.CTA_HTML
     img = f'<img class="ph" src="{photo}" alt="{html.escape(p.name)}" width="112" height="140" referrerpolicy="no-referrer" style="margin:0 18px 0 0;float:left">' if photo else ''
     para = f"{html.escape(p.name)} est actuellement n°{p.current_rank} au classement {tour}. Selon TennisMind, sa meilleure surface est le {SURF_LABEL[best]} (niveau {lv[best]} sur 100), contre "
     para += " et ".join(f"{lv[s]} sur 100 sur {SURF_LABEL[s]}" for s in lv if s != best) + "."
@@ -441,7 +442,6 @@ def render_player(db: Session, slug: str) -> Optional[str]:
     faq = [(f"Quel est le classement de {p.name} ?", f"{p.name} est n°{p.current_rank} au classement {tour}."),
            (f"Sur quelle surface {p.name} est-il le plus à l'aise ?", f"D'après le niveau TennisMind, sa meilleure surface est le {SURF_LABEL[best]}.")]
     h += '<section class="card"><h2>Questions fréquentes</h2>' + ''.join(f'<details><summary>{html.escape(q)}</summary><p>{html.escape(a)}</p></details>' for q, a in faq) + '</section>'
-    h += f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Connais le gagnant avant le match</span><h2>Découvre qui va gagner, avant le coup d\'envoi</h2><p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div><a class="btn dark" href="{R.APP}">Prédire un match gratuitement</a></section>'
     ld = {"@context": "https://schema.org", "@graph": [
         {"@type": "ProfilePage", "@id": BASE + path, "url": BASE + path, "name": f"Pronostic {p.name}", "inLanguage": "fr",
          "mainEntity": {"@type": "Person", "name": p.name, "jobTitle": "Joueur de tennis professionnel"}},
@@ -466,6 +466,7 @@ def render_day(db: Session, when: str) -> Optional[str]:
     path = f"/fr/pronostics/{when}"
     crumbs = [("Accueil", "/"), ("Pronostics", "/fr/pronostics"), (word.capitalize(), path)]
     h = _crumb_html(crumbs) + f'<h1>Pronostics tennis {word} : {label}</h1>'
+    h += R.CTA_HTML
     if pages:
         h += '<section class="card"><h2>Matchs du jour</h2>' + R._grouped([P._row(x) for x in pages]) + '</section>'
     else:
