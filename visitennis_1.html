@@ -1861,14 +1861,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .fmt-btn{ flex:1; min-width:110px; padding:12px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--text-sec,#9AA69A); font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; transition:all .15s; }
   .fmt-btn:hover{ color:var(--text,#fff); border-color:rgba(255,255,255,0.25); }
   .fmt-btn.active{ background:var(--accent,#D7F22C); border-color:var(--accent,#D7F22C); color:#14180a; }
-  .quick-scores{ margin:14px 0 6px; }
-  .quick-scores .qs-label{ font-size:11px; font-weight:800; letter-spacing:1.4px; color:var(--text-dim,#6C7A6C); margin-bottom:8px; }
-  .quick-scores .qs-row{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
-  .quick-scores .qs-chip{ display:flex; flex-direction:column; align-items:center; gap:2px; min-width:92px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10); }
-  .quick-scores .qs-chip.top{ background:rgba(215,242,44,0.10); border-color:rgba(215,242,44,0.35); }
-  .quick-scores .qs-score{ font-family:'Unbounded','Arial Black',Inter,sans-serif; font-weight:900; font-size:18px; color:#fff; }
+  .quick-scores{ margin:18px 0 10px; }
+  .quick-scores .qs-label{ font-size:11px; font-weight:800; letter-spacing:1.4px; color:var(--text-dim,#6C7A6C); margin-bottom:10px; }
+  .quick-scores .qs-row{ display:flex; gap:26px; justify-content:center; flex-wrap:wrap; }
+  .quick-scores .qs-chip{ display:flex; flex-direction:column; align-items:center; gap:3px; min-width:70px; padding:0; background:none; border:0; }
+  .quick-scores .qs-score{ font-family:'Unbounded','Arial Black',Inter,sans-serif; font-weight:900; font-size:clamp(24px,7vw,34px); line-height:1.1; letter-spacing:-1px; color:#fff; }
   .quick-scores .qs-meta{ font-size:11px; color:var(--text-sec,#9AA69A); }
-  .quick-scores .qs-meta b{ color:var(--accent,#D7F22C); }
+  .quick-scores .qs-meta b{ color:#fff; }
   .hero-win.no-photo{ height:auto; margin:8px auto 4px; }
   .hero-win.no-photo .hero-win-pct{ position:static; }
   .hero-win.no-photo .hero-win-photo{ display:none; }
