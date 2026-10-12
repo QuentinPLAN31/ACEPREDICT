@@ -330,12 +330,14 @@ def hub_page(upcoming, recent, acc):
                       "/fr/pronostics", crumb + h, ld)
 
 
-def bilan_page(acc, rows, by_month=None):
+def bilan_page(acc, rows, by_month=None, acc_week=None):
     crumb = '<nav class="crumb"><a href="/">Accueil</a> › <a href="/fr/pronostics">Pronostics</a> › Bilan</nav>'
     h = '<h1>Bilan public des pronostics TennisMind</h1>'
     h += '<p style="color:var(--ts);margin:0 0 22px">Tous les pronostics sont publiés avant le match puis comparés au résultat réel. Aucun pronostic n\'est modifié ni supprimé après coup.</p>'
+    if acc_week and acc_week["total"]:
+        h += f'<section class="card"><h2>Cette semaine (7 derniers jours)</h2><div class="proj"><div><b>{fr(acc_week["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc_week["ok"]}</b><small>justes</small></div><div><b>{acc_week["total"]-acc_week["ok"]}</b><small>ratés</small></div></div></section>'
     if acc and acc["total"]:
-        h += f'<section class="card"><h2>Résultat global</h2><div class="proj"><div><b>{fr(acc["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc["ok"]}</b><small>justes</small></div><div><b>{acc["total"]-acc["ok"]}</b><small>ratés</small></div></div></section>'
+        h += f'<section class="card"><h2>Résultat global depuis le début</h2><div class="proj"><div><b>{fr(acc["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc["ok"]}</b><small>justes</small></div><div><b>{acc["total"]-acc["ok"]}</b><small>ratés</small></div></div></section>'
     else:
         h += '<section class="card"><p class="pend">Le bilan s\'affichera dès les premiers matchs terminés.</p></section>'
     if rows:

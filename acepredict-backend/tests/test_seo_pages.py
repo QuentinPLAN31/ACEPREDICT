@@ -246,3 +246,10 @@ def test_evergreen_shows_matches_before_intro_and_photo_cache(seeded):
 def test_empty_evergreen_shows_next_predictions(seeded):
     h = client.get("/seo/fr/tournoi/roland-garros").text
     assert "Aucun match de Roland-Garros" in h and "Prochains pronostics" in h and "/fr/pronostic/" in h
+
+
+def test_stats_json_and_bilan_week(seeded):
+    r = client.get("/seo/stats.json")
+    assert r.status_code == 200 and set(r.json()) == {"global", "week"}
+    assert "s-maxage" in r.headers["cache-control"]
+    assert client.get("/seo/fr/bilan").status_code == 200

@@ -25,6 +25,10 @@
       "destination": "https://acepredict-production.up.railway.app/seo/fr/tournoi/:slug"
     },
     {
+      "source": "/stats-public.json",
+      "destination": "https://acepredict-production.up.railway.app/seo/stats.json"
+    },
+    {
       "source": "/sitemap.xml",
       "destination": "https://acepredict-production.up.railway.app/seo/sitemap.xml"
     },

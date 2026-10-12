@@ -191,21 +191,18 @@
   }
 
   .stat-line{
-    margin: 38px auto 0; max-width: 560px; padding: 30px 28px 26px; text-align:center;
-    color: var(--text-sec); font-size: 17px; line-height:1.5;
-    background: linear-gradient(180deg, rgba(215,242,44,0.09), rgba(215,242,44,0.02));
-    border: 1px solid rgba(215,242,44,0.28); border-radius: 18px;
-    box-shadow: 0 0 0 6px rgba(215,242,44,0.05), 0 24px 60px -20px rgba(215,242,44,0.22);
+    margin: 26px auto 0; max-width: 560px; padding: 0 20px; text-align:center;
+    color: var(--text-sec); font-size: 16px; line-height:1.5;
   }
   .stat-line b{ font-variant-numeric: tabular-nums; }
   .stat-line b:first-child{
-    display:block; font-family: 'Unbounded', Inter, sans-serif; font-weight: 900;
-    font-size: clamp(60px, 13vw, 108px); line-height: 1; letter-spacing: -2px; margin-bottom: 10px;
-    background: linear-gradient(135deg, #D7F22C, #f6ff8a 60%, #D7F22C);
+    display:block; font-family: 'Unbounded', Inter, sans-serif; font-weight: 800;
+    font-size: clamp(34px, 6vw, 52px); line-height: 1.1; letter-spacing: -1px; margin-bottom: 6px;
+    background: linear-gradient(90deg, #4FC3F7 0%, #9B6BFF 50%, #FF5FA2 100%);
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
   }
-  .stat-line b.n2{ color: #fff; font-size: 1.25em; font-weight: 800; }
-  @media(max-width:520px){ .stat-line{ margin: 30px 16px 0; padding: 24px 18px 20px; font-size: 15px; } }
+  .stat-line b.n2{ color: #fff; font-size: 1.1em; font-weight: 800; }
+  @media(max-width:520px){ .stat-line{ margin: 20px 16px 0; font-size: 14px; } }
 
   /* ---------- PHONE MOCK ---------- */
   .phone-stage{
@@ -686,7 +683,7 @@
     <button data-i18n="btn_analyser" onclick="window.location.href='/app?auth=register'">Analyser</button>
   </div>
 
-  <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs analysés la semaine dernière</span></div>
+  <div class="stat-line reveal" id="statLine" style="display:none"><b class="counter" id="statPct" data-target="0" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" id="statN" data-target="0">0</b><span data-i18n="stat_mid2"> matchs vérifiés depuis le début</span></div>
 </section>
 
 <section class="court-section">
@@ -961,7 +958,7 @@
     "hero_search_ph": "Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)",
     "btn_analyser": "Analyser",
     "stat_mid1": " de précision sur les ",
-    "stat_mid2": " matchs analysés la semaine dernière",
+    "stat_mid2": " matchs vérifiés depuis le début",
     "p_h1_analyse": "Analyse de match",
     "p_sub1": "Entre les joueurs que tu veux analyser",
     "p_sub_accent1": "Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.",
@@ -1035,7 +1032,7 @@
     "hero_search_ph": "Search for a player (e.g. Alcaraz, Sinner...)",
     "btn_analyser": "Analyze",
     "stat_mid1": " accuracy on the ",
-    "stat_mid2": " matches analyzed last week",
+    "stat_mid2": " matches verified so far",
     "p_h1_analyse": "Match analysis",
     "p_sub1": "Enter the players you want to analyze",
     "p_sub_accent1": "Our AI is connected to tennis news and crosses millions of data points for every prediction.",
@@ -1109,7 +1106,7 @@
     "hero_search_ph": "Busca un jugador (ej: Alcaraz, Sinner...)",
     "btn_analyser": "Analizar",
     "stat_mid1": " de precisión en los ",
-    "stat_mid2": " partidos analizados la semana pasada",
+    "stat_mid2": " partidos verificados desde el inicio",
     "p_h1_analyse": "Análisis de partido",
     "p_sub1": "Introduce los jugadores que quieres analizar",
     "p_sub_accent1": "Nuestra IA está conectada a la actualidad del tenis y cruza millones de datos para cada pronóstico.",
@@ -1183,7 +1180,7 @@
     "hero_search_ph": "Spieler suchen (z. B. Alcaraz, Sinner...)",
     "btn_analyser": "Analysieren",
     "stat_mid1": " Genauigkeit bei den ",
-    "stat_mid2": " Matches, die letzte Woche analysiert wurden",
+    "stat_mid2": " geprüften Matches seit Beginn",
     "p_h1_analyse": "Match-Analyse",
     "p_sub1": "Gib die Spieler ein, die du analysieren möchtest",
     "p_sub_accent1": "Unsere KI ist mit aktuellen Tennisnachrichten verbunden und wertet Millionen von Daten für jede Prognose aus.",
@@ -1257,7 +1254,7 @@
     "hero_search_ph": "Cerca un giocatore (es: Alcaraz, Sinner...)",
     "btn_analyser": "Analizza",
     "stat_mid1": " di precisione sulle ",
-    "stat_mid2": " partite analizzate la settimana scorsa",
+    "stat_mid2": " partite verificate dall'inizio",
     "p_h1_analyse": "Analisi della partita",
     "p_sub1": "Inserisci i giocatori che vuoi analizzare",
     "p_sub_accent1": "La nostra IA è connessa alle notizie sul tennis e incrocia milioni di dati per ogni pronostico.",
@@ -1546,7 +1543,14 @@
   const cio = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{ if(e.isIntersecting){ animateCounter(e.target); cio.unobserve(e.target); } });
   }, { threshold: 0.4 });
-  document.querySelectorAll('.counter').forEach(el=> cio.observe(el));
+  document.querySelectorAll('.counter').forEach(el=> { if(!el.id) cio.observe(el); });
+  // chiffre public réel (global), mis à jour côté serveur toutes les quelques heures
+  fetch('/stats-public.json').then(r=>r.json()).then(d=>{
+    const g=d&&d.global; if(!g||!g.total||g.total<20) return;
+    const pct=document.getElementById('statPct'), n=document.getElementById('statN'), box=document.getElementById('statLine');
+    pct.dataset.target=g.pct; n.dataset.target=g.total; box.style.display='';
+    cio.observe(pct); cio.observe(n);
+  }).catch(()=>{});
 
   // FAQ accordion
   document.querySelectorAll('.faq-item').forEach(item=>{

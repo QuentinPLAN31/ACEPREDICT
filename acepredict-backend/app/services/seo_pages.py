@@ -563,8 +563,10 @@ def sync_match_pages(db: Session, now: Optional[datetime] = None) -> dict:
 
 
 # ----------------------------------------------------------------- render --
-def accuracy(db: Session, tournament_slug: Optional[str] = None) -> Optional[dict]:
+def accuracy(db: Session, tournament_slug: Optional[str] = None, days: Optional[int] = None) -> Optional[dict]:
     q = db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None), ~models.MatchPage.match_key.like("retro|%"))
+    if days:
+        q = q.filter(models.MatchPage.finished_at >= datetime.utcnow() - timedelta(days=days))
     if tournament_slug:
         q = q.filter(models.MatchPage.tournament_slug == tournament_slug)
     pages = q.all()
@@ -696,7 +698,7 @@ def render_hub(db: Session) -> str:
 def render_bilan(db: Session) -> str:
     rec = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.isnot(None), ~models.MatchPage.match_key.like("retro|%"))
            .order_by(models.MatchPage.scheduled_time.desc()).limit(100).all())
-    return seo_render.bilan_page(accuracy(db), [_row(p) for p in rec])
+    return seo_render.bilan_page(accuracy(db), [_row(p) for p in rec], acc_week=accuracy(db, days=7))
 
 
 def render_tournoi(db: Session, slug: str) -> Optional[str]:

@@ -4,7 +4,7 @@ backend ; Vercel les expose sous /fr/pronostic/<slug>, /fr/pronostics,
 /fr/bilan, /fr/tournoi/<slug>, /sitemap.xml (cf. vercel.json).
 """
 from fastapi import APIRouter, Depends
-from fastapi.responses import HTMLResponse, PlainTextResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 from sqlalchemy.orm import Session
 
 from app import models
@@ -33,6 +33,13 @@ def match_page(slug: str, db: Session = Depends(get_db)):
 @router.get("/fr/pronostics")
 def hub(db: Session = Depends(get_db)):
     return HTMLResponse(seo_pages.render_hub(db), headers=CACHE)
+
+
+@router.get("/stats.json")
+def stats(db: Session = Depends(get_db)):
+    """Chiffres publics pour la landing : global (depuis le début) et 7 derniers jours."""
+    return JSONResponse({"global": seo_pages.accuracy(db), "week": seo_pages.accuracy(db, days=7)},
+                        headers={"Cache-Control": "public, s-maxage=21600, stale-while-revalidate=86400"})
 
 
 @router.get("/fr/bilan")
