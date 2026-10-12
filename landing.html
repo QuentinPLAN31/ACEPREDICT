@@ -683,7 +683,8 @@
     <button data-i18n="btn_analyser" onclick="window.location.href='/app?auth=register'">Analyser</button>
   </div>
 
-  <div class="stat-line reveal" id="statLine" style="display:none"><b class="counter" id="statPct" data-target="0" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" id="statN" data-target="0">0</b><span data-i18n="stat_mid2"> matchs vérifiés depuis le début</span></div>
+  <!-- CHIFFRE À METTRE À JOUR À LA MAIN CHAQUE SEMAINE : data-target="91.8" (taux) et data-target="612" (nombre de matchs) -->
+  <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs vérifiés depuis le début</span></div>
 </section>
 
 <section class="court-section">
@@ -1543,14 +1544,7 @@
   const cio = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{ if(e.isIntersecting){ animateCounter(e.target); cio.unobserve(e.target); } });
   }, { threshold: 0.4 });
-  document.querySelectorAll('.counter').forEach(el=> { if(!el.id) cio.observe(el); });
-  // chiffre public réel (global), mis à jour côté serveur toutes les quelques heures
-  fetch('/stats-public.json').then(r=>r.json()).then(d=>{
-    const g=d&&d.global; if(!g||!g.total||g.total<20) return;
-    const pct=document.getElementById('statPct'), n=document.getElementById('statN'), box=document.getElementById('statLine');
-    pct.dataset.target=g.pct; n.dataset.target=g.total; box.style.display='';
-    cio.observe(pct); cio.observe(n);
-  }).catch(()=>{});
+  document.querySelectorAll('.counter').forEach(el=> cio.observe(el));
 
   // FAQ accordion
   document.querySelectorAll('.faq-item').forEach(item=>{
