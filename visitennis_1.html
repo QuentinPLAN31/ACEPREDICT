@@ -1838,6 +1838,20 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     margin-top:18px; background: none; border:0;
     border-radius:12px; padding:20px 0 0; text-align:center;
   }
+  /* Héros du résultat : photo détourée du favori + gros pourcentage derrière */
+  .hero-win{ position:relative; height:270px; max-width:360px; margin:6px auto 4px; display:flex; justify-content:center; align-items:flex-end; }
+  .hero-win-pct{
+    position:absolute; left:0; right:0; bottom:0; z-index:1; text-align:center;
+    font-family:'Unbounded', Inter, sans-serif; font-weight:900; line-height:.9; letter-spacing:-3px;
+    font-size:clamp(84px, 26vw, 132px);
+    background: linear-gradient(135deg, #ff7a45, #ffb020 55%, #ff5f6d);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    filter: drop-shadow(0 10px 30px rgba(255,122,69,.25));
+  }
+  .hero-win-photo{ position:relative; z-index:2; height:235px; width:auto; max-width:92%; object-fit:contain; margin-bottom:34px; filter: drop-shadow(0 10px 18px rgba(0,0,0,.45)); }
+  .hero-win-photo.masked{ width:210px; height:235px; object-fit:cover; object-position:top; border-radius:18px;
+    -webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 100%); mask-image:linear-gradient(to bottom,#000 62%,transparent 100%); }
+  .hero-win-photo[hidden]{ display:none; }
   .result-winner{ font-size:19px; font-weight:800; color: var(--accent); margin-bottom:4px; }
   .result-winner-name{ background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
   .result-prob{ font-size:13.5px; color: var(--text-sec); margin-bottom:10px; }
@@ -5643,6 +5657,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     const teaser =
       '<div class="result-badge">' + favoriteLabel(rawPct) + '</div>' +
+      '<div class="hero-win"><div class="hero-win-pct">' + pct + '%</div><img class="hero-win-photo" id="heroWinPhoto" alt="' + winnerName.replace(/"/g,'&quot;') + '" hidden></div>' +
       '<div class="result-winner"><span class="result-winner-name">' + winnerName + '</span> ' + t('analysis.gagnant_probable') + '</div>' +
       '<div class="result-detail">' + t('analysis.face_a') + ' ' + loserName + surfaceTag + '</div>' +
       '<div class="form-row" style="margin-top:12px;">' +
@@ -5713,6 +5728,25 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     box.querySelectorAll('.clickable-name[data-player-name]').forEach(el=>{
       el.addEventListener('click', ()=> openPlayerProfileByName(el.dataset.playerName));
     });
+    hydrateHeroPhoto(winnerName);
+  }
+
+  // Photos détourées (PNG transparents) déjà prêtes ; sinon photo Wikipédia fondue en bas.
+  const CUTOUTS = { alcaraz:'assets/players/cutout/alcaraz.png', sinner:'assets/players/cutout/sinner.png', djokovic:'assets/players/cutout/djokovic.png' };
+  function cutoutFor(name){
+    const n = String(name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    for(const k in CUTOUTS){ if(n.indexOf(k) !== -1) return CUTOUTS[k]; }
+    return null;
+  }
+  async function hydrateHeroPhoto(name){
+    const img = document.getElementById('heroWinPhoto');
+    if(!img) return;
+    const cut = cutoutFor(name);
+    if(cut){ img.src = cut; img.hidden = false; return; }
+    try{
+      const url = await getPlayerPhotoUrl(name);
+      if(url && document.getElementById('heroWinPhoto') === img){ img.classList.add('masked'); img.src = url; img.hidden = false; }
+    }catch(e){}
   }
 
 
