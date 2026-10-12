@@ -1857,6 +1857,18 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .hero-win-photo.masked{ width:228px; height:258px; object-fit:cover; object-position:top; border-radius:18px;
     -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 100%); mask-image:linear-gradient(to bottom,#000 55%,transparent 100%); }
   .hero-win-photo[hidden]{ display:none; }
+  .format-picker{ display:flex; gap:10px; margin:14px 0 26px; flex-wrap:wrap; }
+  .fmt-btn{ flex:1; min-width:110px; padding:12px 10px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--text-sec,#9AA69A); font-weight:700; font-size:13px; cursor:pointer; font-family:inherit; transition:all .15s; }
+  .fmt-btn:hover{ color:var(--text,#fff); border-color:rgba(255,255,255,0.25); }
+  .fmt-btn.active{ background:var(--accent,#D7F22C); border-color:var(--accent,#D7F22C); color:#14180a; }
+  .quick-scores{ margin:14px 0 6px; }
+  .quick-scores .qs-label{ font-size:11px; font-weight:800; letter-spacing:1.4px; color:var(--text-dim,#6C7A6C); margin-bottom:8px; }
+  .quick-scores .qs-row{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .quick-scores .qs-chip{ display:flex; flex-direction:column; align-items:center; gap:2px; min-width:92px; padding:9px 12px; border-radius:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10); }
+  .quick-scores .qs-chip.top{ background:rgba(215,242,44,0.10); border-color:rgba(215,242,44,0.35); }
+  .quick-scores .qs-score{ font-family:'Unbounded','Arial Black',Inter,sans-serif; font-weight:900; font-size:18px; color:#fff; }
+  .quick-scores .qs-meta{ font-size:11px; color:var(--text-sec,#9AA69A); }
+  .quick-scores .qs-meta b{ color:var(--accent,#D7F22C); }
   .hero-win.no-photo{ height:auto; margin:8px auto 4px; }
   .hero-win.no-photo .hero-win-pct{ position:static; }
   .hero-win.no-photo .hero-win-photo{ display:none; }
@@ -2075,6 +2087,12 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           <button type="button" class="surf-btn" data-surface="hard"><span data-i18n="surface.hard">Dur</span></button>
           <button type="button" class="surf-btn" data-surface="clay"><span data-i18n="surface.clay">Terre battue</span></button>
           <button type="button" class="surf-btn" data-surface="grass"><span data-i18n="surface.grass">Gazon</span></button>
+        </div>
+        <div class="field-label" style="margin-top:6px;" data-i18n="field.format">FORMAT DU MATCH (OPTIONNEL)</div>
+        <div class="format-picker" id="formatPicker" role="group">
+          <button type="button" class="fmt-btn active" data-bo=""><span data-i18n="surface.auto">Auto</span></button>
+          <button type="button" class="fmt-btn" data-bo="3"><span data-i18n="analysis.proj_bo3">2 sets gagnants</span></button>
+          <button type="button" class="fmt-btn" data-bo="5"><span data-i18n="analysis.proj_bo5">3 sets gagnants</span></button>
         </div>
         <div class="analyse-msg" id="analyseMsg"></div>
         <button class="btn-primary" id="analyseBtn" data-i18n="btn.analyze_match">Analyser le match avec l'IA</button>
@@ -2745,6 +2763,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'vs': 'VS',
       'field.next_match_between': 'PROCHAIN MATCH ENTRE CES DEUX JOUEURS',
       'field.surface': 'SURFACE (OPTIONNEL)',
+      'field.format': 'FORMAT DU MATCH (OPTIONNEL)',
+      'analysis.quick_scores': 'SCORES LES PLUS PROBABLES',
       'surface.auto': 'Auto',
       'btn.analyze_match': "Analyser le match avec l'IA",
       'btn.analyzing': 'Analyse en cours...',
@@ -3227,6 +3247,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'vs': 'VS',
       'field.next_match_between': 'PRÓXIMO PARTIDO ENTRE ESTOS DOS JUGADORES',
       'field.surface': 'SUPERFICIE (OPCIONAL)',
+      'field.format': 'FORMATO DEL PARTIDO (OPCIONAL)',
+      'analysis.quick_scores': 'MARCADORES MÁS PROBABLES',
       'surface.auto': 'Auto',
       'btn.analyze_match': 'Analizar el partido con la IA',
       'btn.analyzing': 'Analizando...',
@@ -3709,6 +3731,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'vs': 'VS',
       'field.next_match_between': 'NEXT MATCH BETWEEN THESE TWO PLAYERS',
       'field.surface': 'SURFACE (OPTIONAL)',
+      'field.format': 'MATCH FORMAT (OPTIONAL)',
+      'analysis.quick_scores': 'MOST LIKELY SCORES',
       'surface.auto': 'Auto',
       'btn.analyze_match': 'Analyze the match with AI',
       'btn.analyzing': 'Analyzing...',
@@ -5369,6 +5393,33 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="fiche-grid">' + card(p1Name, fiches.j1, false) + card(p2Name, fiches.j2, true) + '</div>');
   }
 
+  // Choisit la vue de projection selon le format sélectionné avant l'analyse (sinon celle du serveur).
+  function pickProjView(sp){
+    var alt = sp && sp.alt && sp.alt.scenarios && sp.alt.scenarios.length ? sp.alt : null;
+    var want = parseInt(selectedBestOf, 10);
+    if(want && alt){
+      if((sp.best_of || 3) === want) return sp;
+      if((alt.best_of || 3) === want) return alt;
+    }
+    return sp;
+  }
+
+  // Aperçu rapide : les 3 scores les plus probables, juste au-dessus des fiches.
+  function renderQuickScores(detail){
+    var sp = detail && detail.score_projection;
+    if(!sp || !sp.scenarios || !sp.scenarios.length) return '';
+    var v = pickProjView(sp);
+    var esc = function(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+    var chips = v.scenarios.slice(0, 3).map(function(sc, i){
+      var pct = Math.round(sc.probability * 1000) / 10;
+      var pctTxt = String(pct).replace('.', currentLang === 'en' ? '.' : ',');
+      var last = String(sc.winner_name || '').split(' ').slice(-1)[0];
+      return '<div class="qs-chip' + (i === 0 ? ' top' : '') + '"><span class="qs-score">' + esc(sc.score) + '</span>' +
+        '<span class="qs-meta">' + esc(last) + ' · <b>' + pctTxt + '%</b></span></div>';
+    }).join('');
+    return '<div class="quick-scores"><div class="qs-label">' + t('analysis.quick_scores') + '</div><div class="qs-row">' + chips + '</div></div>';
+  }
+
   function renderScoreProjectionBlock(detail){
     var sp = detail && detail.score_projection;
     if(!sp || !sp.scenarios || !sp.scenarios.length) return '';
@@ -5397,16 +5448,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       }
       return '<div class="proj-view" data-bo="' + (v.best_of || 3) + '"' + (visible ? '' : ' style="display:none;"') + '>' + rows + games + '</div>';
     };
-    var main = sp, alt = sp.alt && sp.alt.scenarios && sp.alt.scenarios.length ? sp.alt : null;
-    var toggle = '';
-    if(alt){
-      var views = [main, alt].sort(function(x, y){ return (x.best_of || 3) - (y.best_of || 3); });
-      toggle = '<div class="proj-toggle" role="group">' + views.map(function(v){
-        return '<button type="button" data-bo="' + v.best_of + '" class="' + (v === main ? 'active' : '') + '">' +
-          t(v.best_of === 5 ? 'analysis.proj_bo5' : 'analysis.proj_bo3') + '</button>';
-      }).join('') + '</div>';
-    }
-    var body = toggle + '<div class="proj-card">' + viewHtml(main, true) + (alt ? viewHtml(alt, false) : '') + '</div>';
+    var chosen = pickProjView(sp);
+    var body = '<div class="proj-card">' + viewHtml(chosen, true) + '</div>';
     return resSection('lime', t('analysis.proj_title'), body);
   }
 
@@ -5669,6 +5712,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       '<div class="hero-win"><div class="hero-win-pct">' + pct + '%</div><img class="hero-win-photo" id="heroWinPhoto" alt="' + winnerName.replace(/"/g,'&quot;') + '" hidden></div>' +
       '<div class="result-winner"><span class="result-winner-name">' + winnerName + '</span> ' + t('analysis.gagnant_probable') + '</div>' +
       '<div class="result-detail">' + t('analysis.face_a') + ' ' + loserName + surfaceTag + '</div>' +
+      renderQuickScores(data.detail) +
       '<div class="form-row" style="margin-top:12px;">' +
         '<div class="form-card"><div class="form-card-name">' + p1Name + '</div>' +
           '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">' + t('btn.see_fiche') + '</button></div>' +
@@ -5813,6 +5857,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     chip.addEventListener('click', ()=>{
       manualSurface = chip.dataset.surface || '';
       document.querySelectorAll('#surfacePicker .surf-btn').forEach(c=> c.classList.toggle('active', c === chip));
+    });
+  });
+  // Format du match choisi AVANT l'analyse : '' = auto (celui du serveur), '3' = 2 sets gagnants, '5' = 3 sets gagnants.
+  let selectedBestOf = '';
+  document.querySelectorAll('#formatPicker .fmt-btn').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      selectedBestOf = chip.dataset.bo || '';
+      document.querySelectorAll('#formatPicker .fmt-btn').forEach(c=> c.classList.toggle('active', c === chip));
     });
   });
 
