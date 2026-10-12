@@ -197,18 +197,20 @@
   }
 
   .stat-line{
-    margin: 26px auto 0; max-width: 920px; padding: 0 20px; text-align:center;
-    color: var(--text-sec); font-size: 17px; line-height:1.4;
-    display:flex; flex-wrap:wrap; justify-content:center; align-items:baseline; gap:4px 8px;
+    margin: 26px auto 0; max-width: 720px; padding: 0 20px; text-align:center;
+    color: var(--text-sec); font-size: 16px; line-height:1.5;
   }
-  .stat-line b{ font-variant-numeric: tabular-nums; }
-  .stat-line b:first-child{
-    display:inline-block; font-family: 'Unbounded', Inter, sans-serif; font-weight: 800;
-    font-size: clamp(34px, 6vw, 52px); line-height: 1.1; letter-spacing: -1px;
+  .stat-top{ display:flex; justify-content:center; align-items:baseline; gap:6px 12px; flex-wrap:wrap; }
+  .stat-pct, .stat-lbl{
+    font-family: 'Unbounded', Inter, sans-serif; font-weight: 800; font-variant-numeric: tabular-nums;
     background: linear-gradient(135deg, #00C4CC 0%, #4C7DF5 50%, #7D2AE8 100%);
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
   }
-  .stat-line b.n2{ color: #fff; font-size: 1.1em; font-weight: 800; }
+  .stat-pct{ font-size: clamp(34px, 6vw, 52px); line-height:1.1; letter-spacing:-1px; }
+  .stat-lbl{ font-size: clamp(17px, 3vw, 26px); line-height:1.1; }
+  .stat-sub{ margin-top:6px; }
+  .stat-sub b{ font-variant-numeric: tabular-nums; }
+  .stat-sub b.n2{ color:#fff; font-size:1.15em; font-weight:800; }
   @media(max-width:520px){ .stat-line{ margin: 20px 16px 0; font-size: 14px; } }
 
   /* ---------- PHONE MOCK ---------- */
@@ -691,7 +693,7 @@
   </div>
 
   <!-- CHIFFRE À METTRE À JOUR À LA MAIN CHAQUE SEMAINE : data-target="91.8" (taux) et data-target="612" (nombre de matchs) -->
-  <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs vérifiés depuis le début</span></div>
+  <div class="stat-line reveal"><div class="stat-top"><b class="stat-pct counter" data-target="91.8" data-suffix="%">0%</b><span class="stat-lbl" data-i18n="stat_mid1">de précision</span></div><div class="stat-sub"><span data-i18n="stat_sub1">sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs vérifiés depuis le début</span></div></div>
 </section>
 
 <section class="court-section">
@@ -965,7 +967,7 @@
     "hero_sub": "Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.",
     "hero_search_ph": "Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)",
     "btn_analyser": "Analyser",
-    "stat_mid1": " de précision sur les ",
+    "stat_mid1": "de précision", "stat_sub1": "sur les ",
     "stat_mid2": " matchs vérifiés depuis le début",
     "p_h1_analyse": "Analyse de match",
     "p_sub1": "Entre les joueurs que tu veux analyser",
@@ -1039,7 +1041,7 @@
     "hero_sub": "AI analysis, advanced stats and match scenarios to anticipate results and better understand the game.",
     "hero_search_ph": "Search for a player (e.g. Alcaraz, Sinner...)",
     "btn_analyser": "Analyze",
-    "stat_mid1": " accuracy on the ",
+    "stat_mid1": "accuracy", "stat_sub1": "on the ",
     "stat_mid2": " matches verified so far",
     "p_h1_analyse": "Match analysis",
     "p_sub1": "Enter the players you want to analyze",
@@ -1113,7 +1115,7 @@
     "hero_sub": "Análisis con IA, estadísticas avanzadas y escenarios de partido para anticipar resultados y entender mejor el juego.",
     "hero_search_ph": "Busca un jugador (ej: Alcaraz, Sinner...)",
     "btn_analyser": "Analizar",
-    "stat_mid1": " de precisión en los ",
+    "stat_mid1": "de precisión", "stat_sub1": "en los ",
     "stat_mid2": " partidos verificados desde el inicio",
     "p_h1_analyse": "Análisis de partido",
     "p_sub1": "Introduce los jugadores que quieres analizar",
@@ -1187,7 +1189,7 @@
     "hero_sub": "KI-Analysen, fortschrittliche Statistiken und Spielszenarien, um Ergebnisse vorherzusehen und das Spiel besser zu verstehen.",
     "hero_search_ph": "Spieler suchen (z. B. Alcaraz, Sinner...)",
     "btn_analyser": "Analysieren",
-    "stat_mid1": " Genauigkeit bei den ",
+    "stat_mid1": "Genauigkeit", "stat_sub1": "bei den ",
     "stat_mid2": " geprüften Matches seit Beginn",
     "p_h1_analyse": "Match-Analyse",
     "p_sub1": "Gib die Spieler ein, die du analysieren möchtest",
@@ -1261,7 +1263,7 @@
     "hero_sub": "Analisi IA, statistiche avanzate e scenari di partita per anticipare i risultati e capire meglio il gioco.",
     "hero_search_ph": "Cerca un giocatore (es: Alcaraz, Sinner...)",
     "btn_analyser": "Analizza",
-    "stat_mid1": " di precisione sulle ",
+    "stat_mid1": "di precisione", "stat_sub1": "sulle ",
     "stat_mid2": " partite verificate dall'inizio",
     "p_h1_analyse": "Analisi della partita",
     "p_sub1": "Inserisci i giocatori che vuoi analizzare",
