@@ -18,3 +18,4 @@ Thumbs.db
 # Data (uncomment if you don't want to version large CSVs)
 # data/real/*.csv
 outils_video/
+tests_hero_css.txt
