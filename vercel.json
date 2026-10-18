@@ -1,4 +1,8 @@
 {
+  "redirects": [
+    { "source": "/tournois", "destination": "/fr/tournois", "permanent": true },
+    { "source": "/joueurs", "destination": "/fr/joueurs", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/",
