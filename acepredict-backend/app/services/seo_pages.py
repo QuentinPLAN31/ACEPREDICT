@@ -120,7 +120,7 @@ def fetch_photo(name: str) -> Optional[str]:
         title = name.strip().replace(" ", "_")
         r = httpx.get(
             f"https://en.wikipedia.org/api/rest_v1/page/summary/{title}",
-            timeout=6.0, headers={"User-Agent": "TennisMind/1.0 (https://app-tennismind.com)"},
+            timeout=6.0, headers={"User-Agent": "TennisMind/1.0 (https://www.app-tennismind.com)"},
         )
         if r.status_code != 200:
             return None

@@ -99,7 +99,7 @@ class Settings(BaseSettings):
     # Misc
     # SEO : clé IndexNow (fichier /seo/indexnow-key.txt) et base publique du site
     indexnow_key: str = ""
-    public_site_url: str = "https://app-tennismind.com"
+    public_site_url: str = "https://www.app-tennismind.com"
 
     env: str = "development"
     # "null" = origine envoyée par un navigateur quand landing.html/visitennis_1.html
