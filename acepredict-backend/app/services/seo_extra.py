@@ -340,7 +340,7 @@ def _tcards(items):
         mono = MONO.get(s) or "".join(w[0] for w in t["name"].split()[:2]).upper()
         out.append(
             f'<a class="tcard" style="--surf:var(--{t["surface"]})" href="/fr/tournoi/{s}">'
-            f'<span class="tbadge" aria-hidden="true"><i>{html.escape(mono)}</i><img src="/assets/tournois/{s}.png" alt="" loading="lazy" onload="this.parentNode.classList.add(\'lg\')" onerror="this.remove()"></span>'
+            f'<span class="tbadge" aria-hidden="true"><i>{html.escape(mono)}</i><img src="/assets/tournois/{"masters-1000" if t["level"] != "Grand Chelem" else s}.png" alt="" loading="lazy" onload="this.parentNode.classList.add(\'lg\')" onerror="this.remove()"></span>'
             f'<span class="tbody"><span class="lv">{html.escape(t["level"])}</span><b>{html.escape(t["name"])}</b>'
             f'<span class="meta">{html.escape(t["city"])} · {SURF_LABEL[t["surface"]].capitalize()} · {html.escape(t["when"])}</span></span>'
             f'<span class="tgo" aria-hidden="true">→</span></a>')
@@ -363,7 +363,7 @@ def render_tournois(db: Session) -> str:
             eds[slug] = name
     if eds:
         h += '<section class="card"><h2>Autres tournois en cours ou récents</h2><div class="rel">' + ''.join(
-            f'<a href="/fr/tournoi/{s}">{html.escape(n or s)}<span>Voir les matchs</span></a>' for s, n in sorted(eds.items())) + '</div></section>'
+            f'<a href="/fr/tournoi/{s}">{html.escape(n or s)}<span>Voir les matchs →</span></a>' for s, n in sorted(eds.items())) + '</div></section>'
     return R.page_shell("Pronostics des grands tournois de tennis | TennisMind",
                         "Pronostics des Grands Chelems et Masters 1000 : favoris selon TennisMind, probabilités de victoire et résultats réels.",
                         "/fr/tournois", h, {"@context": "https://schema.org", "@type": "CollectionPage", "name": "Tournois de tennis", "url": BASE + "/fr/tournois", "inLanguage": "fr"})

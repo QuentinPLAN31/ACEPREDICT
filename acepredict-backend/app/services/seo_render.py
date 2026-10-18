@@ -83,7 +83,10 @@ main h1::after{content:"";display:block;width:64px;height:5px;border-radius:3px;
 .tcard:hover{transform:translateY(-3px);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--surf,#D7F22C) 55%,transparent),0 14px 30px -18px var(--surf,#D7F22C)}
 .tbadge{flex:none;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--surf,#D7F22C) 60%,#fff) 0%,var(--surf,#D7F22C) 45%,color-mix(in srgb,var(--surf,#D7F22C) 45%,#000) 100%);box-shadow:0 6px 18px -6px var(--surf,#D7F22C),inset 0 0 0 2px rgba(255,255,255,.18)}
 .tbadge i{font-style:normal;font-family:Unbounded,Inter,sans-serif;font-weight:800;font-size:17px;color:#0b110c;letter-spacing:-.5px}
-.tbadge{position:relative;overflow:hidden}.tbadge img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:9px;background:#fff;border-radius:50%}.tbadge.lg{background:#fff}.tbadge.lg i{opacity:0}
+.tbadge{position:relative;overflow:hidden}.tbadge img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:0;background:#fff;border-radius:50%}.tbadge.lg{background:#fff}.tbadge.lg i{opacity:0}
+.rel{gap:14px}.rel a{padding:17px 22px;border-radius:16px;transition:transform .18s,background .18s,border-color .18s,box-shadow .18s}
+.rel a span{display:inline-block;transition:transform .18s}
+.rel a:hover{transform:translateX(8px);background:linear-gradient(90deg,rgba(255,122,69,.14),rgba(255,176,32,.05) 70%,#182519);border-color:rgba(255,176,32,.55);box-shadow:0 14px 28px -20px #ff7a45}.rel a:hover span{transform:translateX(4px)}
 .tbody{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.tbody .lv{font-size:10.5px}.tbody b{font-size:17px;line-height:1.2}.tbody .meta{font-size:12.5px}
 .tgo{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);color:#ffb020;font-weight:800;transition:background .15s,color .15s}.tcard:hover .tgo{background:var(--og);color:#0b110c}
 @media(max-width:520px){.tgrid{grid-template-columns:1fr}.tbadge{width:52px;height:52px}}
