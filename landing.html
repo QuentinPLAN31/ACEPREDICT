@@ -207,7 +207,7 @@
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
     filter: drop-shadow(0 0 14px rgba(111,163,255,.35));
   }
-  .stat-pct{ font-size: clamp(34px, 6vw, 52px); line-height:1.1; letter-spacing:-1px; }
+  .stat-pct{ font-size: clamp(48px, 8.4vw, 73px); line-height:1.1; letter-spacing:-1px; }
   .stat-lbl{ font-size: clamp(17px, 3vw, 26px); line-height:1.1; }
   .stat-sub{ margin-top:6px; }
   .stat-sub b{ font-variant-numeric: tabular-nums; }
@@ -326,10 +326,13 @@
   }
 
 
-  /* Chips dynamiques : repoussées par la souris / le doigt */
-  .factors-field{ position:relative; }
-  .factor-chip{ will-change:transform; transition: border-color .25s, background .25s, color .25s; border-color: rgba(215,242,44,calc(.16 + var(--g,0)*.7)); background: rgba(215,242,44,calc(.04 + var(--g,0)*.12)); color: color-mix(in srgb, #fff calc(var(--g,0)*100%), var(--text-sec)); user-select:none; }
-  .factor-chip svg{ width:15px; height:15px; flex:none; margin-right:8px; fill:none; stroke:#D7F22C; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  /* Nuage d'icônes : sans cadre, couleurs variées, repoussées par la souris */
+  .factors-field{ display:flex; flex-wrap:wrap; justify-content:center; gap:26px 30px; position:relative; margin-top:46px; }
+  .factors-field .factor-chip{ flex-direction:column; background:none; border:0; border-radius:0; padding:0; width:120px; white-space:normal; overflow:visible; text-overflow:clip; text-align:center; font-size:12px; line-height:1.3; font-weight:600; color: color-mix(in srgb, var(--c) calc(var(--g,0)*55%), var(--text-sec)); user-select:none; will-change:transform; }
+  .factors-field .factor-chip svg{ width:34px; height:34px; margin:0 0 9px; flex:none; fill:none; stroke:var(--c); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transform:scale(calc(1 + var(--g,0)*.4)); filter:drop-shadow(0 0 calc(6px + var(--g,0)*10px) color-mix(in srgb, var(--c) 55%, transparent)); transition:filter .2s; }
+  .factors-field.cloud{ display:block; height:380px; margin-top:34px; }
+  .factors-field.cloud .factor-chip{ position:absolute; left:0; top:0; display:flex; align-items:center; }
+  @media (max-width:640px){ .factors-field.cloud{ height:560px; } .factors-field .factor-chip{ width:92px; font-size:10.5px; } .factors-field .factor-chip svg{ width:30px; height:30px; } }
   @media (prefers-reduced-motion: reduce){ .factor-chip{ transform:none !important; } }
 
   /* ---------- SCORE / COURT SECTION ---------- */
@@ -752,18 +755,18 @@
     <h2 class="reveal" data-i18n-html="sources_h2">Nous analysons +220 <span class="lime">sources</span></h2>
     <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
     <div class="factors-row factors-field reveal" id="factorsField">
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h11M14 3l4 4-4 4M17 17H6M10 13l-4 4 4 4"/></svg>Historique face-a-face</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14M3 12h18"/></svg>Surface de jeu</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Forme des 10 derniers matchs</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3"/></svg>Classement ATP/WTA en direct</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 1116 0M12 16l4-5"/><circle cx="12" cy="16" r="1.2"/></svg>Vitesse moyenne de service</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>Conversion des balles de break</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="16" height="9" rx="2"/><path d="M21 11v3M7 11v3M11 11v3"/></svg>Indice de fatigue physique</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>Ratio de victoires par surface</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 01-.5-7.97A5.5 5.5 0 0117 9.5a4 4 0 01-.5 8.5z"/></svg>Conditions meteo du match</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Analyse biomecanique du service</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="18" rx="2" transform="rotate(45 12 12)"/><path d="M12 12h.01M10 10h.01M14 14h.01"/></svg>Historique des blessures</span>
-      <span class="factor-chip"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></svg>Indice de confiance psychologique</span>
+      <span class="factor-chip" style="--c:#D7F22C"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h11M14 3l4 4-4 4M17 17H6M10 13l-4 4 4 4"/></svg>Historique face-a-face</span>
+      <span class="factor-chip" style="--c:#FF8A3D"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14M3 12h18"/></svg>Surface de jeu</span>
+      <span class="factor-chip" style="--c:#2FEAF0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Forme des 10 derniers matchs</span>
+      <span class="factor-chip" style="--c:#B07CFF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3"/></svg>Classement ATP/WTA en direct</span>
+      <span class="factor-chip" style="--c:#FF6F91"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 1116 0M12 16l4-5"/><circle cx="12" cy="16" r="1.2"/></svg>Vitesse moyenne de service</span>
+      <span class="factor-chip" style="--c:#FFC53D"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>Conversion des balles de break</span>
+      <span class="factor-chip" style="--c:#6FA3FF"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="16" height="9" rx="2"/><path d="M21 11v3M7 11v3M11 11v3"/></svg>Indice de fatigue physique</span>
+      <span class="factor-chip" style="--c:#3ED66B"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>Ratio de victoires par surface</span>
+      <span class="factor-chip" style="--c:#FF7A45"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 01-.5-7.97A5.5 5.5 0 0117 9.5a4 4 0 01-.5 8.5z"/></svg>Conditions meteo du match</span>
+      <span class="factor-chip" style="--c:#5EE6B8"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Analyse biomecanique du service</span>
+      <span class="factor-chip" style="--c:#E879F9"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="18" rx="2" transform="rotate(45 12 12)"/><path d="M12 12h.01M10 10h.01M14 14h.01"/></svg>Historique des blessures</span>
+      <span class="factor-chip" style="--c:#7DD3FC"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></svg>Indice de confiance psychologique</span>
     </div>
   </div>
 </section>
@@ -1617,33 +1620,55 @@
     document.addEventListener('mouseleave', ()=> marks.forEach(m=> m.classList.remove('col-active')));
   })();
 
-/* Chips de la section sources : ressort + repoussées par la souris/le doigt */
+/* Nuage d'icônes de la section sources : ressort, répulsion souris/doigt, sans chevauchement */
 (function(){
   var f=document.getElementById('factorsField'); if(!f) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var chips=[].slice.call(f.querySelectorAll('.factor-chip')).map(function(el,i){
-    return {el:el,x:0,y:0,vx:0,vy:0,ph:i*1.7,cx:0,cy:0};
+  var JIT=[[-.04,-.06],[.05,.07],[-.05,.04],[.04,-.05],[.06,.05],[-.03,-.07],[.04,.06],[-.06,-.03],[-.02,.07],[.05,-.06],[-.05,.05],[.03,-.04]];
+  var items=[].slice.call(f.querySelectorAll('.factor-chip')).map(function(el,i){
+    return {el:el,hx:0,hy:0,x:0,y:0,vx:0,vy:0,ph:i*1.7,g:0};
   });
-  var mx=-9999,my=-9999,active=false,R=150,MAX=110,raf=null,vis=false;
-  function measure(){ chips.forEach(function(c){ var r=c.el.getBoundingClientRect(); c.cx=r.left+r.width/2-c.x; c.cy=r.top+r.height/2-c.y; }); }
+  var W=0,H=0,mx=-9999,my=-9999,active=false,R=150,MAX=120,raf=null,vis=false,box=null;
+  function layout(){
+    f.classList.add('cloud');
+    var r=f.getBoundingClientRect(); W=r.width; H=r.height;
+    var cols=W<640?3:4, rows=Math.ceil(items.length/cols);
+    items.forEach(function(c,i){
+      var col=i%cols,row=Math.floor(i/cols),st=(row%2)?0.5/cols:-0.0;
+      var jm=W<640?0.45:1; var px=(col+0.5)/cols+JIT[i][0]/cols*2*jm;
+      var py=(row+0.5)/rows+JIT[i][1]/rows*jm;
+      c.hx=Math.min(.93,Math.max(.07,px+((row%2)?0.06/cols*0:0)))*W; c.hy=Math.min(.9,Math.max(.1,py))*H;
+      c.el.style.left=c.hx+'px'; c.el.style.top=c.hy+'px';
+    });
+  }
   function tick(t){
-    measure();
-    chips.forEach(function(c){
-      var ax=-c.x*0.06, ay=-c.y*0.06; /* rappel vers la position d'origine */
-      ax+=Math.sin(t/1400+c.ph)*0.012; ay+=Math.cos(t/1700+c.ph)*0.012; /* flottement */
+    box=f.getBoundingClientRect();
+    items.forEach(function(c){
+      var ax=-c.x*0.06, ay=-c.y*0.06;
+      ax+=Math.sin(t/1400+c.ph)*0.014; ay+=Math.cos(t/1700+c.ph)*0.014;
       var g=0;
       if(active){
-        var dx=(c.cx+c.x)-mx, dy=(c.cy+c.y)-my, d=Math.sqrt(dx*dx+dy*dy)||1;
-        if(d<R){ var k=(1-d/R); ax+=dx/d*k*2.4; ay+=dy/d*k*2.4; g=k; }
+        var dx=(box.left+c.hx+c.x)-mx, dy=(box.top+c.hy+c.y)-my, d=Math.sqrt(dx*dx+dy*dy)||1;
+        if(d<R){ var k=1-d/R; ax+=dx/d*k*2.6; ay+=dy/d*k*2.6; g=k; }
       }
-      c.vx=(c.vx+ax)*0.86; c.vy=(c.vy+ay)*0.86;
-      c.x+=c.vx; c.y+=c.vy;
+      c.vx+=ax; c.vy+=ay; c.g=g;
+    });
+    /* pas de chevauchement : les icônes proches se repoussent */
+    var minD=W<640?84:116;
+    for(var i=0;i<items.length;i++) for(var j=i+1;j<items.length;j++){
+      var a=items[i],b=items[j];
+      var dx=(a.hx+a.x)-(b.hx+b.x), dy=(a.hy+a.y)-(b.hy+b.y), d=Math.sqrt(dx*dx+dy*dy)||1;
+      if(d<minD){ var s=(minD-d)/minD*0.9; a.vx+=dx/d*s; a.vy+=dy/d*s; b.vx-=dx/d*s; b.vy-=dy/d*s; }
+    }
+    items.forEach(function(c){
+      c.vx*=0.86; c.vy*=0.86; c.x+=c.vx; c.y+=c.vy;
       var m=Math.sqrt(c.x*c.x+c.y*c.y); if(m>MAX){ c.x*=MAX/m; c.y*=MAX/m; }
-      c.el.style.transform='translate('+c.x.toFixed(1)+'px,'+c.y.toFixed(1)+'px)';
-      c.el.style.setProperty('--g',g.toFixed(2));
+      c.el.style.transform='translate(-50%,-50%) translate('+c.x.toFixed(1)+'px,'+c.y.toFixed(1)+'px)';
+      c.el.style.setProperty('--g',c.g.toFixed(2));
     });
     raf=vis?requestAnimationFrame(tick):null;
   }
+  layout(); window.addEventListener('resize',layout);
   new IntersectionObserver(function(e){ vis=e[0].isIntersecting; if(vis&&!raf) raf=requestAnimationFrame(tick); }).observe(f);
   var sec=f.closest('section')||f;
   sec.addEventListener('pointermove',function(e){ mx=e.clientX; my=e.clientY; active=true; });
