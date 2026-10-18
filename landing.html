@@ -456,6 +456,10 @@
   .seo-section{ padding: 70px 32px 40px; }
   .seo-section::before{ display:none; }
   .seo-k{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+  .seo-links{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
+  .seo-links a{ padding:8px 16px; border-radius:999px; border:1px solid rgba(255,176,32,.45); color:#ffcf6b; font-size:13.5px; font-weight:700; text-decoration:none; transition:background .15s,color .15s,transform .15s; }
+  .seo-links a:hover{ background:linear-gradient(135deg,#ff7a45,#ffb020,#ff5f6d); color:#0b110c; border-color:transparent; transform:translateY(-2px); }
+  .seo-note{ margin:14px 0 0 !important; font-size:12.5px !important; color:var(--text-sec); }
   .seo-btn{ display:inline-block; margin-top:28px; padding:15px 26px; border-radius:12px; background:var(--accent); color:#0b110c; font-weight:800; font-size:15px; text-decoration:none; }
   @media(max-width:760px){ .seo-section{ padding:50px 18px 24px; } }
   .voir-tous{
@@ -787,7 +791,9 @@
     <span class="seo-k reveal" data-i18n="seo_k">Pronostics du jour</span>
     <h2 class="reveal" data-i18n-html="seo_h2">Les matchs <span class="lime">en un coup d'œil.</span></h2>
     <p class="reveal" data-i18n="seo_p">Probabilité de victoire, score probable et résultat réel de chaque match ATP et WTA, publiés avant le premier service.</p>
-    <a class="seo-btn reveal" href="/fr/pronostics" data-i18n="seo_btn">Voir les pronostics</a>
+    <a class="seo-btn reveal" href="/fr/pronostics/aujourdhui" data-i18n="seo_btn">Voir les matchs du jour</a>
+    <div class="seo-links reveal"><a href="/fr/pronostics/demain" data-i18n="seo_l1">Demain</a><a href="/fr/tournois" data-i18n="seo_l2">Tournois</a><a href="/fr/joueurs" data-i18n="seo_l3">Joueurs</a></div>
+    <p class="seo-note reveal" data-i18n="seo_note">Gratuit, sans inscription</p>
   </div>
 </section>
 
@@ -1004,7 +1010,7 @@
     "seo_k": "Pronostics du jour",
     "seo_h2": "Les matchs <span class=\"lime\">en un coup d'œil.</span>",
     "seo_p": "Probabilité de victoire, score probable et résultat réel de chaque match ATP et WTA, publiés avant le premier service.",
-    "seo_btn": "Voir les pronostics",
+    "seo_btn": "Voir les matchs du jour", "seo_l1": "Demain", "seo_l2": "Tournois", "seo_l3": "Joueurs", "seo_note": "Gratuit, sans inscription",
     "p_h1_comp": "Compétitions",
     "p_sub2": "Découvre les compétitions en cours",
     "p_sub_accent2": "Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.",
@@ -1078,7 +1084,7 @@
     "seo_k": "Today's predictions",
     "seo_h2": "Every match <span class=\"lime\">at a glance.</span>",
     "seo_p": "Win probability, likely score and real result for every ATP and WTA match, published before the first point.",
-    "seo_btn": "See predictions",
+    "seo_btn": "See today's matches", "seo_l1": "Tomorrow", "seo_l2": "Tournaments", "seo_l3": "Players", "seo_note": "Free, no sign-up",
     "p_h1_comp": "Competitions",
     "p_sub2": "Discover ongoing competitions",
     "p_sub_accent2": "Our AI analyzes tournaments and gives you insights on players, rankings and upcoming matches.",
@@ -1152,7 +1158,7 @@
     "seo_k": "Pronósticos del día",
     "seo_h2": "Los partidos <span class=\"lime\">de un vistazo.</span>",
     "seo_p": "Probabilidad de victoria, marcador probable y resultado real de cada partido ATP y WTA, publicados antes de empezar.",
-    "seo_btn": "Ver pronósticos",
+    "seo_btn": "Ver los partidos de hoy", "seo_l1": "Mañana", "seo_l2": "Torneos", "seo_l3": "Jugadores", "seo_note": "Gratis, sin registro",
     "p_h1_comp": "Competiciones",
     "p_sub2": "Descubre las competiciones en curso",
     "p_sub_accent2": "Nuestra IA analiza los torneos y te da información sobre jugadores, clasificaciones y próximos partidos.",
@@ -1226,7 +1232,7 @@
     "seo_k": "Tipps des Tages",
     "seo_h2": "Alle Matches <span class=\"lime\">auf einen Blick.</span>",
     "seo_p": "Siegwahrscheinlichkeit, wahrscheinliches Ergebnis und echtes Resultat jedes ATP- und WTA-Matches, vor dem ersten Ballwechsel veröffentlicht.",
-    "seo_btn": "Prognosen ansehen",
+    "seo_btn": "Heutige Matches ansehen", "seo_l1": "Morgen", "seo_l2": "Turniere", "seo_l3": "Spieler", "seo_note": "Kostenlos, ohne Anmeldung",
     "p_h1_comp": "Wettbewerbe",
     "p_sub2": "Entdecke laufende Wettbewerbe",
     "p_sub_accent2": "Unsere KI analysiert Turniere und liefert dir Einblicke zu Spielern, Ranglisten und kommenden Matches.",
@@ -1299,7 +1305,7 @@
     "seo_k": "Pronostici del giorno",
     "seo_h2": "Tutte le partite <span class=\"lime\">in un colpo d'occhio.</span>",
     "seo_p": "Probabilità di vittoria, punteggio probabile e risultato reale di ogni partita ATP e WTA, pubblicati prima dell'inizio.",
-    "seo_btn": "Vedi i pronostici",
+    "seo_btn": "Vedi le partite di oggi", "seo_l1": "Domani", "seo_l2": "Tornei", "seo_l3": "Giocatori", "seo_note": "Gratis, senza registrazione",
     "p_h1_comp": "Competizioni",
     "p_sub2": "Scopri le competizioni in corso",
     "p_sub_accent2": "La nostra IA analizza i tornei e ti offre approfondimenti su giocatori, classifiche e prossime partite.",
