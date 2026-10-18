@@ -83,6 +83,7 @@ main h1::after{content:"";display:block;width:64px;height:5px;border-radius:3px;
 .tcard:hover{transform:translateY(-3px);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--surf,#D7F22C) 55%,transparent),0 14px 30px -18px var(--surf,#D7F22C)}
 .tbadge{flex:none;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--surf,#D7F22C) 60%,#fff) 0%,var(--surf,#D7F22C) 45%,color-mix(in srgb,var(--surf,#D7F22C) 45%,#000) 100%);box-shadow:0 6px 18px -6px var(--surf,#D7F22C),inset 0 0 0 2px rgba(255,255,255,.18)}
 .tbadge i{font-style:normal;font-family:Unbounded,Inter,sans-serif;font-weight:800;font-size:17px;color:#0b110c;letter-spacing:-.5px}
+.tbadge{position:relative;overflow:hidden}.tbadge img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:9px;background:#fff;border-radius:50%}.tbadge.lg{background:#fff}.tbadge.lg i{opacity:0}
 .tbody{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.tbody .lv{font-size:10.5px}.tbody b{font-size:17px;line-height:1.2}.tbody .meta{font-size:12.5px}
 .tgo{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);color:#ffb020;font-weight:800;transition:background .15s,color .15s}.tcard:hover .tgo{background:var(--og);color:#0b110c}
 @media(max-width:520px){.tgrid{grid-template-columns:1fr}.tbadge{width:52px;height:52px}}
