@@ -7,7 +7,7 @@ Pages SEO "evergreen" et de découverte :
 Contenu = faits stables sur le tournoi/joueur + données réelles de la base
 (favoris par Elo de surface, prochains pronostics, résultats). Rien d'inventé.
 """
-import html
+import html, unicodedata
 import json
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -298,13 +298,13 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
     fin = finals_section(pages)
     retro_html = retro_sections(db, slug)
     if up:
-        h += '<section class="card"><h2>Prochains matchs et pronostics</h2>' + R._grouped(up) + '</section>'
+        h += '<section class="card"><h2>Prochains matchs et pronostics</h2>' + R.grouped_search(up) + '</section>'
     h += fin
     h += retro_html
     if dn:
         h += '<section class="card"><h2>Derniers résultats</h2>' + R._grouped(dn) + '</section>'
     if tot:
-        h += f'<section class="card"><h2>Fiabilité sur ce tournoi</h2><div class="proj"><div><b>{R.fr(round(100*ok/tot,1))} %</b><small>pronostics justes</small></div><div><b>{ok}/{tot}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
+        h += f'<section class="card"><h2>Fiabilité sur ce tournoi</h2><div class="proj"><div><b>{R.fr(round(100*ok/tot,1))} %</b><small>pronostics justes</small></div><div><b>{ok}/{tot}</b><small>matchs vérifiés</small></div><div class="projbtn"><small>Matchs passés</small><a class="btn" href="/fr/bilan">Voir l’historique</a></div></div></section>'
     if not (up or dn or fin or retro_html):
         nxt = (db.query(models.MatchPage).filter(models.MatchPage.finished_at.is_(None), ~models.MatchPage.match_key.like("retro|%"),
                                                 models.MatchPage.scheduled_time >= datetime.utcnow() - timedelta(hours=6))
@@ -329,11 +329,22 @@ def render_evergreen(db: Session, slug: str) -> Optional[str]:
                         path, h, ld)
 
 
+MONO = {"australian-open": "AO", "roland-garros": "RG", "wimbledon": "W", "us-open": "US", "indian-wells": "IW",
+        "miami": "MI", "monte-carlo": "MC", "madrid": "MA", "rome": "RO", "canada": "CA", "cincinnati": "CI",
+        "shanghai": "SH", "paris-bercy": "PB"}
+
+
 def _tcards(items):
-    return '<div class="tgrid">' + ''.join(
-        f'<a class="tcard" style="--surf:var(--{t["surface"]})" href="/fr/tournoi/{s}"><span class="lv">{html.escape(t["level"])}</span>'
-        f'<b>{html.escape(t["name"])}</b><span class="meta">{html.escape(t["city"])} · {SURF_LABEL[t["surface"]].capitalize()}</span>'
-        f'<span class="meta">{html.escape(t["when"].capitalize())}</span><span class="go">Voir les pronostics →</span></a>' for s, t in items) + '</div>'
+    out = []
+    for s, t in items:
+        mono = MONO.get(s) or "".join(w[0] for w in t["name"].split()[:2]).upper()
+        out.append(
+            f'<a class="tcard" style="--surf:var(--{t["surface"]})" href="/fr/tournoi/{s}">'
+            f'<span class="tbadge" aria-hidden="true"><i>{html.escape(mono)}</i></span>'
+            f'<span class="tbody"><span class="lv">{html.escape(t["level"])}</span><b>{html.escape(t["name"])}</b>'
+            f'<span class="meta">{html.escape(t["city"])} · {SURF_LABEL[t["surface"]].capitalize()} · {html.escape(t["when"])}</span></span>'
+            f'<span class="tgo" aria-hidden="true">→</span></a>')
+    return '<div class="tgrid">' + ''.join(out) + '</div>'
 
 
 def render_tournois(db: Session) -> str:
@@ -341,10 +352,10 @@ def render_tournois(db: Session) -> str:
     h = _crumb_html(crumbs)
     h += ('<section class="hero"><h1>Pronostics des grands tournois de tennis</h1>'
           '<p>Grands Chelems et Masters 1000 : favoris, probabilités de victoire et résultats, mis à jour tout au long de la saison.</p>'
-          '<div class="hs"><a class="btn" href="/fr/pronostics/aujourdhui">Pronostics du jour</a><a class="btn ghost" href="/fr/joueurs">Joueurs</a></div></section>')
+          '<div class="hs" data-nosnippet><a class="btn" href="/fr/pronostics/aujourdhui">Pronostics du jour</a><a class="btn ghost" href="/fr/joueurs">Joueurs</a></div></section>')
     for title, lvl in (("Grands Chelems", "Grand Chelem"), ("Masters 1000", None)):
         items = [(s, t) for s, t in T.items() if (t["level"] == "Grand Chelem") == (lvl is not None)]
-        h += f'<section class="card"><h2>{title}</h2>' + _tcards(items) + '</section>'
+        h += f'<section class="tsec"><h2>{title}</h2>' + _tcards(items) + '</section>'
     known = set(T)
     eds = {}
     for slug, name in db.query(models.MatchPage.tournament_slug, models.MatchPage.tournament_name).all():
@@ -373,6 +384,22 @@ def find_player(db: Session, slug: str):
     return None
 
 
+_SEARCH_JS = r"""
+(function(){var q=document.getElementById('pq');if(!q)return;
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+var secs=[].slice.call(document.querySelectorAll('.jsec'));
+secs.forEach(function(s){s.shown=10});
+function apply(){var v=norm(q.value.trim());
+secs.forEach(function(s){var cs=[].slice.call(s.querySelectorAll('.pcard')),n=0,hit=0;
+cs.forEach(function(c,i){var ok=v?c.getAttribute('data-n').indexOf(v)>-1:i<s.shown;c.classList.toggle('hid',!ok);if(ok)hit++});
+var m=s.querySelector('[data-more]');if(m)m.parentNode.style.display=(v||s.shown>=cs.length)?'none':'flex';
+var nr=s.querySelector('.nores');if(nr)nr.style.display=(v&&!hit)?'block':'none'})}
+q.addEventListener('input',apply);
+secs.forEach(function(s){var m=s.querySelector('[data-more]');if(m)m.addEventListener('click',function(){s.shown+=10;apply()})});
+})();
+"""
+
+
 def render_joueurs(db: Session) -> str:
     crumbs = [("Accueil", "/"), ("Joueurs", "/fr/joueurs")]
     allp = top_players(db)
@@ -381,6 +408,8 @@ def render_joueurs(db: Session) -> str:
     h += ('<section class="hero"><h1>Pronostics par joueur : ATP et WTA</h1>'
           '<p>Fiche de chaque joueur du top 100 : classement, niveau par surface, forme, prochains pronostics et derniers résultats.</p>'
           '<div class="hs"><a class="btn" href="/fr/pronostics/aujourdhui">Pronostics du jour</a><a class="btn ghost" href="/fr/tournois">Tournois</a></div></section>')
+    h += ('<div class="sbar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+          '<input id="pq" type="search" placeholder="Rechercher un joueur ou une joueuse…" autocomplete="off" aria-label="Rechercher un joueur"></div>')
     for tour, lab in (("atp", "Messieurs (ATP)"), ("wta", "Dames (WTA)")):
         seen, cards = set(), []
         for p in allp:
@@ -391,12 +420,18 @@ def render_joueurs(db: Session) -> str:
                 continue
             seen.add(sl)
             img = photos.get(str(p.id)) or P.PLACEHOLDER_IMG
+            key = unicodedata.normalize("NFD", p.name.lower())
+            key = "".join(c for c in key if not unicodedata.combining(c))
+            hid = " hid" if len(cards) >= 10 else ""
             cards.append(
-                f'<a class="pcard{" top3" if p.current_rank <= 3 else ""}" href="/fr/joueur/{sl}"><span class="rk">N°{p.current_rank}</span>'
+                f'<a class="pcard{" top3" if p.current_rank <= 3 else ""}{hid}" data-n="{html.escape(key)}" href="/fr/joueur/{sl}"><span class="rk">N°{p.current_rank}</span>'
                 f'<img src="{html.escape(img)}" alt="{html.escape(p.name)}" width="92" height="92" loading="lazy" referrerpolicy="no-referrer">'
                 f'<b>{html.escape(p.name)}</b><small>Voir la fiche</small></a>')
         if cards:
-            h += f'<section class="card"><h2>{lab}</h2><div class="pgrid">' + ''.join(cards) + '</div></section>'
+            more = f'<div class="moreb"><button type="button" data-more>Afficher 10 de plus</button></div>' if len(cards) > 10 else ''
+            h += (f'<section class="card jsec"><h2>{lab}</h2><div class="pgrid">' + ''.join(cards) + '</div>'
+                  f'<p class="nores">Aucun résultat dans cette catégorie.</p>{more}</section>')
+    h += "<script>" + _SEARCH_JS + "</script>"
     return R.page_shell("Pronostics tennis par joueur : fiches ATP et WTA | TennisMind",
                         "Fiches des joueurs ATP et WTA : classement, niveau par surface, forme récente, prochains pronostics et résultats.",
                         "/fr/joueurs", h, {"@context": "https://schema.org", "@type": "CollectionPage", "name": "Joueurs de tennis", "url": BASE + "/fr/joueurs", "inLanguage": "fr"})
@@ -457,6 +492,7 @@ def render_player(db: Session, slug: str) -> Optional[str]:
     h += f'<section class="card analysis"><h2>Profil de {html.escape(p.name)}</h2>{img}' + ''.join(f'<p>{x if i == 0 else x}</p>' for i, x in enumerate(paras)) + '<div style="clear:both"></div></section>'
     rows = ''.join(f'<div class="fr"><span>{SURF_LABEL[s].capitalize()}</span><i style="width:{lv[s]}%"></i><b style="margin-left:8px">{lv[s]}</b></div>' for s in ("hard", "clay", "grass") if lv[s] is not None)
     h += f'<section class="card"><h2>Niveau TennisMind par surface</h2><div class="fac" style="margin-top:0">{rows}</div></section>'
+    h += R.more_card(p.name)
     if up:
         h += f'<section class="card"><h2>Prochains pronostics de {html.escape(p.name)}</h2>' + R._grouped(up) + '</section>'
     if dn:
@@ -490,7 +526,7 @@ def render_day(db: Session, when: str) -> Optional[str]:
     h = _crumb_html(crumbs) + f'<h1>Pronostics tennis {word} : {label}</h1>'
     h += R.CTA_HTML
     if pages:
-        h += '<section class="card"><h2>Matchs du jour</h2>' + R._grouped([P._row(x) for x in pages]) + '</section>'
+        h += '<section class="card"><h2>Matchs du jour</h2>' + R.grouped_search([P._row(x) for x in pages]) + '</section>'
     else:
         h += '<section class="card"><p class="pend">Aucun pronostic publié pour ce jour pour le moment. <a href="/fr/pronostics">Voir tous les pronostics</a>.</p></section>'
     return R.page_shell(f"Pronostics tennis {word} ({label}) | TennisMind",

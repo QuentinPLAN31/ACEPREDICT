@@ -76,6 +76,26 @@ main h1::after{content:"";display:block;width:64px;height:5px;border-radius:3px;
 .pcard:hover,.tcard:hover{border-color:#ffb020}
 .crumb a:hover{color:#ffb020}
 .chip{border-left-color:#ff7a45}.chip.surf{border-left-color:var(--surf)}
+/* Annuaire des tournois : tuiles sans cadre, badge coloré par surface */
+.tsec{margin:30px 0 8px}.tsec h2{font-size:13px;letter-spacing:1.6px;text-transform:uppercase;font-weight:800;margin:0 0 14px;background:var(--og);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;display:inline-block}
+.tgrid{grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.tcard{flex-direction:row;align-items:center;gap:16px;border:0;border-top:0;border-radius:18px;padding:16px 18px;background:linear-gradient(120deg,color-mix(in srgb,var(--surf,#D7F22C) 16%,#162217) 0%,#142016 70%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);position:relative;overflow:hidden}
+.tcard:hover{transform:translateY(-3px);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--surf,#D7F22C) 55%,transparent),0 14px 30px -18px var(--surf,#D7F22C)}
+.tbadge{flex:none;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--surf,#D7F22C) 60%,#fff) 0%,var(--surf,#D7F22C) 45%,color-mix(in srgb,var(--surf,#D7F22C) 45%,#000) 100%);box-shadow:0 6px 18px -6px var(--surf,#D7F22C),inset 0 0 0 2px rgba(255,255,255,.18)}
+.tbadge i{font-style:normal;font-family:Unbounded,Inter,sans-serif;font-weight:800;font-size:17px;color:#0b110c;letter-spacing:-.5px}
+.tbody{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}.tbody .lv{font-size:10.5px}.tbody b{font-size:17px;line-height:1.2}.tbody .meta{font-size:12.5px}
+.tgo{flex:none;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);color:#ffb020;font-weight:800;transition:background .15s,color .15s}.tcard:hover .tgo{background:var(--og);color:#0b110c}
+@media(max-width:520px){.tgrid{grid-template-columns:1fr}.tbadge{width:52px;height:52px}}
+/* Fiche joueur : teaser vers l'appli ; annuaire joueurs : recherche + affichage par 10 */
+.lock.morecard{min-height:230px}.lock.morecard .blur h2{margin-bottom:14px}
+.lock.morecard .cta{background:linear-gradient(180deg,rgba(15,22,18,.35),rgba(15,22,18,.86))}.lock.morecard .cta b{font-size:19px}.lock.morecard .cta span{max-width:430px}
+.lock.morecard .cta .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.sbar{position:relative;margin:4px 0 22px}.sbar input{width:100%;padding:15px 18px 15px 48px;border-radius:14px;border:1px solid var(--line2);background:#0f1612;color:#fff;font:600 16px Inter,sans-serif;outline:none;transition:border-color .15s,box-shadow .15s}.sbar input::placeholder{color:var(--td);font-weight:500}.sbar input:focus{border-color:#ffb020;box-shadow:0 0 0 4px rgba(255,176,32,.12)}
+.sbar svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:20px;height:20px;stroke:#ffb020;fill:none;stroke-width:2;stroke-linecap:round}
+.pcard.hid{display:none}.moreb{display:flex;justify-content:center;margin-top:16px}.moreb button{cursor:pointer;font:700 14px Inter,sans-serif;color:#ffcf6b;background:transparent;border:1.5px solid rgba(255,176,32,.5);border-radius:10px;padding:10px 18px}.moreb button:hover{background:var(--og);color:#0b110c;border-color:transparent}
+.nores{display:none;text-align:center;color:var(--ts);padding:18px 0 4px}
+.lst .mw.hid,.lst .dg.hid{display:none}.lst .sbar{margin:0 0 16px}.lst .moreb{margin-top:14px}
+.proj .projbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}.proj .projbtn .btn{white-space:nowrap;padding:10px 14px;font-size:13.5px}
 """
 BRAND='<span class="brand-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M 11.07,1.11 L 11.14,1.32 L 11.25,1.54 L 11.50,1.75 L 11.78,1.97 L 12.04,2.19 L 12.29,2.40 L 12.47,2.62 L 12.65,2.83 L 12.83,3.05 L 12.97,3.26 L 13.11,3.48 L 13.22,3.70 L 13.29,3.91 L 13.37,4.13 L 13.44,4.34 L 13.47,4.56 L 13.51,4.77 L 13.55,4.99 L 13.55,5.21 L 13.55,5.42 L 13.55,5.64 L 13.51,5.85 L 13.47,6.07 L 13.44,6.28 L 13.40,6.50 L 13.37,6.72 L 13.29,6.93 L 13.22,7.15 L 13.15,7.36 L 13.08,7.58 L 13.01,7.79 L 12.93,8.01 L 12.83,8.23 L 12.75,8.44 L 12.65,8.66 L 12.54,8.87 L 12.43,9.09 L 12.32,9.30 L 12.22,9.52 L 12.11,9.74 L 12.00,9.95 L 11.89,10.17 L 11.78,10.38 L 11.68,10.60 L 11.53,10.81 L 11.42,11.03 L 11.32,11.25 L 11.17,11.46 L 11.07,11.68 L 10.96,11.89 L 10.85,12.11 L 10.71,12.32 L 10.60,12.54 L 10.49,12.75 L 10.38,12.97 L 10.24,13.19 L 10.13,13.40 L 10.02,13.62 L 9.92,13.83 L 9.81,14.05 L 9.74,14.26 L 9.63,14.48 L 9.52,14.70 L 9.41,14.91 L 9.34,15.13 L 9.23,15.34 L 9.16,15.56 L 9.09,15.77 L 9.02,15.99 L 8.94,16.21 L 8.87,16.42 L 8.80,16.64 L 8.76,16.85 L 8.69,17.07 L 8.66,17.28 L 8.62,17.50 L 8.58,17.72 L 8.55,17.93 L 8.55,18.15 L 8.51,18.36 L 8.51,18.58 L 8.51,18.79 L 8.51,19.01 L 8.55,19.23 L 8.55,19.44 L 8.58,19.66 L 8.62,19.87 L 8.69,20.09 L 8.73,20.30 L 8.80,20.52 L 8.87,20.74 L 8.98,20.95 L 9.09,21.17 L 9.20,21.38 L 9.30,21.60 L 9.45,21.81 L 9.59,22.03 L 9.77,22.25 L 9.95,22.46 L 10.13,22.68 L 10.31,22.86 L 12.90,22.86 L 12.86,22.68 L 12.72,22.46 L 12.50,22.25 L 12.22,22.03 L 11.96,21.81 L 11.71,21.60 L 11.53,21.38 L 11.32,21.17 L 11.17,20.95 L 10.99,20.74 L 10.89,20.52 L 10.78,20.30 L 10.67,20.09 L 10.60,19.87 L 10.53,19.66 L 10.49,19.44 L 10.45,19.23 L 10.42,19.01 L 10.42,18.79 L 10.42,18.58 L 10.42,18.36 L 10.45,18.15 L 10.45,17.93 L 10.53,17.72 L 10.56,17.50 L 10.60,17.28 L 10.67,17.07 L 10.71,16.85 L 10.78,16.64 L 10.85,16.42 L 10.96,16.21 L 11.03,15.99 L 11.10,15.77 L 11.21,15.56 L 11.32,15.34 L 11.39,15.13 L 11.50,14.91 L 11.60,14.70 L 11.71,14.48 L 11.82,14.26 L 11.93,14.05 L 12.04,13.83 L 12.18,13.62 L 12.29,13.40 L 12.40,13.19 L 12.50,12.97 L 12.65,12.75 L 12.75,12.54 L 12.86,12.32 L 13.01,12.11 L 13.11,11.89 L 13.22,11.68 L 13.33,11.46 L 13.47,11.25 L 13.58,11.03 L 13.69,10.81 L 13.80,10.60 L 13.91,10.38 L 14.01,10.17 L 14.12,9.95 L 14.23,9.74 L 14.34,9.52 L 14.44,9.30 L 14.52,9.09 L 14.62,8.87 L 14.70,8.66 L 14.80,8.44 L 14.88,8.23 L 14.95,8.01 L 15.02,7.79 L 15.09,7.58 L 15.16,7.36 L 15.20,7.15 L 15.27,6.93 L 15.31,6.72 L 15.34,6.50 L 15.38,6.28 L 15.42,6.07 L 15.42,5.85 L 15.45,5.64 L 15.45,5.42 L 15.45,5.21 L 15.45,4.99 L 15.45,4.77 L 15.42,4.56 L 15.38,4.34 L 15.34,4.13 L 15.31,3.91 L 15.24,3.70 L 15.16,3.48 L 15.09,3.26 L 15.02,3.05 L 14.91,2.83 L 14.80,2.62 L 14.66,2.40 L 14.55,2.19 L 14.41,1.97 L 14.23,1.75 L 14.05,1.54 L 13.87,1.32 L 13.65,1.11 Z" fill="var(--bg)"/></svg></span>'
 APP="/app"
@@ -278,6 +298,15 @@ CTA_HTML = (f'<section class="bigcta"><div class="bc-t"><span class="bc-k">Conna
             f'<p>Choisis deux joueurs et une surface : TennisMind te donne le favori, sa probabilité de victoire et le score le plus probable, en quelques secondes et gratuitement.</p></div>'
             f'<a class="btn dark" href="{APP}">Prédire un match gratuitement</a></section>')
 
+def more_card(name):
+    n = html.escape(name)
+    return ('<section class="card lock morecard"><div class="blur" aria-hidden="true"><h2>Statistiques détaillées</h2>'
+            '<div class="proj"><div><b>7,4</b><small>Aces par match</small></div><div><b>63 %</b><small>Points au retour</small></div><div><b>4-1</b><small>Face-à-face</small></div></div></div>'
+            f'<div class="cta"><b>Voir l’analyse complète de {n}</b>'
+            '<span>Statistiques détaillées, face-à-face et probabilités de victoire contre chaque adversaire, gratuitement dans l’application.</span>'
+            f'<div class="row"><a class="btn" href="{APP}">Voir l’analyse complète</a><a class="btn ghost" href="/">Découvrir TennisMind</a></div></div></section>')
+
+
 
 def page_shell(title, desc, path, body, ld=None, robots="index,follow,max-image-preview:large,max-snippet:-1"):
     url = BASE + path
@@ -319,6 +348,44 @@ def _grouped(rows):
         out.append(_row(p))
     return "".join(out)
 
+import unicodedata as _ud
+_LIST_JS = r"""
+(function(){if(window.__lst)return;window.__lst=1;
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+document.querySelectorAll('.lst').forEach(function(L){
+var q=L.querySelector('input'),rows=[].slice.call(L.querySelectorAll('.mw')),groups=[].slice.call(L.querySelectorAll('.dg')),
+btn=L.querySelector('[data-more]'),nr=L.querySelector('.nores'),lim=parseInt(L.getAttribute('data-lim')||'10',10),shown=lim;
+function apply(){var v=norm(q?q.value.trim():''),hit=0;
+rows.forEach(function(r,i){var ok=v?r.getAttribute('data-n').indexOf(v)>-1:i<shown;r.classList.toggle('hid',!ok);if(ok)hit++});
+groups.forEach(function(g){g.classList.toggle('hid',!g.querySelector('.mw:not(.hid)'))});
+if(btn)btn.parentNode.style.display=(v||shown>=rows.length)?'none':'flex';
+if(nr)nr.style.display=(v&&!hit)?'block':'none'}
+if(q)q.addEventListener('input',apply);
+if(btn)btn.addEventListener('click',function(){shown+=lim;apply()});
+apply()})})();
+"""
+
+
+def grouped_search(rows, limit=10, label="Rechercher un joueur ou un tournoi…"):
+    """Liste de matchs groupée par jour : 10 premiers affichés, recherche et bouton « Afficher plus »."""
+    if len(rows) <= limit:
+        return _grouped(rows)
+    groups, order = {}, []
+    for i, p in enumerate(rows):
+        day = p.get("day", "")
+        if day not in groups:
+            groups[day] = []; order.append(day)
+        key = " ".join(str(p.get(k, "")) for k in ("p1", "p2", "tournoi"))
+        key = "".join(c for c in _ud.normalize("NFD", key.lower()) if not _ud.combining(c))
+        groups[day].append(f'<div class="mw" data-n="{html.escape(key)}">{_row(p)}</div>')
+    body = "".join(
+        '<div class="dg">' + (f'<div class="dh">{html.escape(d)}</div>' if d else "") + "".join(groups[d]) + "</div>" for d in order)
+    return (f'<div class="lst" data-lim="{limit}"><div class="sbar"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>'
+            f'<input type="search" placeholder="{html.escape(label)}" autocomplete="off" aria-label="Rechercher un match"></div>'
+            f'{body}<p class="nores">Aucun match trouvé.</p><div class="moreb"><button type="button" data-more>Afficher {limit} de plus</button></div>'
+            f'<script>{_LIST_JS}</script></div>')
+
+
 
 def hub_page(upcoming, recent, acc):
     crumb = '<nav class="crumb"><a href="/">Accueil</a> › Pronostics</nav>'
@@ -326,15 +393,15 @@ def hub_page(upcoming, recent, acc):
     h += '<p style="color:var(--ts);margin:0 0 22px">Chaque match reçoit une probabilité de victoire et un score probable calculés par TennisMind, publiés avant la rencontre puis comparés au résultat réel.</p>'
     h += CTA_HTML
     if acc:
-        h += f'<section class="card"><h2>Taux de réussite</h2><div class="proj"><div><b>{fr(acc["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc["ok"]}/{acc["total"]}</b><small>matchs vérifiés</small></div><div><a class="btn" href="/fr/bilan">Bilan public</a></div></div></section>'
+        h += f'<section class="card"><h2>Taux de réussite</h2><div class="proj"><div><b>{fr(acc["pct"])} %</b><small>pronostics justes</small></div><div><b>{acc["ok"]}/{acc["total"]}</b><small>matchs vérifiés</small></div><div class="projbtn"><small>Matchs passés</small><a class="btn" href="/fr/bilan">Voir l’historique</a></div></div></section>'
     h += ('<section class="card"><h2>Explorer</h2><div class="chips" style="margin:0">'
           '<a class="btn ghost" href="/fr/pronostics/aujourdhui">Pronostics du jour</a><a class="btn ghost" href="/fr/pronostics/demain">Demain</a>'
           '<a class="btn ghost" href="/fr/tournois">Tournois</a><a class="btn ghost" href="/fr/joueurs">Joueurs</a></div></section>')
     if upcoming:
-        h += '<section class="card"><h2>Matchs à venir</h2>' + _grouped(upcoming) + '</section>'
+        h += '<section class="card"><h2>Matchs à venir</h2>' + grouped_search(upcoming) + '</section>'
     if recent:
         h += ('<details class="past"><summary class="btn ghost">Voir les matchs passés</summary>'
-              '<section class="card" style="margin-top:16px"><h2>Matchs passés</h2>' + _grouped(recent) + '</section></details>')
+              '<section class="card" style="margin-top:16px"><h2>Matchs passés</h2>' + grouped_search(recent) + '</section></details>')
     if not upcoming and not recent:
         h += '<section class="card"><p class="pend">Les prochains pronostics arrivent très bientôt.</p></section>'
     ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": "Pronostics tennis", "url": BASE + "/fr/pronostics", "inLanguage": "fr"}
@@ -368,7 +435,7 @@ def tournoi_page(name, slug, upcoming, done, acc, finals=''):
         h += f'<p style="color:var(--ts);margin:0 0 22px">Sur ce tournoi, {acc["ok"]} pronostics sur {acc["total"]} déjà vérifiés sont justes ({fr(acc["pct"])} %).</p>'
     h += finals
     if upcoming:
-        h += '<section class="card"><h2>Matchs à venir</h2>' + _grouped(upcoming) + '</section>'
+        h += '<section class="card"><h2>Matchs à venir</h2>' + grouped_search(upcoming) + '</section>'
     if done:
         h += '<section class="card"><h2>Résultats</h2>' + _grouped(done) + '</section>'
     ld = {"@context": "https://schema.org", "@type": "CollectionPage", "name": f"Pronostics {name}", "url": f"{BASE}/fr/tournoi/{slug}", "inLanguage": "fr"}

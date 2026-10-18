@@ -1620,55 +1620,66 @@
     document.addEventListener('mouseleave', ()=> marks.forEach(m=> m.classList.remove('col-active')));
   })();
 
-/* Nuage d'icônes de la section sources : ressort, répulsion souris/doigt, sans chevauchement */
+/* Nuage d'icônes de la section sources : dérive libre, repoussées par la souris/le doigt, sans chevauchement, sans position d'ancrage */
 (function(){
   var f=document.getElementById('factorsField'); if(!f) return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var JIT=[[-.04,-.06],[.05,.07],[-.05,.04],[.04,-.05],[.06,.05],[-.03,-.07],[.04,.06],[-.06,-.03],[-.02,.07],[.05,-.06],[-.05,.05],[.03,-.04]];
-  var items=[].slice.call(f.querySelectorAll('.factor-chip')).map(function(el,i){
-    return {el:el,hx:0,hy:0,x:0,y:0,vx:0,vy:0,ph:i*1.7,g:0};
+  var seed=7; function rnd(){ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }
+  var items=[].slice.call(f.querySelectorAll('.factor-chip')).map(function(el){
+    return {el:el,x:0,y:0,vx:(rnd()-.5)*.5,vy:(rnd()-.5)*.5,g:0};
   });
-  var W=0,H=0,mx=-9999,my=-9999,active=false,R=150,MAX=120,raf=null,vis=false,box=null;
-  function layout(){
-    f.classList.add('cloud');
-    var r=f.getBoundingClientRect(); W=r.width; H=r.height;
-    var cols=W<640?3:4, rows=Math.ceil(items.length/cols);
-    items.forEach(function(c,i){
-      var col=i%cols,row=Math.floor(i/cols),st=(row%2)?0.5/cols:-0.0;
-      var jm=W<640?0.45:1; var px=(col+0.5)/cols+JIT[i][0]/cols*2*jm;
-      var py=(row+0.5)/rows+JIT[i][1]/rows*jm;
-      c.hx=Math.min(.93,Math.max(.07,px+((row%2)?0.06/cols*0:0)))*W; c.hy=Math.min(.9,Math.max(.1,py))*H;
-      c.el.style.left=c.hx+'px'; c.el.style.top=c.hy+'px';
+  var W=0,H=0,mx=-9999,my=-9999,active=false,R=170,raf=null,vis=false,box=null,PAD=(window.innerWidth<640?50:64),placed=false;
+  function cw(){ return W<640?98:128; } function ch(){ return 88; }
+  function scatter(){
+    /* placement aléatoire sans chevauchement (rejet) : un vrai nuage, pas une grille */
+    var pts=[];
+    items.forEach(function(c){
+      var best=null,bd=-1;
+      for(var k=0;k<400;k++){
+        var x=PAD+rnd()*(W-2*PAD), y=PAD*.8+rnd()*(H-1.6*PAD), m=1e9;
+        pts.forEach(function(q){ var d=Math.max(Math.abs(q.x-x)/cw(),Math.abs(q.y-y)/ch()); if(d<m) m=d; });
+        if(m>bd){ bd=m; best={x:x,y:y}; if(m>=1.15) break; }
+      }
+      c.x=best.x; c.y=best.y; pts.push(c);
     });
   }
-  function tick(t){
-    box=f.getBoundingClientRect();
+  function size(){
+    var r=f.getBoundingClientRect(), w=r.width, h=r.height;
+    if(!placed){ f.classList.add('cloud'); r=f.getBoundingClientRect(); w=r.width; h=r.height; }
+    if(placed){ items.forEach(function(c){ c.x*=w/(W||w); c.y*=h/(H||h); }); }
+    W=w; H=h;
+    if(!placed){ scatter(); placed=true; }
+  }
+  function tick(){
+    box=f.getBoundingClientRect(); var CW=cw(),CH=ch();
     items.forEach(function(c){
-      var ax=-c.x*0.06, ay=-c.y*0.06;
-      ax+=Math.sin(t/1400+c.ph)*0.014; ay+=Math.cos(t/1700+c.ph)*0.014;
-      var g=0;
+      /* léger vagabondage + répulsion du curseur */
+      c.vx+=(rnd()-.5)*.05; c.vy+=(rnd()-.5)*.05; c.g=0;
       if(active){
-        var dx=(box.left+c.hx+c.x)-mx, dy=(box.top+c.hy+c.y)-my, d=Math.sqrt(dx*dx+dy*dy)||1;
-        if(d<R){ var k=1-d/R; ax+=dx/d*k*2.6; ay+=dy/d*k*2.6; g=k; }
+        var dx=c.x+box.left-mx, dy=c.y+box.top-my, d=Math.hypot(dx,dy)||1;
+        if(d<R){ var k=1-d/R; c.vx+=dx/d*k*2.2; c.vy+=dy/d*k*2.2; c.g=k; }
       }
-      c.vx+=ax; c.vy+=ay; c.g=g;
     });
-    /* pas de chevauchement : les icônes proches se repoussent */
-    var minD=W<640?84:116;
     for(var i=0;i<items.length;i++) for(var j=i+1;j<items.length;j++){
-      var a=items[i],b=items[j];
-      var dx=(a.hx+a.x)-(b.hx+b.x), dy=(a.hy+a.y)-(b.hy+b.y), d=Math.sqrt(dx*dx+dy*dy)||1;
-      if(d<minD){ var s=(minD-d)/minD*0.9; a.vx+=dx/d*s; a.vy+=dy/d*s; b.vx-=dx/d*s; b.vy-=dy/d*s; }
+      var a=items[i],b=items[j],dx=a.x-b.x,dy=a.y-b.y,px=CW-Math.abs(dx),py=CH-Math.abs(dy);
+      if(px>0&&py>0){ /* chevauchement de boîtes : on pousse sur l'axe le moins pénétré */
+        if(px/CW<py/CH){ var s=Math.sign(dx||1)*(px*.06+.15); a.vx+=s; b.vx-=s; a.x+=s*2; b.x-=s*2; }
+        else { var s2=Math.sign(dy||1)*(py*.06+.15); a.vy+=s2; b.vy-=s2; a.y+=s2*2; b.y-=s2*2; } }
     }
     items.forEach(function(c){
-      c.vx*=0.86; c.vy*=0.86; c.x+=c.vx; c.y+=c.vy;
-      var m=Math.sqrt(c.x*c.x+c.y*c.y); if(m>MAX){ c.x*=MAX/m; c.y*=MAX/m; }
-      c.el.style.transform='translate(-50%,-50%) translate('+c.x.toFixed(1)+'px,'+c.y.toFixed(1)+'px)';
+      c.vx*=.955; c.vy*=.955;
+      var sp=Math.hypot(c.vx,c.vy); if(sp>14){ c.vx*=14/sp; c.vy*=14/sp; }
+      if(sp<.25){ c.vx+=(rnd()-.5)*.12; c.vy+=(rnd()-.5)*.12; }
+      c.x+=c.vx; c.y+=c.vy;
+      /* bords doux : rebond amorti, pas de rappel vers un point fixe */
+      if(c.x<PAD*.6){ c.x=PAD*.6; c.vx=Math.abs(c.vx)*.6; } if(c.x>W-PAD*.6){ c.x=W-PAD*.6; c.vx=-Math.abs(c.vx)*.6; }
+      if(c.y<PAD*.6){ c.y=PAD*.6; c.vy=Math.abs(c.vy)*.6; } if(c.y>H-PAD*.6){ c.y=H-PAD*.6; c.vy=-Math.abs(c.vy)*.6; }
+      c.el.style.transform='translate('+c.x.toFixed(1)+'px,'+c.y.toFixed(1)+'px) translate(-50%,-50%)';
       c.el.style.setProperty('--g',c.g.toFixed(2));
     });
     raf=vis?requestAnimationFrame(tick):null;
   }
-  layout(); window.addEventListener('resize',layout);
+  size(); window.addEventListener('resize',size);
   new IntersectionObserver(function(e){ vis=e[0].isIntersecting; if(vis&&!raf) raf=requestAnimationFrame(tick); }).observe(f);
   var sec=f.closest('section')||f;
   sec.addEventListener('pointermove',function(e){ mx=e.clientX; my=e.clientY; active=true; });
