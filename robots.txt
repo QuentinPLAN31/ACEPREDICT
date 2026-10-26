@@ -3,4 +3,4 @@ Allow: /
 Disallow: /app
 Disallow: /api/
 
-Sitemap: https://app-tennismind.com/sitemap.xml
+Sitemap: https://www.app-tennismind.com/sitemap.xml
