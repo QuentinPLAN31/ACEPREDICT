@@ -89,13 +89,13 @@ def _external_id_for(tour: str, p1_name: str, p2_name: str, scheduled_time_raw: 
                      tournament_id: Optional[str] = None, round_: Optional[str] = None) -> str:
     """Identifiant déterministe d'un match (LiveTennisAPI ne renvoie pas d'id
     stable dans la liste large). Quand le tournoi et le tour sont connus, la clé
-    est (tour ATP/WTA, tournoi, round, PAIRE de joueurs non ordonnée) et ignore
+    est (tour ATP/WTA, tournoi, PAIRE de joueurs non ordonnée) et ignore
     l'horaire : un match déplacé (nouvel horaire, changement de court) ou dont
     les joueurs sont inversés reste LE MÊME match au lieu d'être dupliqué.
     Sans tournoi/round, on retombe sur l'ancienne clé (horaire inclus)."""
     a, b = sorted([p1_name.strip().lower(), p2_name.strip().lower()])
     if tournament_id or round_:
-        basis = f"{tour}|{tournament_id or ''}|{(round_ or '').strip().lower()}|{a}|{b}"
+        basis = f"{tour}|{tournament_id or ''}|{a}|{b}"
     else:
         basis = f"{tour}|{a}|{b}|{scheduled_time_raw or ''}"
     return "ltapi:" + hashlib.sha1(basis.encode("utf-8")).hexdigest()[:24]
@@ -235,7 +235,8 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
 
         fixture = db.query(models.Fixture).filter(models.Fixture.external_id == external_id).first()
         # Anciennes lignes (clé avec horaire) ou joueurs inversés : même match
-        # = même tour + même paire (ordre indifférent) + même tournoi + même round.
+        # = même tour + même paire (ordre indifférent) + même tournoi (le round est
+        # ignoré : la source renvoie parfois le même match avec et sans round).
         same_match = [
             f for f in db.query(models.Fixture).filter(
                 models.Fixture.tour == tour,
@@ -243,7 +244,6 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
                 | ((models.Fixture.player1_id == p2.id) & (models.Fixture.player2_id == p1.id)),
             ).all()
             if (f.tournament_id_external or None) == (tournament_id or None)
-            and (f.round or None) == (m.get("round") or None)
         ]
         if not fixture and same_match:
             fixture = same_match[0]
@@ -263,7 +263,7 @@ async def _sync_fixtures_for_tour(db: Session, tour: str) -> dict:
         fixture.tour = tour
         fixture.surface = _normalize_surface(m.get("surface"))
         fixture.indoor = m.get("indoor")
-        fixture.round = m.get("round")
+        fixture.round = m.get("round") or fixture.round
         fixture.tournament_name = m.get("tournament")
         fixture.tournament_id_external = tournament_id
         fixture.city = city

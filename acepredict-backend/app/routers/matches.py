@@ -71,16 +71,19 @@ def _annotate_analyzable(db: Session, matches: list[dict]) -> list[dict]:
 
 
 def _dedupe_fixtures(fixtures):
-    """Garde-fou en lecture : un même match (tournoi + round + paire de joueurs,
-    ordre indifférent) ne doit apparaître qu'une fois, même si la base contient
-    encore des doublons (horaire modifié par la source entre deux synchros).
-    On garde la ligne synchronisée en dernier."""
+    """Garde-fou en lecture : un même match (circuit + paire de joueurs, ordre
+    indifférent) ne doit apparaître qu'une fois. La source renvoie parfois le
+    même match en double (une fois avec le round, une fois sans, parfois avec
+    un horaire différent) : la clé ignore donc tournoi, round et horaire. Une
+    paire de joueurs ne se rencontre qu'une fois dans la fenêtre affichée.
+    On garde en priorité la ligne qui a un round renseigné, puis la plus
+    récemment synchronisée."""
     best = {}
     for f in fixtures:
-        key = (f.tour, f.tournament_id_external or f.tournament_name, f.round,
-               frozenset((str(f.player1_id), str(f.player2_id))))
+        key = (f.tour, frozenset((str(f.player1_id), str(f.player2_id))))
         cur = best.get(key)
-        if cur is None or (f.synced_at or datetime.min) >= (cur.synced_at or datetime.min):
+        rank = (1 if f.round else 0, f.synced_at or datetime.min)
+        if cur is None or rank >= (1 if cur.round else 0, cur.synced_at or datetime.min):
             best[key] = f
     kept = {id(v) for v in best.values()}
     return [f for f in fixtures if id(f) in kept]
@@ -148,7 +151,7 @@ def upcoming_matches_list(
             & (models.Fixture.scheduled_time <= now + UPCOMING_HORIZON),
         )
     )
-    fixtures = _dedupe_fixtures(query.order_by(models.Fixture.scheduled_time.asc()).limit(limit).all())
+    fixtures = _dedupe_fixtures(query.order_by(models.Fixture.scheduled_time.asc()).all())[:limit]
 
     matches = []
     for f in fixtures:
