@@ -31,9 +31,10 @@ def test_paid_plan_not_reset_before_24h():
     assert q.analyses_used == 3
 
 
-def test_free_plan_is_monthly():
-    q = _quota(3, timedelta(days=10))
+def test_free_plan_is_daily():
+    q = _quota(1, timedelta(hours=10))
     assert refresh_quota_period(q, "free", _FakeDb()) is False
-    q2 = _quota(3, timedelta(days=31))
+    q2 = _quota(1, timedelta(hours=25))
     assert refresh_quota_period(q2, "free", _FakeDb()) is True
     assert q2.analyses_used == 0
+    assert q2.analyses_limit == 1

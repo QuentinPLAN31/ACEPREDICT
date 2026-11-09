@@ -162,8 +162,9 @@ def test_analysis_flow_and_history(seed_players):
 def test_analysis_quota_exceeded(seed_players):
     token = register_and_login("quota@example.com")
     headers = {"Authorization": f"Bearer {token}"}
-    # plan free = 5 analyses/mois (voir app/deps.py PLAN_QUOTAS)
-    for _ in range(5):
+    # plan free = PLAN_QUOTAS["free"] analyses/jour (voir app/deps.py)
+    from app.deps import PLAN_QUOTAS
+    for _ in range(PLAN_QUOTAS["free"]):
         r = client.post(
             "/analyses",
             json={"player1_id": seed_players["p1"], "player2_id": seed_players["p2"]},

@@ -43,22 +43,32 @@ def get_current_user(
 # 6 analyses complètes/jour que Pro, permanent, jamais unlimited (avant ce
 # correctif la page pricing annonçait "analyses illimitées" pour Pro/Lifetime
 # alors que le quota réel restait fini -- texte et code étaient incohérents).
-# Seul le plan free reste sur un quota MENSUEL (3/mois).
+# Plan free : 1 analyse PAR JOUR (changement du 2026-11-09, avant 3/mois) --
+# les gratuits brûlaient leurs 3 analyses le 1er jour puis ne revenaient plus ;
+# un quota quotidien les fait revenir chaque jour.
 PLAN_QUOTAS = {
-    "free": 3,
+    "free": 1,
     "starter": 3,
     "pro": 6,
     "lifetime": 6,
 }
 
 # Durée de la période de reset par plan -- "day" pour tous les plans payants
-# (rechargés chaque jour), "month" pour le plan gratuit uniquement.
+# Tous les plans, y compris free, sont rechargés chaque jour.
 PLAN_PERIODS = {
-    "free": "month",
+    "free": "day",
     "starter": "day",
     "pro": "day",
     "lifetime": "day",
 }
+
+
+def quota_resets_at(quota: "models.UsageQuota", plan: str):
+    """Date (UTC naïf) de la prochaine remise à zéro du quota -- affichée côté
+    frontend ("prochaine analyse dans X h")."""
+    if not quota or not quota.period_start:
+        return None
+    return quota.period_start + _period_length(plan)
 
 
 def _period_length(plan: str) -> timedelta:

@@ -73,7 +73,11 @@ def grant_subscription_reward(db: Session, referred_user: models.User, plan: str
     if not referrer.quota:
         referrer.quota = models.UsageQuota(user_id=referrer.id, analyses_limit=PLAN_QUOTAS["free"])
         db.add(referrer.quota)
-    referrer.quota.analyses_limit += bonus
+    # Bonus crédité en analyses PERSISTANTES (comme un pack) : analyses_limit
+    # est remis à la valeur du plan à chaque reset quotidien, un bonus ajouté
+    # là disparaissait donc dès le lendemain.
+    referrer.quota.bonus_analyses = (referrer.quota.bonus_analyses or 0) + bonus
+    referrer.quota.bonus_analyses_total = (referrer.quota.bonus_analyses_total or 0) + bonus
 
     # Palier atteint pile avec ce nouveau filleul abonné (le compte ne peut
     # passer un seuil qu'une fois, donc pas de garde anti-doublon nécessaire).
@@ -85,7 +89,8 @@ def grant_subscription_reward(db: Session, referred_user: models.User, plan: str
     tier = next((t for t in REFERRAL_TIERS if t["threshold"] == subscribed_count), None)
     if tier:
         bonus += tier["bonus_analyses"]
-        referrer.quota.analyses_limit += tier["bonus_analyses"]
+        referrer.quota.bonus_analyses = (referrer.quota.bonus_analyses or 0) + tier["bonus_analyses"]
+        referrer.quota.bonus_analyses_total = (referrer.quota.bonus_analyses_total or 0) + tier["bonus_analyses"]
 
     # bonus_analyses_granted reflète le total attribuable à CE filleul (plan +
     # palier débloqué grâce à lui), pour que /referrals/me (qui en fait la

@@ -3001,6 +3001,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'msg.select_two_players': 'Sélectionne deux joueurs dans les suggestions (tape au moins 2 lettres, puis clique sur un nom).',
       'msg.choose_different_players': 'Choisis deux joueurs différents.',
       'msg.quota_reached': "Quota d'analyses atteint pour ton plan.",
+      'msg.quota_free_done': 'Tu as utilisé ton analyse gratuite du jour.',
+      'msg.quota_next_in': 'Prochaine analyse gratuite dans {h} h {m} min.',
+      'msg.quota_invite': 'Inviter un ami',
+      'msg.quota_upgrade': 'Voir les offres',
       'msg.upgrade_or_buy': 'Passer au plan supérieur ou acheter des analyses',
       'msg.analysis_error': "Erreur lors de l'analyse.",
       'msg.no_player_found': 'Aucun joueur trouvé',
@@ -3485,6 +3489,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'msg.select_two_players': 'Selecciona dos jugadores en las sugerencias (escribe al menos 2 letras y luego haz clic en un nombre).',
       'msg.choose_different_players': 'Elige dos jugadores diferentes.',
       'msg.quota_reached': 'Se alcanzó el límite de análisis de tu plan.',
+      'msg.quota_free_done': 'Ya usaste tu análisis gratuito de hoy.',
+      'msg.quota_next_in': 'Próximo análisis gratuito en {h} h {m} min.',
+      'msg.quota_invite': 'Invitar a un amigo',
+      'msg.quota_upgrade': 'Ver los planes',
       'msg.upgrade_or_buy': 'Mejorar de plan o comprar análisis',
       'msg.analysis_error': 'Error durante el análisis.',
       'msg.no_player_found': 'No se encontró ningún jugador',
@@ -3969,6 +3977,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'msg.select_two_players': 'Select two players from the suggestions (type at least 2 letters, then click on a name).',
       'msg.choose_different_players': 'Choose two different players.',
       'msg.quota_reached': 'Analysis quota reached for your plan.',
+      'msg.quota_free_done': "You've used today's free analysis.",
+      'msg.quota_next_in': 'Next free analysis in {h} h {m} min.',
+      'msg.quota_invite': 'Invite a friend',
+      'msg.quota_upgrade': 'See plans',
       'msg.upgrade_or_buy': 'Upgrade your plan or buy more analyses',
       'msg.analysis_error': 'Error during analysis.',
       'msg.no_player_found': 'No player found',
@@ -4664,7 +4676,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const hideMain = isFreeAccount && packActive;
       quotaMainEl.style.display = hideMain ? 'none' : '';
       if(!hideMain){
-        document.getElementById('quotaTitle').textContent = isFreeAccount ? t('quota.title_month') : t('quota.title');
+        document.getElementById('quotaTitle').textContent = t('quota.title');
         document.getElementById('quotaNum').textContent = sub.analyses_used + ' / ' + sub.analyses_limit;
         const quotaFillMain = document.getElementById('quotaFillMain');
         if(quotaFillMain && sub.analyses_limit > 0){
@@ -4672,7 +4684,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
           quotaFillMain.style.width = pctMain + '%';
         }
         const quotaNote = document.getElementById('quotaNote');
-        const remainingKeyMain = isFreeAccount ? 'quota.remaining_month' : 'quota.remaining_day';
+        const remainingKeyMain = 'quota.remaining_day';
         quotaNote.textContent = sub.analyses_used >= sub.analyses_limit
           ? t('quota.limit_reached')
           : tf(remainingKeyMain, { n: sub.analyses_limit - sub.analyses_used });
@@ -5905,8 +5917,31 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         if(res.status === 401){ openAuth('login', runAnalysis); return; }
         if(res.status === 402){
           msg.className = 'analyse-msg error';
-          msg.innerHTML = t('msg.quota_reached') +
-            '<button type="button" class="upgrade-cta-btn" id="quotaUpgradeBtn">' + t('msg.upgrade_or_buy') + '</button>';
+          // Plan gratuit : 1 analyse/jour -> on affiche quand revient la
+          // prochaine + l'offre payante + le parrainage (analyses bonus).
+          let sub = null;
+          try {
+            const sr = await fetch(API_BASE + '/users/me/subscription', { headers: { 'Authorization': 'Bearer ' + authToken } });
+            if(sr.ok) sub = await sr.json();
+          } catch(e){}
+          if(sub && sub.plan === 'free'){
+            let next = '';
+            if(sub.quota_resets_at){
+              const ms = new Date(sub.quota_resets_at.endsWith('Z') ? sub.quota_resets_at : sub.quota_resets_at + 'Z') - new Date();
+              if(ms > 0){
+                const mins = Math.ceil(ms / 60000);
+                next = ' ' + tf('msg.quota_next_in', { h: Math.floor(mins / 60), m: mins % 60 });
+              }
+            }
+            msg.innerHTML = t('msg.quota_free_done') + next +
+              '<button type="button" class="upgrade-cta-btn" id="quotaUpgradeBtn">' + t('msg.quota_upgrade') + '</button>' +
+              '<button type="button" class="upgrade-cta-btn" id="quotaInviteBtn" style="margin-left:8px">' + t('msg.quota_invite') + '</button>';
+            const inv = document.getElementById('quotaInviteBtn');
+            if(inv) inv.addEventListener('click', ()=> go('remuneration'));
+          } else {
+            msg.innerHTML = t('msg.quota_reached') +
+              '<button type="button" class="upgrade-cta-btn" id="quotaUpgradeBtn">' + t('msg.upgrade_or_buy') + '</button>';
+          }
           const upBtn = document.getElementById('quotaUpgradeBtn');
           if(upBtn) upBtn.addEventListener('click', ()=> go('pricing'));
           return;

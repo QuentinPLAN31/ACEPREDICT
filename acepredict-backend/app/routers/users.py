@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app import models, schemas
 from app.database import get_db
-from app.deps import get_current_user, refresh_quota_period
+from app.deps import get_current_user, refresh_quota_period, quota_resets_at
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -59,4 +59,6 @@ def my_subscription(
         # Total cumulé jamais acheté (jamais décrémenté) -- sert de
         # dénominateur pour la jauge "curseur ponctuel" côté frontend.
         "bonus_analyses_total": quota.bonus_analyses_total if quota else 0,
+        # Prochaine remise à zéro du quota (UTC) -- compte à rebours côté app.
+        "quota_resets_at": quota_resets_at(quota, current_user.plan.value) if quota else None,
     }
