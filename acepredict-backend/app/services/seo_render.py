@@ -203,6 +203,13 @@ def scores_card(d,state,fav,p1,p2):
     if state=='after':
         ac=d['actual']
         out+=f'<div class="final"><div><small>Résultat final</small><div class="fs">{d["score"]}</div><span>{d["winner"]} s\'impose {act.replace("-"," à ")}</span></div><div class="fp"><div><b>{ac["sets"]}</b><small>de probabilité pour ce résultat en sets</small></div></div></div>'
+    locked = state!='after'
+    if locked:
+        # Scénarios de score réservés aux inscrits : présents dans le HTML
+        # (indexables) mais floutés pour le visiteur -- balisé via
+        # isAccessibleForFree/hasPart (cssSelector .paywalled) dans le JSON-LD,
+        # format "contenu payant" reconnu par Google (pas du cloaking).
+        out=f'<section class="card sccard lockcard"><div class="lk-body paywalled" style="min-height:0"><h2>Score du match {p1} – {p2}</h2>'
     out+='<div class="sc2g">'
     for i,(sets,games,prob) in enumerate(d['scores'],1):
         cls='';tag=''
@@ -210,6 +217,8 @@ def scores_card(d,state,fav,p1,p2):
             if norm(games)==norm(d['score']):cls=' hit';tag='<em>Score exact trouvé</em>'
             elif sets==act:cls=' near';tag='<em>Bon score en sets</em>'
         out+=f'<div class="sct{cls}"><div class="sl"><span class="sn">Scénario {i} · {fav} {sets}</span><b class="sg">{games}</b>{tag}</div><div class="sp">{prob}</div></div>'
+    if locked:
+        return out+'</div></div><div class="lk-over" style="align-items:center"><div class="lk-pan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Score le plus probable réservé aux inscrits</b><span>Crée ton compte gratuit pour voir le score le plus probable et sa probabilité.</span><a class="btn" href="'+APP+'">Voir le score gratuitement</a></div></div></section>'
     return out+'</div></section>'
 
 
@@ -254,9 +263,12 @@ def render(d,state):
         "superEvent":{"@type":"SportsEvent","name":d['tournoi']},"image":f"{base}/og/{d['slug']}.png"}
     page={"@type":"WebPage","@id":url,"url":url,"name":title,"inLanguage":"fr","datePublished":d['publie_iso'],"dateModified":d['modif_iso'],
           "isPartOf":{"@type":"WebSite","name":"TennisMind","url":base},"primaryImageOfPage":f"{base}/og/{d['slug']}.png"}
+    if not done:
+        page["isAccessibleForFree"]=False
+        page["hasPart"]={"@type":"WebPageElement","isAccessibleForFree":False,"cssSelector":".paywalled"}
     crumbs={"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":u} for i,(n,u) in enumerate([("Accueil",base+"/"),("Pronostics",base+"/fr/pronostics"),(d['tournoi'],base+"/fr/tournoi/"+d['tournoi_slug']),(f"{p1} – {p2}",url)])]}
     fq=[("Comment est calculé ce pronostic ?","TennisMind combine le niveau de chaque joueur sur la surface, la forme récente, le face-à-face, les conditions de jeu et la météo, puis compare le tout à l'historique des matchs ATP."),
-        ("Peut-on se fier à ce pourcentage ?",f"Un pourcentage est une probabilité, pas une certitude : à {fr(pf)} %, le favori perd statistiquement environ un match sur {max(2,round(1/max(0.01,1-d.get('raw_pf',pf)/100)))}. Pour juger la fiabilité du modèle, le bilan public affiche chaque pronostic publié avant le match, avec son résultat réel et le taux de réussite mis à jour chaque jour.")]
+        ("Peut-on se fier à ce pourcentage ?",f"Un pourcentage est une probabilité, pas une certitude : à {fr(pf)} %, le favori perd statistiquement environ un match sur {max(2,round(1/max(0.01,1-pf/100)))}. Pour juger la fiabilité du modèle, le bilan public affiche chaque pronostic publié avant le match, avec son résultat réel et le taux de réussite mis à jour chaque jour.")]
     faq={"@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in fq]}
     ld={"@context":"https://schema.org","@graph":[page]+([] if retro else [ev])+[crumbs,faq]}
     tz=d.get("tease") or ("19–15","38 %","9 – 4")
@@ -283,7 +295,7 @@ def render(d,state):
     h+=f"""<section class="card"><h2>Chiffres clés : {p1} contre {p2}</h2>{stats_table(d,p1,p2,surf)}</section>
 {weather_section(d)}
 <section class="card analysis"><h2>Analyse du match {p1} – {p2}</h2>{''.join(f'<p>{x}</p>' for x in d['analyse'])}</section>
-<section class="card lockcard"><div class="lk-body" aria-hidden="true"><h2>Analyse détaillée {p1} – {p2}</h2>
+<section class="card lockcard"><div class="lk-body paywalled" aria-hidden="true"><h2>Analyse détaillée {p1} – {p2}</h2>
 <div class="proj"><div><b>{tz[0]}</b><small>Jeux gagnés attendus</small></div><div><b>{tz[1]}</b><small>Tie-break probable</small></div><div><b>{tz[2]}</b><small>Aces attendus</small></div></div>
 <div class="fac"><div class="fh">Facteurs clés du match</div><div class="fr"><span>Service</span><i style="width:82%"></i></div><div class="fr"><span>Retour</span><i style="width:64%"></i></div><div class="fr"><span>Forme récente</span><i style="width:71%"></i></div></div>
 <p class="al">Alerte : le favori perd son service en début de 2e set dans 3 matchs sur 10 sur cette surface…</p></div>

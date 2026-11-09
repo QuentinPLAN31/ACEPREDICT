@@ -318,7 +318,7 @@ def _analysis(snap: dict) -> list[str]:
     if parts:
         paras.append(" ".join(parts))
     tail = f"{opp} n'est jamais hors de portée : "
-    tail += f"statistiquement, environ un match sur {max(2, round(100 / max(1.0, 100 - rf)))} avec ce type d'écart tourne en faveur de l'outsider."
+    tail += f"statistiquement, environ un match sur {max(2, round(100 / max(1.0, 100 - pf)))} avec ce type d'écart tourne en faveur de l'outsider."
     if p.get("weather_adjusted"):
         tail += " Les conditions météo ont été prises en compte dans le calcul."
     paras.append(tail)
