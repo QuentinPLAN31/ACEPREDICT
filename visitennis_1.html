@@ -999,10 +999,14 @@
   .qm-count{ font-family:'Unbounded',Inter,sans-serif; font-weight:800; font-size:46px; letter-spacing:-1px; font-variant-numeric:tabular-nums;
     background:linear-gradient(135deg,#2FEAF0 0%,#6FA3FF 50%,#B07CFF 100%); -webkit-background-clip:text; background-clip:text;
     -webkit-text-fill-color:transparent; color:transparent; filter:drop-shadow(0 0 14px rgba(111,163,255,.35)); margin:4px 0 22px; }
-  .qm-perks{ display:flex; flex-direction:column; gap:10px; text-align:left; background:rgba(255,255,255,.03);
-    border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px 18px; margin-bottom:20px; }
-  .qm-perks div{ display:flex; gap:10px; align-items:center; font-size:13.5px; }
-  .qm-perks svg{ width:15px; height:15px; color:var(--accent); flex-shrink:0; }
+  .qm-perks{ display:flex; flex-direction:column; gap:14px; text-align:left; background:linear-gradient(160deg,rgba(215,242,44,.06),rgba(255,255,255,.02));
+    border:1px solid rgba(215,242,44,.18); border-radius:16px; padding:18px 18px; margin-bottom:20px; }
+  .qm-perks-h{ font-size:11px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase; color:var(--text-sec); }
+  .qm-perk{ display:flex; gap:12px; align-items:center; }
+  .qm-ic{ width:28px; height:28px; flex-shrink:0; display:block; filter:drop-shadow(0 0 8px rgba(215,242,44,.35)); }
+  .qm-perk b{ display:block; font-size:14px; color:#fff; font-weight:700; line-height:1.25; }
+  .qm-perk small{ display:block; font-size:12px; color:var(--text-sec); margin-top:2px; }
+  .qm-perk .qm-up{ color:var(--accent); }
   .qm-cta{ width:100%; border:none; border-radius:12px; padding:15px; cursor:pointer; font-family:inherit; font-weight:800; font-size:14.5px;
     background:var(--accent); color:#14180a; box-shadow:0 0 30px rgba(215,242,44,.25); }
   .qm-cta:hover{ filter:brightness(1.06); }
@@ -2697,9 +2701,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <div class="qm-sub" data-i18n="qm.sub">Ta prochaine analyse gratuite arrive dans</div>
     <div class="qm-count" id="qmCount">--:--:--</div>
     <div class="qm-perks">
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="qm.perk1">Jusqu'à 6 analyses par jour</span></div>
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="qm.perk2">Analyse détaillée débloquée</span></div>
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="qm.perk3">Score le plus probable de chaque match</span></div>
+      <div class="qm-perks-h" data-i18n="qm.perks_h">Avec un plan payant</div>
+      <div class="qm-perk"><img class="qm-ic" src="assets/ball.png" alt=""><div><b data-i18n="qm.perk1" data-i18n-html>Jusqu'à <span class="qm-up">6 analyses</span> par jour</b><small data-i18n="qm.perk1s">au lieu d'1 en gratuit</small></div></div>
+      <div class="qm-perk"><img class="qm-ic" src="assets/ball.png" alt=""><div><b data-i18n="qm.perk2" data-i18n-html>L'analyse <span class="qm-up">détaillée</span> débloquée</b><small data-i18n="qm.perk2s">facteurs clés, alertes, projection jeu par jeu</small></div></div>
+      <div class="qm-perk"><img class="qm-ic" src="assets/ball.png" alt=""><div><b data-i18n="qm.perk3" data-i18n-html>Le match prédit <span class="qm-up">set par set</span></b><small data-i18n="qm.perk3s">scénario précis et moments où tout bascule</small></div></div>
     </div>
     <button class="qm-cta" id="qmUpgrade" type="button" data-i18n="msg.quota_upgrade">Voir les offres</button>
     <button class="qm-ghost" id="qmInvite" type="button" data-i18n="qm.invite">Inviter un ami · analyses bonus</button>
@@ -3060,9 +3065,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'qm.pill': 'Plan gratuit',
       'qm.title': 'Analyse du jour<br><span>utilisée</span>',
       'qm.sub': 'Ta prochaine analyse gratuite arrive dans',
-      'qm.perk1': "Jusqu'à 6 analyses par jour",
-      'qm.perk2': 'Analyse détaillée débloquée',
-      'qm.perk3': 'Score le plus probable de chaque match',
+      'qm.perks_h': 'Avec un plan payant',
+      'qm.perk1': 'Jusqu\'à <span class="qm-up">6 analyses</span> par jour',
+      'qm.perk1s': 'au lieu d\'1 en gratuit',
+      'qm.perk2': 'L\'analyse <span class="qm-up">détaillée</span> débloquée',
+      'qm.perk2s': 'facteurs clés, alertes, projection jeu par jeu',
+      'qm.perk3': 'Le match prédit <span class="qm-up">set par set</span>',
+      'qm.perk3s': 'scénario précis et moments où tout bascule',
       'qm.invite': 'Inviter un ami · analyses bonus',
       'qm.foot': 'Sans engagement · résiliable à tout moment',
       'msg.upgrade_or_buy': 'Passer au plan supérieur ou acheter des analyses',
@@ -3556,9 +3565,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'qm.pill': 'Plan gratuito',
       'qm.title': 'Análisis del día<br><span>usado</span>',
       'qm.sub': 'Tu próximo análisis gratuito llega en',
-      'qm.perk1': 'Hasta 6 análisis al día',
-      'qm.perk2': 'Análisis detallado desbloqueado',
-      'qm.perk3': 'Marcador más probable de cada partido',
+      'qm.perks_h': 'Con un plan de pago',
+      'qm.perk1': 'Hasta <span class="qm-up">6 análisis</span> al día',
+      'qm.perk1s': 'en lugar de 1 gratis',
+      'qm.perk2': 'Análisis <span class="qm-up">detallado</span> desbloqueado',
+      'qm.perk2s': 'factores clave, alertas, proyección juego a juego',
+      'qm.perk3': 'El partido predicho <span class="qm-up">set a set</span>',
+      'qm.perk3s': 'escenario preciso y momentos donde todo cambia',
       'qm.invite': 'Invitar a un amigo · análisis extra',
       'qm.foot': 'Sin compromiso · cancelable en cualquier momento',
       'msg.upgrade_or_buy': 'Mejorar de plan o comprar análisis',
@@ -4052,9 +4065,13 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'qm.pill': 'Free plan',
       'qm.title': "Today's analysis<br><span>used</span>",
       'qm.sub': 'Your next free analysis arrives in',
-      'qm.perk1': 'Up to 6 analyses per day',
-      'qm.perk2': 'Detailed analysis unlocked',
-      'qm.perk3': 'Most likely score for every match',
+      'qm.perks_h': 'With a paid plan',
+      'qm.perk1': 'Up to <span class="qm-up">6 analyses</span> per day',
+      'qm.perk1s': 'instead of 1 on free',
+      'qm.perk2': '<span class="qm-up">Detailed</span> analysis unlocked',
+      'qm.perk2s': 'key factors, alerts, game-by-game projection',
+      'qm.perk3': 'The match predicted <span class="qm-up">set by set</span>',
+      'qm.perk3s': 'precise scenario and turning points',
       'qm.invite': 'Invite a friend · bonus analyses',
       'qm.foot': 'No commitment · cancel anytime',
       'msg.upgrade_or_buy': 'Upgrade your plan or buy more analyses',
