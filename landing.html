@@ -393,8 +393,9 @@
   .showcase .score-stats{ padding: 0 2%; }
   .showcase .score-stat:first-child .score-num{ filter: drop-shadow(0 2px 10px rgba(10,15,11,0.9)); }
   .showcase .score-stat:first-child .score-num .counter{ background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
-  .showcase .score-stat:first-child{ justify-self:start; margin-left:6%; }
-  .showcase .score-stat:last-child{ justify-self:end; margin-right:6%; }
+  .showcase .score-stat:first-child{ justify-self:start; margin-left:0; }
+  .showcase .score-stat:last-child{ justify-self:end; margin-right:2%; }
+  .showcase .score-num{ font-size: clamp(34px,4.6vw,52px); }
   .showcase-phone{
     position:absolute; z-index:3; top:10px; left:calc(50% - 140px); width: 280px;
   }
@@ -735,11 +736,11 @@
       </svg>
       <div class="score-stats">
         <div class="score-stat reveal">
-          <div class="score-num"><span class="counter" data-target="78" data-suffix="%">0%</span></div>
+          <div class="score-num"><span class="counter" data-target="91.4" data-suffix="%">0%</span></div>
           <div class="score-cap" data-i18n="score_cap1">Victoire Alcaraz</div>
         </div>
         <div class="score-stat reveal">
-          <div class="score-num"><span class="counter" data-target="22" data-suffix="%">0%</span></div>
+          <div class="score-num"><span class="counter" data-target="8.6" data-suffix="%">0%</span></div>
           <div class="score-cap" data-i18n="score_cap2">Victoire Sinner</div>
         </div>
       </div>

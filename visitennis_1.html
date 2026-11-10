@@ -978,6 +978,38 @@
   }
   .unlock-foot{ margin-top:13px; font-size:11.5px; color: var(--text-dim); }
 
+
+  /* ---------- Modale "analyse gratuite du jour utilisée" (style landing) ---------- */
+  .quota-overlay{ position:fixed; inset:0; z-index:2000; background:rgba(4,6,5,.78); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center; padding:20px; }
+  .quota-overlay.open{ display:flex; animation:qmFade .25s ease; }
+  @keyframes qmFade{ from{opacity:0} to{opacity:1} }
+  .quota-modal{ position:relative; width:100%; max-width:440px; overflow:hidden; text-align:center;
+    background:#131a16; border:1px solid rgba(215,242,44,.22); border-radius:24px; padding:38px 28px 28px;
+    box-shadow:0 30px 90px rgba(0,0,0,.6), 0 0 60px rgba(215,242,44,.08); }
+  .quota-modal::before{ content:""; position:absolute; inset:-40% -20% auto; height:420px; pointer-events:none;
+    background:radial-gradient(closest-side, rgba(215,242,44,.16), transparent 70%); }
+  .quota-modal > *{ position:relative; }
+  .qm-pill{ display:inline-block; border:1px solid rgba(215,242,44,.45); background:rgba(215,242,44,.08); color:var(--accent);
+    border-radius:999px; padding:7px 16px; font-size:11.5px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; }
+  .qm-title{ font-family:'Unbounded',Inter,sans-serif; font-weight:900; text-transform:uppercase; font-size:26px; line-height:1.08;
+    letter-spacing:-.5px; margin:20px 0 10px; color:#fff; }
+  .qm-title span{ color:var(--accent); }
+  .qm-sub{ font-size:14px; color:var(--text-sec); margin-bottom:6px; }
+  .qm-count{ font-family:'Unbounded',Inter,sans-serif; font-weight:800; font-size:46px; letter-spacing:-1px; font-variant-numeric:tabular-nums;
+    background:linear-gradient(135deg,#2FEAF0 0%,#6FA3FF 50%,#B07CFF 100%); -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent; filter:drop-shadow(0 0 14px rgba(111,163,255,.35)); margin:4px 0 22px; }
+  .qm-perks{ display:flex; flex-direction:column; gap:10px; text-align:left; background:rgba(255,255,255,.03);
+    border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px 18px; margin-bottom:20px; }
+  .qm-perks div{ display:flex; gap:10px; align-items:center; font-size:13.5px; }
+  .qm-perks svg{ width:15px; height:15px; color:var(--accent); flex-shrink:0; }
+  .qm-cta{ width:100%; border:none; border-radius:12px; padding:15px; cursor:pointer; font-family:inherit; font-weight:800; font-size:14.5px;
+    background:var(--accent); color:#14180a; box-shadow:0 0 30px rgba(215,242,44,.25); }
+  .qm-cta:hover{ filter:brightness(1.06); }
+  .qm-ghost{ width:100%; margin-top:10px; border-radius:12px; padding:13px; cursor:pointer; font-family:inherit; font-weight:700; font-size:13.5px;
+    background:transparent; color:#fff; border:1px solid rgba(255,255,255,.18); }
+  .qm-ghost:hover{ border-color:var(--accent); color:var(--accent); }
+  .qm-foot{ margin-top:12px; font-size:11.5px; color:var(--text-dim); }
   /* ---------- Pricing modal (choix du plan depuis le paywall) ---------- */
   .pricing-overlay{
     position:fixed; inset:0; z-index:310;
@@ -2655,6 +2687,26 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   </div>
 </div>
 
+<div class="quota-overlay" id="quotaOverlay">
+  <div class="quota-modal" role="dialog" aria-modal="true">
+    <button class="auth-close" id="quotaClose" type="button" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <span class="qm-pill" data-i18n="qm.pill">Plan gratuit</span>
+    <div class="qm-title" data-i18n-html="qm.title">Analyse du jour<br><span>utilisée</span></div>
+    <div class="qm-sub" data-i18n="qm.sub">Ta prochaine analyse gratuite arrive dans</div>
+    <div class="qm-count" id="qmCount">--:--:--</div>
+    <div class="qm-perks">
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="qm.perk1">Jusqu'à 6 analyses par jour</span></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="qm.perk2">Analyse détaillée débloquée</span></div>
+      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="qm.perk3">Score le plus probable de chaque match</span></div>
+    </div>
+    <button class="qm-cta" id="qmUpgrade" type="button" data-i18n="msg.quota_upgrade">Voir les offres</button>
+    <button class="qm-ghost" id="qmInvite" type="button" data-i18n="qm.invite">Inviter un ami · analyses bonus</button>
+    <div class="qm-foot" data-i18n="qm.foot">Sans engagement · résiliable à tout moment</div>
+  </div>
+</div>
+
 <div class="unlock-overlay" id="unlockOverlay">
   <div class="unlock-modal">
     <button class="auth-close" id="unlockClose" type="button" aria-label="Fermer" data-i18n-aria-label="auth.close">
@@ -3005,6 +3057,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'msg.quota_next_in': 'Prochaine analyse gratuite dans {h} h {m} min.',
       'msg.quota_invite': 'Inviter un ami',
       'msg.quota_upgrade': 'Voir les offres',
+      'qm.pill': 'Plan gratuit',
+      'qm.title': 'Analyse du jour<br><span>utilisée</span>',
+      'qm.sub': 'Ta prochaine analyse gratuite arrive dans',
+      'qm.perk1': "Jusqu'à 6 analyses par jour",
+      'qm.perk2': 'Analyse détaillée débloquée',
+      'qm.perk3': 'Score le plus probable de chaque match',
+      'qm.invite': 'Inviter un ami · analyses bonus',
+      'qm.foot': 'Sans engagement · résiliable à tout moment',
       'msg.upgrade_or_buy': 'Passer au plan supérieur ou acheter des analyses',
       'msg.analysis_error': "Erreur lors de l'analyse.",
       'msg.no_player_found': 'Aucun joueur trouvé',
@@ -3493,6 +3553,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'msg.quota_next_in': 'Próximo análisis gratuito en {h} h {m} min.',
       'msg.quota_invite': 'Invitar a un amigo',
       'msg.quota_upgrade': 'Ver los planes',
+      'qm.pill': 'Plan gratuito',
+      'qm.title': 'Análisis del día<br><span>usado</span>',
+      'qm.sub': 'Tu próximo análisis gratuito llega en',
+      'qm.perk1': 'Hasta 6 análisis al día',
+      'qm.perk2': 'Análisis detallado desbloqueado',
+      'qm.perk3': 'Marcador más probable de cada partido',
+      'qm.invite': 'Invitar a un amigo · análisis extra',
+      'qm.foot': 'Sin compromiso · cancelable en cualquier momento',
       'msg.upgrade_or_buy': 'Mejorar de plan o comprar análisis',
       'msg.analysis_error': 'Error durante el análisis.',
       'msg.no_player_found': 'No se encontró ningún jugador',
@@ -3981,6 +4049,14 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'msg.quota_next_in': 'Next free analysis in {h} h {m} min.',
       'msg.quota_invite': 'Invite a friend',
       'msg.quota_upgrade': 'See plans',
+      'qm.pill': 'Free plan',
+      'qm.title': "Today's analysis<br><span>used</span>",
+      'qm.sub': 'Your next free analysis arrives in',
+      'qm.perk1': 'Up to 6 analyses per day',
+      'qm.perk2': 'Detailed analysis unlocked',
+      'qm.perk3': 'Most likely score for every match',
+      'qm.invite': 'Invite a friend · bonus analyses',
+      'qm.foot': 'No commitment · cancel anytime',
       'msg.upgrade_or_buy': 'Upgrade your plan or buy more analyses',
       'msg.analysis_error': 'Error during analysis.',
       'msg.no_player_found': 'No player found',
@@ -5820,6 +5896,29 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
   // ---------- Paywall : modal checklist puis modal de plans ----------
   const unlockOverlay = document.getElementById('unlockOverlay');
+  // ---------- Modale "analyse gratuite du jour utilisée" ----------
+  const quotaOverlay = document.getElementById('quotaOverlay');
+  let qmTimer = null;
+  function closeQuotaModal(){ quotaOverlay.classList.remove('open'); if(qmTimer){ clearInterval(qmTimer); qmTimer = null; } }
+  function openQuotaModal(resetsAt){
+    const el = document.getElementById('qmCount');
+    const target = resetsAt ? new Date(resetsAt.endsWith('Z') ? resetsAt : resetsAt + 'Z').getTime() : null;
+    const tick = ()=>{
+      if(!target){ el.textContent = '--:--:--'; return; }
+      let s = Math.max(0, Math.floor((target - Date.now()) / 1000));
+      const h = Math.floor(s / 3600); s -= h * 3600; const m = Math.floor(s / 60); s -= m * 60;
+      el.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      if(target - Date.now() <= 0 && qmTimer){ clearInterval(qmTimer); qmTimer = null; }
+    };
+    tick(); if(qmTimer) clearInterval(qmTimer); qmTimer = setInterval(tick, 1000);
+    const title = document.querySelector('#quotaOverlay .qm-title'); if(title) title.innerHTML = t('qm.title');
+    quotaOverlay.classList.add('open');
+  }
+  document.getElementById('quotaClose').addEventListener('click', closeQuotaModal);
+  quotaOverlay.addEventListener('click', (e)=>{ if(e.target === quotaOverlay) closeQuotaModal(); });
+  document.getElementById('qmUpgrade').addEventListener('click', ()=>{ closeQuotaModal(); openPricingModal(); });
+  document.getElementById('qmInvite').addEventListener('click', ()=>{ closeQuotaModal(); go('remuneration'); });
+
   function openUnlockModal(){ unlockOverlay.classList.add('open'); }
   function closeUnlockModal(){ unlockOverlay.classList.remove('open'); }
   document.getElementById('unlockClose').addEventListener('click', closeUnlockModal);
@@ -5925,19 +6024,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
             if(sr.ok) sub = await sr.json();
           } catch(e){}
           if(sub && sub.plan === 'free'){
-            let next = '';
-            if(sub.quota_resets_at){
-              const ms = new Date(sub.quota_resets_at.endsWith('Z') ? sub.quota_resets_at : sub.quota_resets_at + 'Z') - new Date();
-              if(ms > 0){
-                const mins = Math.ceil(ms / 60000);
-                next = ' ' + tf('msg.quota_next_in', { h: Math.floor(mins / 60), m: mins % 60 });
-              }
-            }
-            msg.innerHTML = t('msg.quota_free_done') + next +
-              '<button type="button" class="upgrade-cta-btn" id="quotaUpgradeBtn">' + t('msg.quota_upgrade') + '</button>' +
-              '<button type="button" class="upgrade-cta-btn" id="quotaInviteBtn" style="margin-left:8px">' + t('msg.quota_invite') + '</button>';
-            const inv = document.getElementById('quotaInviteBtn');
-            if(inv) inv.addEventListener('click', ()=> go('remuneration'));
+            msg.className = 'analyse-msg';
+            msg.innerHTML = '';
+            openQuotaModal(sub.quota_resets_at);
+            return;
           } else {
             msg.innerHTML = t('msg.quota_reached') +
               '<button type="button" class="upgrade-cta-btn" id="quotaUpgradeBtn">' + t('msg.upgrade_or_buy') + '</button>';
