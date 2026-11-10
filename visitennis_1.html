@@ -1950,6 +1950,81 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   /* ---------- États connecté / déconnecté ---------- */
   .guest-cta{ text-align:center; }
   .guest-cta .btn-primary{ width:auto; padding:13px 28px; margin-top:4px; }
+
+  /* ===== Style landing : titres de pages + panneau "Nouvelle analyse" (v1) ===== */
+  .page-head h1:not(.creator-title){ font-family:'Unbounded',Inter,sans-serif; font-weight:900; text-transform:uppercase;
+    font-size:clamp(28px,4.6vw,44px); line-height:1.05; letter-spacing:-.5px; margin:0 0 12px; }
+  .page-head h1 .ttl-lime{ display:block; color:var(--accent); }
+  .page-head p{ font-size:15px; }
+  .page-head.left .ph-pill{ display:inline-block; }
+  .page-head > .ph-pill + h1{ margin-top:0; }
+  .ph-pill{ display:inline-block; border:1px solid rgba(215,242,44,.45); background:rgba(215,242,44,.08); color:var(--accent);
+    border-radius:999px; padding:7px 16px; font-size:11.5px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:16px; }
+  #page-matchs .analyse-card{ background:#151d18; border:1px solid rgba(215,242,44,.2); border-radius:24px; padding:30px 28px 26px;
+    box-shadow:0 30px 80px rgba(0,0,0,.45); counter-reset:step; }
+  #page-matchs .analyse-card::before{ top:-30%; left:-10%; right:-10%; height:300px; background:radial-gradient(closest-side,rgba(215,242,44,.10),transparent 70%); pointer-events:none; }
+  #page-matchs .analyse-card > .field-label{ color:#8f9a94; border-bottom:0; padding-bottom:0; font-size:11.5px; letter-spacing:2px; font-weight:700; }
+  #page-matchs .analyse-card > .field-label:not(#upcomingBlock .field-label){ counter-increment:step; }
+  #page-matchs .analyse-card > .field-label::before{ content:"0" counter(step); color:var(--accent); margin-right:10px; font-weight:800; }
+  #page-matchs .team-input{ background:#0c110e; border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:18px 18px; font-size:17px; font-weight:700; }
+  #page-matchs .team-input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(215,242,44,.12); }
+  #page-matchs .vs-divider{ margin:16px 0; }
+  #page-matchs .vs-divider::before{ background:linear-gradient(90deg,transparent,rgba(215,242,44,.4)); }
+  #page-matchs .vs-divider::after{ background:linear-gradient(90deg,rgba(215,242,44,.4),transparent); }
+  #page-matchs .vs-badge{ width:50px; height:50px; background:#131a16; border:2px solid var(--accent); color:var(--accent);
+    font-family:'Unbounded',Inter,sans-serif; font-weight:900; font-size:15px; box-shadow:0 0 26px rgba(215,242,44,.35); }
+  #page-matchs .upcoming-block .field-label{ color:#8f9a94; border-bottom:0; }
+  #page-matchs #surfacePicker .surf-btn{ border-radius:16px; height:96px; }
+  #page-matchs #surfacePicker .surf-btn span{ font-family:'Unbounded',Inter,sans-serif; font-weight:800; text-transform:uppercase; font-size:12px; }
+  #page-matchs #surfacePicker .surf-btn.active{ outline-color:var(--accent); box-shadow:0 0 26px rgba(215,242,44,.35); }
+  #page-matchs #surfacePicker .surf-btn.active span{ color:var(--accent); }
+  #page-matchs .fmt-btn{ border-radius:999px; padding:14px 10px; font-size:13.5px; }
+  #page-matchs .fmt-btn.active{ background:rgba(215,242,44,.1); border-color:var(--accent); color:var(--accent); }
+  #page-matchs #analyseBtn{ background:var(--accent) !important; color:#131a16 !important; border-radius:16px; padding:19px;
+    font-family:'Unbounded',Inter,sans-serif; font-weight:900; text-transform:uppercase; font-size:15.5px; box-shadow:0 0 40px rgba(215,242,44,.3) !important; }
+  #page-matchs .analyse-card{ padding:40px 36px 32px !important; max-width:660px;
+    background:radial-gradient(360px 300px at 0% 25%,rgba(47,234,240,.08),transparent 70%),radial-gradient(360px 300px at 100% 25%,rgba(176,124,255,.10),transparent 70%),#151d18 !important; }
+  #page-matchs .analyse-card > .field-label{ margin-bottom:16px; }
+  #page-matchs .player-search-wrap + .vs-divider{ margin:22px 0; }
+  #page-matchs .upcoming-block{ margin-top:28px; }
+  #page-matchs #surfacePicker{ margin:16px 0 38px !important; gap:14px; }
+  #page-matchs .analyse-card > .field-label[data-i18n="field.surface"]{ margin-top:40px !important; }
+  #page-matchs .format-picker{ margin:16px 0 40px; gap:14px; }
+  #page-matchs .an-foot{ text-align:center; color:#6f7a74; font-size:12.5px; margin-top:16px; }
+
+  /* ===== Skin "landing" sur toutes les pages (cartes, listes, boutons) ===== */
+  .upcoming-card,.comp-row,.player-row,.match-row,.parr-stat-card,.acc-card,.empty-card,.plan,.pj-stat-card,.pj-rank-card,.pj-winrate-card,.pj-lastmatch-card{
+    background:#151d18 !important; border:1px solid rgba(215,242,44,.14) !important; border-radius:18px !important; transition:border-color .2s, box-shadow .2s, transform .2s; }
+  .upcoming-card{ border-left:3px solid var(--upcoming-surf, var(--accent)) !important; }
+  .upcoming-card:hover,.comp-row:hover,.player-row:hover,.match-row:hover,.parr-stat-card:hover{ border-color:rgba(215,242,44,.45) !important; box-shadow:0 0 30px rgba(215,242,44,.10); transform:translateY(-1px); }
+  .plan.featured,.plan.popular,.parr-stat-card.highlight{ border-color:var(--accent) !important; box-shadow:0 0 40px rgba(215,242,44,.18) !important; }
+  .upr-pbox{ background:#0c110e !important; border:1px solid rgba(255,255,255,.08) !important; border-radius:14px !important; }
+  .upr-pname,.player-name,.comp-name,.plan-head{ font-family:'Unbounded',Inter,sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:-.2px; }
+  .upr-pname{ font-size:15px; } .player-name{ font-size:14px; } .comp-name{ font-size:14px; }
+  .upr-rank,.player-rank{ font-family:'Unbounded',Inter,sans-serif; font-weight:800; }
+  .upr-rank{ background:linear-gradient(135deg,#2FEAF0,#6FA3FF 50%,#B07CFF); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; font-size:13px; }
+  .player-rank{ border:1px solid rgba(215,242,44,.25); background:rgba(215,242,44,.06); color:var(--accent); }
+  .player-avatar{ border:2px solid var(--accent); box-shadow:0 0 14px rgba(215,242,44,.25); }
+  .upr-vs{ font-family:'Unbounded',Inter,sans-serif; font-weight:900; color:var(--accent); font-size:11px; }
+  .upr-date{ font-family:'Unbounded',Inter,sans-serif; font-weight:800; font-size:12px; }
+  .upr-btn{ border-radius:999px !important; border:1px solid rgba(215,242,44,.5) !important; background:rgba(215,242,44,.08) !important; color:var(--accent) !important;
+    font-family:'Unbounded',Inter,sans-serif; font-weight:800; text-transform:uppercase; font-size:11px !important; letter-spacing:.3px; padding:11px 18px !important; }
+  .upr-btn:hover{ background:var(--accent) !important; color:#131a16 !important; box-shadow:0 0 24px rgba(215,242,44,.35); }
+  .plan-btn{ border-radius:14px !important; font-family:'Unbounded',Inter,sans-serif; font-weight:900; text-transform:uppercase; font-size:13px !important; padding:16px !important; box-shadow:0 0 30px rgba(215,242,44,.2); }
+  .plan-price,.parr-stat-num{ font-family:'Unbounded',Inter,sans-serif; font-weight:900; }
+  .parr-stat-num{ background:linear-gradient(135deg,#2FEAF0,#6FA3FF 50%,#B07CFF); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .search-bar{ background:#0c110e !important; border:1px solid rgba(255,255,255,.1) !important; border-radius:16px !important; padding:17px 18px !important; font-size:15px !important; }
+  .search-bar:focus{ border-color:var(--accent) !important; box-shadow:0 0 0 3px rgba(215,242,44,.12) !important; }
+  .info-banner{ background:rgba(255,255,255,.02) !important; border:1px dashed rgba(255,255,255,.14) !important; border-radius:14px !important; color:var(--text-sec) !important; }
+  .info-banner a{ color:var(--accent) !important; }
+  .comp-tab{ border-radius:999px !important; }
+  .comp-tab.active{ box-shadow:0 0 22px rgba(215,242,44,.25); }
+  .comp-section-label,.pj-section-label{ color:#8f9a94 !important; letter-spacing:2px !important; font-weight:700 !important; }
+  .comp-section-label::before,.pj-section-label::before{ content:""; display:inline-block; width:18px; height:2px; background:var(--accent); margin-right:10px; vertical-align:middle; box-shadow:0 0 8px var(--accent); }
+  .upr-gender-switch{ background:rgba(215,242,44,.25) !important; }
+  .upr-gender-switch-label.active-men{ color:var(--accent) !important; }
+  .comp-hero-title,.pj-name,.pj-hero-name{ font-family:'Unbounded',Inter,sans-serif !important; font-weight:900 !important; text-transform:uppercase; letter-spacing:-.4px; }
+  .pj-rank-num,.pj-stat-value{ font-family:'Unbounded',Inter,sans-serif; font-weight:900; }
 </style>
 <!-- "Se connecter / S'inscrire avec Google" (cf. JS plus bas, section
      "Google Identity Services") -- chargé en async, la connexion Google
@@ -2098,7 +2173,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <!-- MATCHS -->
     <section class="page active" id="page-matchs">
       <div class="page-head">
-        <h1 data-i18n="page.matchs.title">Analyse de match</h1>
+        <span class="ph-pill" data-i18n="pill.matchs">Nouvelle analyse</span>
+        <h1 data-i18n="page.matchs.title" data-lime="2">Analyse ton match</h1>
         <p data-i18n="page.matchs.sub1">Entre les joueurs que tu veux analyser</p>
       </div>
       <div class="analyse-card">
@@ -2131,6 +2207,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
         </div>
         <div class="analyse-msg" id="analyseMsg"></div>
         <button class="btn-primary" id="analyseBtn" data-i18n="btn.analyze_match">Analyser le match avec l'IA</button>
+        <div class="an-foot" data-i18n="an.foot">Résultat en quelques secondes</div>
         <button class="pj-back" type="button" id="historyBackBtn" data-i18n="hist.back_to_history" onclick="go('historique')">← Retour à l'historique</button>
         <div class="analyse-result" id="analyseResult" style="display:none;"></div>
       </div>
@@ -2139,6 +2216,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <!-- MATCHS A VENIR -->
     <section class="page" id="page-upcoming">
       <div class="page-head">
+        <span class="ph-pill" data-i18n="pill.upcoming">Calendrier</span>
         <h1 data-i18n="page.upcoming.title">Matchs à venir</h1>
         <p data-i18n="page.upcoming.sub1">Retrouve les prochains matchs programmés</p>
       </div>
@@ -2162,6 +2240,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <!-- COMPETITIONS -->
     <section class="page" id="page-competitions">
       <div class="page-head">
+        <span class="ph-pill" data-i18n="pill.competitions">Tournois</span>
         <h1 data-i18n="page.competitions.title">Compétitions</h1>
         <p data-i18n="page.competitions.sub1">Découvre les compétitions en cours</p>
       </div>
@@ -2173,6 +2252,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <!-- JOUEURS (annuaire) -->
     <section class="page" id="page-joueursdir">
       <div class="page-head">
+        <span class="ph-pill" data-i18n="pill.joueursdir">Circuit ATP · WTA</span>
         <h1 data-i18n="page.joueursdir.title">Joueurs</h1>
         <p data-i18n="page.joueursdir.sub1">Cherche un joueur ATP ou WTA pour voir sa fiche complète</p>
       </div>
@@ -2187,6 +2267,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <!-- HISTORIQUE -->
     <section class="page" id="page-historique">
       <div class="page-head">
+        <span class="ph-pill" data-i18n="pill.historique">Tes analyses</span>
         <h1 data-i18n="page.historique.title">Historique des analyses</h1>
         <p data-i18n="page.historique.sub1">Retrouve toutes tes analyses précédentes</p>
       </div>
@@ -2214,6 +2295,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <!-- PRICING -->
     <section class="page" id="page-pricing">
       <div class="page-head">
+        <span class="ph-pill" data-i18n="pill.pricing">Offres</span>
         <h1 data-i18n="page.pricing.title">Choisis ton plan</h1>
         <p data-i18n="page.pricing.sub1">Accède à des analyses complètes et des pronostics détaillés</p>
         <p class="pricing-cancel-note" data-i18n="pricing.cancel_note">Abonnement résiliable à tout moment dans les réglages de ton compte.</p>
@@ -2312,8 +2394,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <div class="rem-panel active" id="page-parrainage">
       <div id="parrLoggedIn">
         <div class="page-head left">
-          <span class="parr-badge" data-i18n="page.parrainage.badge">🎁 Programme de parrainage</span>
-          <h1 data-i18n="page.parrainage.title">Parrainage des analyses</h1>
+          <span class="ph-pill" data-i18n="pill.parrainage">Programme de parrainage</span>
+        <h1 data-i18n="page.parrainage.title">Parrainage des analyses</h1>
           <p data-i18n="page.parrainage.sub1">Partage ton lien : chaque filleul qui prend un abonnement te rapporte des analyses bonus, sans limite.</p>
         </div>
 
@@ -2455,6 +2537,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <!-- COMPTE -->
     <section class="page" id="page-compte">
       <div class="page-head left">
+        <span class="ph-pill" data-i18n="pill.compte">Compte</span>
         <h1 data-i18n="page.compte.title">Mon compte</h1>
         <p data-i18n="page.compte.sub1">Gère tes informations personnelles</p>
       </div>
@@ -2810,8 +2893,17 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'user.plan_pro': 'Pro',
       'user.plan_lifetime': 'Lifetime',
 
-      'page.matchs.title': 'Analyse de match',
-      'page.matchs.sub1': 'Entre les joueurs que tu veux analyser',
+      'pill.matchs': 'Nouvelle analyse',
+      'pill.upcoming': 'Calendrier',
+      'pill.competitions': 'Tournois',
+      'pill.joueursdir': 'Circuit ATP · WTA',
+      'pill.historique': 'Tes analyses',
+      'pill.pricing': 'Offres',
+      'pill.parrainage': 'Programme de parrainage',
+      'pill.compte': 'Compte',
+      'an.foot': 'Résultat en quelques secondes',
+      'page.matchs.title': 'Analyse ton match',
+      'page.matchs.sub1': 'Choisis deux joueurs, TennisMind fait le reste.',
       'page.matchs.sub2': "Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.",
       'field.match_to_analyze': 'MATCH À ANALYSER',
       'placeholder.search_player1': 'Cherche un joueur (ex: Alcaraz, Djokovic...)',
@@ -3310,7 +3402,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'user.plan_pro': 'Pro',
       'user.plan_lifetime': 'Lifetime',
 
-      'page.matchs.title': 'Análisis de partido',
+      'pill.matchs': 'Nuevo análisis',
+      'pill.upcoming': 'Calendario',
+      'pill.competitions': 'Torneos',
+      'pill.joueursdir': 'Circuito ATP · WTA',
+      'pill.historique': 'Tus análisis',
+      'pill.pricing': 'Planes',
+      'pill.parrainage': 'Programa de referidos',
+      'pill.compte': 'Cuenta',
+      'an.foot': 'Resultado en unos segundos',
+      'page.matchs.title': 'Analiza tu partido',
       'page.matchs.sub1': 'Entre los jugadores que quieres analizar',
       'page.matchs.sub2': 'Nuestra IA está conectada a la actualidad del tenis y cruza millones de datos para cada pronóstico.',
       'field.match_to_analyze': 'PARTIDO A ANALIZAR',
@@ -3810,7 +3911,16 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'user.plan_pro': 'Pro',
       'user.plan_lifetime': 'Lifetime',
 
-      'page.matchs.title': 'Match analysis',
+      'pill.matchs': 'New analysis',
+      'pill.upcoming': 'Schedule',
+      'pill.competitions': 'Tournaments',
+      'pill.joueursdir': 'ATP · WTA tour',
+      'pill.historique': 'Your analyses',
+      'pill.pricing': 'Plans',
+      'pill.parrainage': 'Referral program',
+      'pill.compte': 'Account',
+      'an.foot': 'Result in a few seconds',
+      'page.matchs.title': 'Analyze your match',
       'page.matchs.sub1': 'Between the players you want to analyze',
       'page.matchs.sub2': 'Our AI is connected to tennis news and crunches millions of data points for every prediction.',
       'field.match_to_analyze': 'MATCH TO ANALYZE',
@@ -4287,6 +4397,15 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     }
     return str;
   }
+
+  // Titres de pages style landing : dernier(s) mot(s) en vert sur une 2e ligne.
+  function limeTitles(){
+    document.querySelectorAll('.page-head h1[data-i18n]:not(.creator-title)').forEach(h=>{
+      const words = h.textContent.trim().split(/\s+/); if(words.length < 2) { h.innerHTML = '<span class="ttl-lime">'+words.join(' ')+'</span>'; return; }
+      const n = Math.min(parseInt(h.dataset.lime || '1', 10), words.length - 1);
+      h.innerHTML = words.slice(0, words.length - n).join(' ') + ' <span class="ttl-lime">' + words.slice(words.length - n).join(' ') + '</span>';
+    });
+  }
   function applyI18n(root){
     const scope = root || document;
     scope.querySelectorAll('[data-i18n]').forEach(el=>{
@@ -4294,6 +4413,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const val = t(key);
       if(el.hasAttribute('data-i18n-html')) el.innerHTML = val; else el.textContent = val;
     });
+    try{ limeTitles(); }catch(e){}
     scope.querySelectorAll('[data-i18n-placeholder]').forEach(el=>{
       el.setAttribute('placeholder', t(el.getAttribute('data-i18n-placeholder')));
     });
