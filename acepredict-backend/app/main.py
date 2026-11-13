@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import auth, players, competitions, analyses, users, billing, matches, referrals, seo
+from app.routers import auth, players, competitions, analyses, users, billing, matches, referrals, seo, creators
 
 app = FastAPI(
     title="AcePredict API",
@@ -31,6 +31,7 @@ app.include_router(billing.router)
 app.include_router(matches.router)
 app.include_router(referrals.router)
 app.include_router(seo.router)
+app.include_router(creators.router)
 
 
 @app.get("/health", tags=["health"])

@@ -55,7 +55,7 @@ def seeded():
                         indoor=True, round="R32", tournament_name="Masters de Shanghai",
                         tournament_id_external="shanghai", city="Shanghai", scheduled_time=when)
     fx2 = models.Fixture(external_id="x2", player1_id=a.id, player2_id=ghost.id, tour="atp", surface="hard",
-                         round="R32", tournament_name="Masters de Shanghai", scheduled_time=when)
+                         round="R32", tournament_name="Masters de Shanghai", scheduled_time=when + timedelta(hours=8))
     db.add_all([fx, fx2]); db.commit()
     ids = (a.id, b.id, when)
     db.close()

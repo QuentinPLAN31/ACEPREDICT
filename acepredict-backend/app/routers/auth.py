@@ -21,6 +21,7 @@ from app.security import (
 )
 from app.services import email_service
 from app.services.referral_service import generate_referral_code
+from app.services.creator_service import attribute_signup
 
 # Un seul objet Request HTTP réutilisé pour toutes les vérifications de jeton
 # Google (appelle google.com pour récupérer/rafraîchir ses clés publiques) --
@@ -88,6 +89,9 @@ def register(payload: schemas.UserCreate, db: Session = Depends(get_db)):
         )
         if referrer and referrer.id != user.id:
             db.add(models.Referral(referrer_id=referrer.id, referred_user_id=user.id))
+
+    # Programme créateurs : compte arrivé par un lien ?via=nom.
+    attribute_signup(db, user, payload.via_code)
 
     db.commit()
 
@@ -185,6 +189,8 @@ def google_auth(payload: schemas.GoogleAuthRequest, db: Session = Depends(get_db
                 )
                 if referrer and referrer.id != user.id:
                     db.add(models.Referral(referrer_id=referrer.id, referred_user_id=user.id))
+
+            attribute_signup(db, user, payload.via_code)
 
             db.commit()
 

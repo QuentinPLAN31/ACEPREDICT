@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     # défauts pour ne pas dépendre de 6 variables Railway supplémentaires ;
     # un Price ID différent (ex: pour rebasculer en mode Test) peut toujours
     # être fourni via une variable d'env du même nom, qui prime sur ce défaut.
+    # Programme créateurs (cf. routers/creators.py) : jeton des routes admin
+    # (en-tête X-Admin-Token). Vide = routes admin désactivées.
+    admin_token: str = ""
+
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
     # Compte Stripe "AcePredict" (production, live) -- créés via

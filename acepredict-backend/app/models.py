@@ -93,6 +93,11 @@ class User(Base):
     # généré à l'inscription, cf. services/referral_service.py.
     referral_code = Column(String, nullable=True, unique=True, index=True)
 
+    # Programme créateurs (liens ?via=nom) : créateur qui a amené ce compte,
+    # fixé une seule fois à l'inscription, cf. services/creator_service.py.
+    creator_id = Column(UUIDType, ForeignKey("creators.id"), nullable=True, index=True)
+    creator_attributed_at = Column(DateTime, nullable=True)
+
     # Réinitialisation de mot de passe (page "Mot de passe oublié ?") — on ne
     # stocke jamais le token brut, seulement son hash SHA-256, comme pour un
     # token de session classique. Nullable : la grande majorité des users
@@ -150,6 +155,42 @@ class Referral(Base):
     subscribed_at = Column(DateTime, nullable=True)
 
     __table_args__ = (Index("ix_referrals_referrer", "referrer_id"),)
+
+
+class Creator(Base):
+    """Créateur partenaire (TikTok...) rémunéré par client payant amené via
+    son lien app-tennismind.com/?via=<slug> -- cf. services/creator_service.py."""
+    __tablename__ = "creators"
+
+    id = Column(UUIDType, primary_key=True, default=gen_uuid)
+    slug = Column(String, unique=True, nullable=False, index=True)
+    name = Column(String, nullable=False)
+    contact = Column(String, nullable=True)
+    # Clé secrète de la page de stats du créateur (/createur?c=slug&k=key).
+    dashboard_key = Column(String, nullable=False)
+    clicks = Column(Integer, default=0)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class CreatorConversion(Base):
+    """Un client payant amené par un créateur : une seule ligne par client
+    (unique user_id). Commission fixe selon l'offre achetée, versable après
+    le délai de remboursement ; status pending | void (remboursé) | paid."""
+    __tablename__ = "creator_conversions"
+
+    id = Column(UUIDType, primary_key=True, default=gen_uuid)
+    creator_id = Column(UUIDType, ForeignKey("creators.id"), nullable=False, index=True)
+    user_id = Column(UUIDType, ForeignKey("users.id"), nullable=False, unique=True)
+    product = Column(String, nullable=False)  # pack5 | starter | pro | lifetime
+    amount_cents = Column(Integer, nullable=True)
+    commission_cents = Column(Integer, nullable=False)
+    stripe_session_id = Column(String, nullable=True)
+    stripe_payment_intent = Column(String, nullable=True, index=True)
+    stripe_customer_id = Column(String, nullable=True, index=True)
+    status = Column(String, nullable=False, default="pending")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    paid_at = Column(DateTime, nullable=True)
 
 
 class UsageQuota(Base):

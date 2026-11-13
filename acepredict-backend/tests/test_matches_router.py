@@ -94,7 +94,7 @@ def seed_data():
         player1_name_raw="Carlos Alcaraz", player2_name_raw="Joueur Challenger",
         tour="atp", surface="clay", indoor=False, round="QF",
         tournament_name="Challenger de Rennes", tournament_id_external="t2",
-        city="Rennes", scheduled_time=now + timedelta(hours=2),
+        city="Rennes", scheduled_time=now + timedelta(hours=5),
     ))
     db.add(models.Fixture(
         external_id="ltapi:wta-1", source="livetennisapi",
@@ -102,7 +102,7 @@ def seed_data():
         player1_name_raw="Iga Swiatek", player2_name_raw="Aryna Sabalenka",
         tour="wta", surface="hard", indoor=False, round="F",
         tournament_name="WTA Finals", tournament_id_external="t3",
-        city="Riyadh", scheduled_time=now + timedelta(hours=4),
+        city="Riyadh", scheduled_time=now + timedelta(hours=6),
     ))
     db.commit()
 
@@ -184,6 +184,7 @@ def test_upcoming_list_excludes_old_and_far_future_matches(seed_data):
     db = TestingSessionLocal()
     alcaraz = db.query(models.Player).filter(models.Player.name == "Carlos Alcaraz").first()
     sinner = db.query(models.Player).filter(models.Player.name == "Jannik Sinner").first()
+    inconnu = db.query(models.Player).filter(models.Player.id == seed_data["inconnu"]).first()
     now = datetime.utcnow()
     db.add(models.Fixture(
         external_id="ltapi:old", source="livetennisapi",
@@ -193,8 +194,8 @@ def test_upcoming_list_excludes_old_and_far_future_matches(seed_data):
     ))
     db.add(models.Fixture(
         external_id="ltapi:recent", source="livetennisapi",
-        player1_id=alcaraz.id, player2_id=sinner.id,
-        player1_name_raw="Carlos Alcaraz", player2_name_raw="Jannik Sinner",
+        player1_id=sinner.id, player2_id=inconnu.id,
+        player1_name_raw="Jannik Sinner", player2_name_raw="Joueur Inconnu",
         tour="atp", tournament_name="Match recent", scheduled_time=now - timedelta(hours=23),
     ))
     db.add(models.Fixture(
@@ -210,3 +211,19 @@ def test_upcoming_list_excludes_old_and_far_future_matches(seed_data):
     assert "Match recent" in names
     assert "Vieux match" not in names
     assert "Match lointain" not in names
+
+
+def test_drop_impossible_removes_same_player_overlapping_fixtures():
+    """Affiches fantômes (ex. ATP Finals) : un même joueur ne peut pas jouer
+    deux matchs différents au même moment -> toutes les fixtures en conflit
+    sont écartées, les autres restent."""
+    from types import SimpleNamespace as N
+    from datetime import datetime
+    from app.services.fixture_filter import drop_impossible
+    t = datetime(2026, 11, 15, 13, 0)
+    a = N(player1_id="alcaraz", player2_id="medvedev", scheduled_time=t)
+    b = N(player1_id="tiafoe", player2_id="alcaraz", scheduled_time=t)
+    c = N(player1_id="fritz", player2_id="rune", scheduled_time=t)
+    d = N(player1_id="alcaraz", player2_id="cobolli", scheduled_time=t + timedelta(days=1))
+    kept = drop_impossible([a, b, c, d])
+    assert kept == [c, d]

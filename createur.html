@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Espace créateur · TennisMind</title>
+<link rel="icon" href="/favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Unbounded:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#131a16;--card:#1a221d;--line:rgba(255,255,255,.08);--txt:#eef2ef;--mut:#9aa59f;--lime:#D7F22C}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;
+    background-image:radial-gradient(600px 500px at 0% 0%,rgba(47,234,240,.12),transparent 70%),radial-gradient(600px 500px at 100% 0%,rgba(176,124,255,.14),transparent 70%)}
+  .wrap{max-width:760px;margin:0 auto;padding:32px 16px 60px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:Unbounded;font-weight:800;color:var(--lime);text-decoration:none;font-size:18px}
+  .brand img{width:26px;height:26px}
+  h1{font-family:Unbounded;font-weight:900;font-size:clamp(26px,6vw,40px);line-height:1.05;margin:28px 0 6px;text-transform:uppercase}
+  h1 span{color:var(--lime)}
+  .sub{color:var(--mut);margin:0 0 24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:16px}
+  .link{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .link code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#0f1512;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px}
+  button,select{font:inherit;border-radius:12px;border:0;padding:12px 16px;cursor:pointer}
+  button{background:var(--lime);color:#131a16;font-weight:700}
+  select{background:#0f1512;color:var(--txt);border:1px solid var(--line)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .k{background:#0f1512;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .k b{display:block;font-family:Unbounded;font-weight:800;font-size:26px;margin-top:6px}
+  .k small{color:var(--mut);font-size:13px}
+  .big b{background:linear-gradient(135deg,#ff7a45,#ffb020 50%,#ff5f6d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  td,th{padding:10px 6px;border-bottom:1px solid var(--line);text-align:left}
+  td:last-child,th:last-child{text-align:right}
+  th{color:var(--mut);font-weight:500}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .pill{display:inline-block;border:1px solid rgba(215,242,44,.4);color:var(--lime);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  .err{color:#ff8a7a}
+  .note{color:var(--mut);font-size:13px;line-height:1.5;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="brand" href="/"><img src="/assets/ball.png" alt="">TennisMind</a>
+  <h1>Espace <span>créateur</span></h1>
+  <p class="sub" id="hello">Chargement…</p>
+
+  <div id="content" hidden>
+    <div class="card">
+      <div class="pill">Ton lien</div>
+      <div class="link" style="margin-top:12px"><code id="lnk"></code><button id="copy">Copier</button></div>
+    </div>
+
+    <div class="card">
+      <div class="row"><div class="pill">Ce mois-ci</div><select id="month"></select></div>
+      <div class="grid" style="margin-top:14px">
+        <div class="k"><small>Clics (total)</small><b id="clicks">–</b></div>
+        <div class="k"><small>Inscrits</small><b id="signups">–</b></div>
+        <div class="k"><small>Clients payants</small><b id="paying">–</b></div>
+        <div class="k big"><small>Gains du mois</small><b id="total">–</b></div>
+      </div>
+      <div class="grid" style="margin-top:12px">
+        <div class="k"><small>Versable</small><b id="payable">–</b></div>
+        <div class="k"><small>En attente (30 j)</small><b id="waiting">–</b></div>
+        <div class="k"><small>Déjà versé</small><b id="paid">–</b></div>
+        <div class="k"><small>Bonus volume</small><b id="bonus">–</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="pill">Détail par offre</div>
+      <table style="margin-top:10px"><thead><tr><th>Offre</th><th>Par client</th><th>Clients</th></tr></thead><tbody id="rows"></tbody></table>
+      <p class="note">Rémunération fixe, une fois par client payant. Bonus selon le nombre de clients payants du mois : 10 à 29 → +25 %, 30 et plus → +50 %. Les gains sont versables 30 jours après l'achat (délai de remboursement).</p>
+    </div>
+  </div>
+</div>
+<script>
+  const API_BASE = 'https://acepredict-production.up.railway.app';
+  const qs = new URLSearchParams(location.search);
+  const slug = qs.get('c'), key = qs.get('k');
+  const LABELS = { pack5:'Pack ponctuel', starter:'Starter', pro:'Pro', lifetime:'Accès à vie' };
+  const eur = v => (v||0).toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
+  const $ = id => document.getElementById(id);
+
+  const sel = $('month'); const now = new Date();
+  for(let i=0;i<12;i++){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const v = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    sel.add(new Option(d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}), v));
+  }
+  sel.onchange = () => load(sel.value);
+  $('copy').onclick = () => { navigator.clipboard.writeText($('lnk').textContent); $('copy').textContent = 'Copié ✓'; setTimeout(()=>$('copy').textContent='Copier',1500); };
+
+  async function load(month){
+    if(!slug || !key){ $('hello').innerHTML = '<span class="err">Lien incomplet : utilise le lien d\'accès qu\'on t\'a envoyé.</span>'; return; }
+    try{
+      const r = await fetch(`${API_BASE}/creators/stats/${encodeURIComponent(slug)}?k=${encodeURIComponent(key)}&month=${month}`);
+      if(!r.ok) throw new Error(r.status);
+      const d = await r.json();
+      $('hello').textContent = 'Salut ' + d.name + ', voici tes résultats.';
+      $('lnk').textContent = d.link;
+      $('clicks').textContent = d.clicks_total; $('signups').textContent = d.signups; $('paying').textContent = d.paying_clients;
+      $('total').textContent = eur(d.total_eur); $('payable').textContent = eur(d.payable_eur);
+      $('waiting').textContent = eur(d.waiting_refund_period_eur); $('paid').textContent = eur(d.paid_eur);
+      $('bonus').textContent = '+' + d.bonus_pct + ' %';
+      $('rows').innerHTML = Object.keys(LABELS).map(p => `<tr><td>${LABELS[p]}</td><td>${eur(d.grid_eur[p])}</td><td>${d.by_product[p]||0}</td></tr>`).join('');
+      $('content').hidden = false;
+    }catch(e){ $('hello').innerHTML = '<span class="err">Accès introuvable. Vérifie ton lien.</span>'; }
+  }
+  load(sel.value);
+</script>
+</body>
+</html>

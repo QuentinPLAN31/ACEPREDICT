@@ -31,6 +31,7 @@ from sqlalchemy.orm import Session, joinedload
 from app import models, schemas
 from app.database import get_db
 from app.services import data_confidence
+from app.services.fixture_filter import drop_impossible
 
 router = APIRouter(prefix="/matches", tags=["matches"])
 
@@ -111,7 +112,7 @@ def upcoming_matches(
         .order_by(models.Fixture.scheduled_time.asc())
         .all()
     )
-    fixtures = _dedupe_fixtures(fixtures)
+    fixtures = drop_impossible(_dedupe_fixtures(fixtures))
 
     return [
         {
@@ -151,7 +152,7 @@ def upcoming_matches_list(
             & (models.Fixture.scheduled_time <= now + UPCOMING_HORIZON),
         )
     )
-    fixtures = _dedupe_fixtures(query.order_by(models.Fixture.scheduled_time.asc()).all())[:limit]
+    fixtures = drop_impossible(_dedupe_fixtures(query.order_by(models.Fixture.scheduled_time.asc()).all()))[:limit]
 
     matches = []
     for f in fixtures:

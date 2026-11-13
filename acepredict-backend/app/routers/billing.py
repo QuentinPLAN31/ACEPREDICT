@@ -15,6 +15,7 @@ from app.deps import get_current_user
 from app.deps import PLAN_QUOTAS
 from app.services import stripe_service
 from app.services.referral_service import grant_subscription_reward
+from app.services import creator_service
 
 DEMO_MODE_MESSAGE = (
     "Paiement en mode démo : Stripe n'est pas configuré (ou mal configuré) sur "
@@ -89,6 +90,17 @@ def cancel_subscription(
     return {"status": "canceling", "current_period_end": sub.current_period_end}
 
 
+def _creator_conversion(db: Session, user: models.User, plan: str, data: dict) -> None:
+    """Commission créateur si ce client est arrivé par un lien ?via=nom."""
+    creator_service.record_conversion(
+        db, user, plan,
+        amount_cents=data.get("amount_total"),
+        session_id=data.get("id"),
+        payment_intent=data.get("payment_intent"),
+        customer_id=data.get("customer"),
+    )
+
+
 @router.post("/webhook")
 async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
     """
@@ -137,6 +149,7 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             # Compte) plutôt qu'un simple solde sans référence.
             user.quota.bonus_analyses = (user.quota.bonus_analyses or 0) + 5
             user.quota.bonus_analyses_total = (user.quota.bonus_analyses_total or 0) + 5
+            _creator_conversion(db, user, plan, data)
             db.commit()
         elif user and plan:
             was_free = user.plan == models.PlanEnum.free
@@ -163,7 +176,14 @@ async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
             # récompense au parrain de `user`, si `user` a été parrainé et
             # n'a pas encore été récompensé (no-op sinon).
             grant_subscription_reward(db, user, plan)
+            _creator_conversion(db, user, plan, data)
             db.commit()
+
+    elif event_type == "charge.refunded":
+        # Programme créateurs : un client remboursé n'ouvre pas de commission
+        # (à cocher dans Stripe -> Webhooks : événement charge.refunded).
+        creator_service.void_for_refund(db, data.get("payment_intent"), data.get("customer"))
+        db.commit()
 
     elif event_type == "customer.subscription.updated":
         # Reflète côté Stripe un cancel_at_period_end (résilié via /billing/cancel

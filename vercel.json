@@ -9,6 +9,10 @@
       "destination": "/landing.html"
     },
     {
+      "source": "/createur",
+      "destination": "/createur.html"
+    },
+    {
       "source": "/app",
       "destination": "/visitennis_1.html"
     },

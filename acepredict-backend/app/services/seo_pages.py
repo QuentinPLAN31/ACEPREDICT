@@ -512,7 +512,18 @@ def sync_match_pages(db: Session, now: Optional[datetime] = None) -> dict:
                 .filter(models.Fixture.scheduled_time >= now - timedelta(hours=2),
                         models.Fixture.scheduled_time <= now + LOOKAHEAD)
                 .order_by(models.Fixture.scheduled_time).all())
+    # Calendrier impossible (même joueur sur 2 matchs simultanés) : pas de page.
+    from app.services.fixture_filter import impossible_ids
+    bad = impossible_ids(fixtures)
     for fx in fixtures:
+        if id(fx) in bad:
+            # Page déjà créée pour une affiche fantôme (pas encore jouée) : on la retire.
+            ghost = db.query(models.MatchPage).filter(models.MatchPage.match_key == key_for_fixture(fx)).first()
+            if ghost is not None and ghost.finished_at is None:
+                db.delete(ghost); db.commit()
+                stats["removed"] = stats.get("removed", 0) + 1
+            stats["skipped"] += 1
+            continue
         try:
             if not _eligible(fx):
                 stats["skipped"] += 1

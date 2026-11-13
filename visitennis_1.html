@@ -2010,6 +2010,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   .upr-btn{ border-radius:999px !important; border:1px solid rgba(215,242,44,.5) !important; background:rgba(215,242,44,.08) !important; color:var(--accent) !important;
     font-family:'Unbounded',Inter,sans-serif; font-weight:800; text-transform:uppercase; font-size:11px !important; letter-spacing:.3px; padding:11px 18px !important; }
   .upr-btn:hover{ background:var(--accent) !important; color:#131a16 !important; box-shadow:0 0 24px rgba(215,242,44,.35); }
+  .upr-btn{ box-sizing:border-box; white-space:nowrap; max-width:100%; overflow:hidden; text-overflow:ellipsis; }
+  @media (max-width:380px){ .form-card{ padding:14px 8px; } }
+  .form-card .upr-btn{ font-family:Inter,sans-serif !important; font-weight:800 !important; font-size:12px !important; padding:11px 6px !important; letter-spacing:.3px; white-space:nowrap; }
   .plan-btn{ border-radius:14px !important; font-family:'Unbounded',Inter,sans-serif; font-weight:900; text-transform:uppercase; font-size:13px !important; padding:16px !important; box-shadow:0 0 30px rgba(215,242,44,.2); }
   .plan-price,.parr-stat-num{ font-family:'Unbounded',Inter,sans-serif; font-weight:900; }
   .parr-stat-num{ background:linear-gradient(135deg,#2FEAF0,#6FA3FF 50%,#B07CFF); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
@@ -4458,6 +4461,28 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // Accès historique : plan payant OU solde de pack ponctuel > 0
   function hasHistoryAccess(){ return !isFreePlan() || (currentUser && (currentUser.bonus_analyses || 0) > 0); }
 
+  // ---------- Programme createurs : capture du ?via=NOM (valable 30 jours) ----------
+  (function captureCreatorCode(){
+    try{
+      const v = new URLSearchParams(window.location.search).get('via');
+      if(v && /^[a-zA-Z0-9_-]{2,40}$/.test(v.trim())){
+        const code = v.trim().toLowerCase();
+        const prev = JSON.parse(localStorage.getItem('tennismind_via') || 'null');
+        if(!prev || prev.code !== code){
+          localStorage.setItem('tennismind_via', JSON.stringify({ code, ts: Date.now() }));
+          fetch(API_BASE + '/creators/click', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code }) }).catch(()=>{});
+        }
+      }
+    }catch(e){}
+  })();
+  function getPendingViaCode(){
+    try{
+      const v = JSON.parse(localStorage.getItem('tennismind_via') || 'null');
+      if(v && v.code && Date.now() - v.ts < 30*24*3600*1000) return v.code;
+    }catch(e){}
+    return null;
+  }
+
   // ---------- Parrainage : capture du ?ref=CODE dans l'URL du lien partage ----------
   (function captureReferralCode(){
     const urlRef = new URLSearchParams(window.location.search).get('ref');
@@ -4597,7 +4622,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const res = await fetch(API_BASE + '/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: response.credential, ref_code: getPendingRefCode(), device_id: getDeviceId() }),
+        body: JSON.stringify({ id_token: response.credential, ref_code: getPendingRefCode(), via_code: getPendingViaCode(), device_id: getDeviceId() }),
       });
       const data = await res.json().catch(()=> ({}));
       if(!res.ok) throw new Error(data.detail || t('auth.google_error'));
@@ -4661,7 +4686,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       const res = await fetch(API_BASE + '/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, full_name: full_name || null, ref_code: getPendingRefCode(), device_id: getDeviceId() }),
+        body: JSON.stringify({ email, password, full_name: full_name || null, ref_code: getPendingRefCode(), via_code: getPendingViaCode(), device_id: getDeviceId() }),
       });
       if(!res.ok){
         const errBody = await res.json().catch(()=> ({}));
@@ -5939,9 +5964,9 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       renderQuickScores(data.detail) +
       '<div class="form-row" style="margin-top:12px;">' +
         '<div class="form-card"><div class="form-card-name">' + p1Name + '</div>' +
-          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">' + t('btn.see_fiche') + '</button></div>' +
+          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p1Name.replace(/"/g,'&quot;') + '">' + t('btn.fiche') + ' →</button></div>' +
         '<div class="form-card p2"><div class="form-card-name p2">' + p2Name + '</div>' +
-          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p2Name.replace(/"/g,'&quot;') + '">' + t('btn.see_fiche') + '</button></div>' +
+          '<button type="button" class="upr-btn upr-btn-sm" style="width:100%; margin-top:8px;" data-profile-name="' + p2Name.replace(/"/g,'&quot;') + '">' + t('btn.fiche') + ' →</button></div>' +
       '</div>' +
       renderConfidenceWarning(data, p1Name, p2Name) +
       (narrative ? '<p class="result-lead">' + narrative.lead + '</p>' : '') +
