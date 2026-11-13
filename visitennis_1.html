@@ -416,6 +416,58 @@
   .upr-surface-pill.surf-grass{ background: rgba(62,214,107,0.18); color: var(--surf-grass); }
   .upr-surface-pill.surf-carpet{ background: rgba(184,184,184,0.18); color: var(--surf-carpet); }
   .upr-surface-pill.surf-unknown{ background: rgba(255,255,255,0.06); color: var(--text-dim); }
+
+  /* ===== Face à face (fiches joueurs) : style landing, photos + 2 colonnes ===== */
+  .ff{ border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden;
+    background:radial-gradient(420px 220px at 0% 0%, rgba(215,242,44,0.10), transparent 70%),
+      radial-gradient(420px 220px at 100% 0%, rgba(79,195,247,0.12), transparent 70%), rgba(255,255,255,0.025); }
+  .ff-head{ display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; padding:22px 18px 18px;
+    border-bottom:1px solid rgba(255,255,255,0.07); }
+  .ff-p{ display:flex; flex-direction:column; align-items:center; gap:10px; min-width:0; }
+  .ff-ph{ --c:var(--accent); position:relative; width:92px; height:92px; border-radius:50%; overflow:hidden;
+    background:radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--c) 28%, #1a221d), #131a16 75%);
+    box-shadow:0 0 0 2px var(--c), 0 0 26px color-mix(in srgb, var(--c) 35%, transparent);
+    display:flex; align-items:center; justify-content:center; }
+  .ff-p.p2 .ff-ph{ --c:var(--accent2); }
+  .ff-ph img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 12%; }
+  .ff-ph img.cut{ object-fit:cover; object-position:50% 0; top:10%; height:125%; }
+  .ff-ini{ font-family:'Unbounded',sans-serif; font-weight:800; font-size:22px; color:var(--c); }
+  .ff-name{ font-family:'Unbounded',sans-serif; font-weight:800; font-size:14px; line-height:1.2; text-align:center;
+    color:var(--accent); max-width:100%; overflow-wrap:anywhere; cursor:pointer; }
+  .ff-p.p2 .ff-name{ color:var(--accent2); }
+  .ff-vs{ font-family:'Unbounded',sans-serif; font-weight:900; font-size:15px; letter-spacing:.04em;
+    background:linear-gradient(135deg,#ff7a45,#ffb020 50%,#ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .ff-cols{ display:grid; grid-template-columns:1fr 1fr; }
+  .ff-col{ --c:var(--accent); padding:18px 18px 20px; min-width:0; }
+  .ff-col + .ff-col{ border-left:1px solid rgba(255,255,255,0.07); }
+  .ff-col.p2{ --c:var(--accent2); }
+  .ff-colname{ display:none; font-family:'Unbounded',sans-serif; font-weight:800; font-size:13px; color:var(--c); margin-bottom:12px; }
+  .ff-sub{ display:inline-block; font-size:10.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    padding:4px 10px; border-radius:999px; margin-bottom:12px; color:var(--c); border:1px solid color-mix(in srgb, var(--c) 40%, transparent); }
+  .ff-sub.neg{ color:#ffb066; border-color:rgba(255,176,102,0.4); margin-top:18px; }
+  .ff-list{ list-style:none; margin:0; padding:0; }
+  .ff-list li{ display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:1.5; color:var(--text); margin-bottom:11px; }
+  .ff-list li:last-child{ margin-bottom:0; }
+  .ff-ic{ flex:0 0 18px; height:18px; margin-top:1px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--c) 18%, transparent); color:var(--c); }
+  .ff-list.neg .ff-ic{ background:rgba(255,176,102,0.16); color:#ffb066; font-size:11px; font-weight:900; }
+  .ff-ic svg{ width:10px; height:10px; }
+  @media (max-width:560px){
+    .ff-cols{ grid-template-columns:1fr; }
+    .ff-col + .ff-col{ border-left:0; border-top:1px solid rgba(255,255,255,0.07); }
+    .ff-colname{ display:block; }
+    .ff-ph{ width:64px; height:64px; }
+  }
+  /* Interprétation : lignes de lecture avec une flèche, sans numéros */
+  .interp-item{ display:flex; gap:12px; align-items:flex-start; padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.07); }
+  .interp-item:last-child{ border-bottom:0; }
+  .interp-ic{ flex:0 0 22px; height:22px; border-radius:7px; display:flex; align-items:center; justify-content:center;
+    background:color-mix(in srgb, var(--sec-c) 16%, transparent); color:var(--sec-c); margin-top:1px; }
+  .interp-ic svg{ width:12px; height:12px; }
+  .interp-text{ font-size:14px; line-height:1.55; color:var(--text); }
+  .interp-item:first-child .interp-text{ font-weight:600; }
+  /* Projection : plus de numéro de rang (évite trois listes numérotées d'affilée) */
+  .res-sec .proj-rank{ display:none; }
   /* Projection de score */
   .proj-card{ margin-top:14px; border:1px solid rgba(255,255,255,0.08); border-radius:14px; background:rgba(255,255,255,0.03); overflow:hidden; }
   .proj-row{ display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.07); }
@@ -559,7 +611,7 @@
   .pj-stat-label{ font-size:11px; color: var(--text-dim); margin-top:4px; }
 
   /* ===== Sections de l'analyse : cartes à titre coloré, une couleur par type ===== */
-  .res-sec{ --sec-c: var(--accent); margin-top:34px; text-align:left; }
+  .res-sec{ --sec-c: var(--accent); margin-top:30px; text-align:left; }
   /* Palette limitée à celle de l'app : vert lime, orange du dégradé des boutons, neutre. */
   .res-lime, .res-bare{ --sec-c:var(--accent); } .res-orange{ --sec-c:#ff9938; } .res-slate{ --sec-c:rgba(255,255,255,0.62); }
   .res-sec-head{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }
@@ -5621,25 +5673,52 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   // laisser noyée plus bas dans l'analyse.
   function renderCroisementBlock(bullets){
     if(!bullets || !bullets.length) return '';
+    const ic = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
     return resSection('lime', t('analysis.interpretation'),
-      '<ul class="result-narrative-list numbered">' + bullets.map(b => '<li>' + b + '</li>').join('') + '</ul>');
+      '<div class="interp">' + bullets.map(b => '<div class="interp-item"><span class="interp-ic">' + ic + '</span><div class="interp-text">' + b + '</div></div>').join('') + '</div>');
   }
 
   function renderFichesBlock(fiches, p1Name, p2Name){
-    const card = function(name, f, isP2){
-      if(!f.forces.length && !f.faiblesses.length) return '';
-      const list = function(items, cls){
-        if(!items.length) return '';
-        return '<ul class="fiche-list ' + cls + '">' + items.map(i => '<li>' + i + '</li>').join('') + '</ul>';
-      };
-      return '<div class="fiche-card' + (isP2 ? ' p2' : '') + '">' +
-        '<div class="fiche-card-name clickable-name' + (isP2 ? ' p2' : '') + '" data-player-name="' + (name || '').replace(/"/g,'&quot;') + '">' + name + '</div>' +
-        '<div class="fiche-card-sub fiche-sub-pos">' + t('analysis.points_forts') + '</div>' + list(f.forces, 'fiche-pos') +
-        '<div class="fiche-card-sub fiche-sub-neg">' + t('analysis.a_surveiller') + '</div>' + list(f.faiblesses, 'fiche-neg') +
+    const esc = x => String(x || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+    const ini = n => String(n || '').split(/\s+/).filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const last = n => String(n || '').split(/\s+/).slice(-1)[0];
+    const chk = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    const head = (name, isP2) =>
+      '<div class="ff-p' + (isP2 ? ' p2' : '') + '">' +
+        '<div class="ff-ph" data-ff-photo="' + esc(name) + '"><span class="ff-ini">' + ini(name) + '</span></div>' +
+        '<div class="ff-name clickable-name" data-player-name="' + esc(name) + '">' + name + '</div>' +
       '</div>';
-    };
+    const list = (items, cls) => items.length
+      ? '<ul class="ff-list ' + cls + '">' + items.map(i => '<li><span class="ff-ic">' + (cls === 'pos' ? chk : '!') + '</span><span>' + i + '</span></li>').join('') + '</ul>'
+      : '';
+    const col = (name, f, isP2) =>
+      '<div class="ff-col' + (isP2 ? ' p2' : '') + '">' +
+        '<div class="ff-colname">' + last(name) + '</div>' +
+        (f.forces.length ? '<div class="ff-sub">' + t('analysis.points_forts') + '</div>' + list(f.forces, 'pos') : '') +
+        (f.faiblesses.length ? '<div class="ff-sub neg">' + t('analysis.a_surveiller') + '</div>' + list(f.faiblesses, 'neg') : '') +
+      '</div>';
     return resSection('bare', t('analysis.fiches_joueurs'),
-      '<div class="fiche-grid">' + card(p1Name, fiches.j1, false) + card(p2Name, fiches.j2, true) + '</div>');
+      '<div class="ff">' +
+        '<div class="ff-head">' + head(p1Name, false) + '<div class="ff-vs">VS</div>' + head(p2Name, true) + '</div>' +
+        '<div class="ff-cols">' + col(p1Name, fiches.j1, false) + col(p2Name, fiches.j2, true) + '</div>' +
+      '</div>');
+  }
+
+  // Photos des fiches joueurs : détourée si dispo, sinon photo Wikipédia ; initiales en secours.
+  function hydrateFichePhotos(root){
+    (root || document).querySelectorAll('[data-ff-photo]').forEach(async el => {
+      const name = el.getAttribute('data-ff-photo');
+      const put = (src, cut) => {
+        const img = new Image();
+        img.alt = name; if(cut) img.className = 'cut';
+        img.onload = () => { const s = el.querySelector('.ff-ini'); if(s) s.remove(); };
+        img.onerror = () => img.remove();
+        img.src = src; el.appendChild(img);
+      };
+      const cut = cutoutFor(name);
+      if(cut){ put(cut, true); return; }
+      try{ const url = await getPlayerPhotoUrl(name); if(url) put(url, false); }catch(e){}
+    });
   }
 
   // Choisit la vue de projection selon le format sélectionné avant l'analyse (sinon celle du serveur).
@@ -5986,7 +6065,6 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
 
     const lockedInner =
       renderStatCompareBars(data.detail, p1Name, p2Name, pct, p1IsWinner) +
-      renderFactorsBlock(data.detail) +
       (narrative && narrative.fiches
         ? renderFichesBlock(narrative.fiches, p1Name, p2Name)
         : renderForcesClesBlock(data.detail, p1Name, p2Name)) +
@@ -5995,11 +6073,11 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       (narrative && narrative.scenarios.length ? renderScenariosBlock(narrative.scenarios) : '') +
       renderScoreProjectionBlock(data.detail) +
       (narrative && narrative.conseilTactique && narrative.conseilTactique.length ? renderConseilTactiqueBlock(narrative.conseilTactique) : '') +
+      (narrative ? renderNarrativeSectionsBlock(narrative) : '') +
+      (narrative && narrative.chiffreCle ? renderChiffreCleBlock(narrative.chiffreCle) : '') +
       renderTournamentBlock(data.detail) +
       renderMarketBlock(data.detail, p1Name, p2Name) +
       renderWeatherBlock(data.detail) +
-      (narrative ? renderNarrativeSectionsBlock(narrative) : '') +
-      (narrative && narrative.chiffreCle ? renderChiffreCleBlock(narrative.chiffreCle) : '') +
       (narrative && narrative.verdictExpert ? renderVerdictExpertBlock(narrative.verdictExpert) : '');
 
     const jargonFound = [];
@@ -6031,6 +6109,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       el.addEventListener('click', ()=> openPlayerProfileByName(el.dataset.playerName));
     });
     hydrateHeroPhoto(winnerName);
+    hydrateFichePhotos(box);
   }
 
   // Photos détourées (PNG transparents) déjà prêtes ; sinon photo Wikipédia fondue en bas.

@@ -3,7 +3,7 @@ Programme créateurs : un créateur partage app-tennismind.com/?via=<slug>, le
 navigateur garde le code 30 jours (localStorage), il est envoyé à
 l'inscription et rattache le compte au créateur (une seule fois, jamais
 réécrit). Au premier achat de ce compte, une commission fixe est enregistrée
-(cf. routers/billing.py), versable après le délai de remboursement.
+(cf. routers/billing.py), versable après le délai de remboursement (14 jours).
 
 Grille (une fois par client) : pack 0,50 €, Starter 1,50 €, Pro 3 €,
 Accès à vie 8 €. Bonus selon le nombre de clients payants amenés dans le
@@ -23,7 +23,7 @@ TIERS = [(30, 1.5), (10, 1.25), (0, 1.0)]  # (seuil clients payants du mois, mul
 # Le compte doit payer dans ce délai après son inscription via le lien.
 ATTRIBUTION_DAYS = 30
 # Commission versable une fois ce délai passé sans remboursement.
-REFUND_HOLD_DAYS = 30
+REFUND_HOLD_DAYS = 14
 
 _SLUG_RE = re.compile(r"^[a-z0-9_-]{2,40}$")
 
