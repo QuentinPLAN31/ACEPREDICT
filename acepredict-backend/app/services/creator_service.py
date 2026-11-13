@@ -59,6 +59,7 @@ def attribute_signup(db: Session, user: models.User, via_code: Optional[str]) ->
     if creator:
         user.creator_id = creator.id
         user.creator_attributed_at = datetime.utcnow()
+        user.referent = creator.slug
 
 
 def record_conversion(
@@ -98,6 +99,8 @@ def record_conversion(
     conv = models.CreatorConversion(
         creator_id=user.creator_id,
         user_id=user.id,
+        referent=user.referent,
+        user_email=user.email,
         product=base,
         amount_cents=amount_cents,
         commission_cents=commission,

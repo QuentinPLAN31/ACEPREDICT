@@ -97,6 +97,7 @@ class User(Base):
     # fixé une seule fois à l'inscription, cf. services/creator_service.py.
     creator_id = Column(UUIDType, ForeignKey("creators.id"), nullable=True, index=True)
     creator_attributed_at = Column(DateTime, nullable=True)
+    referent = Column(String, nullable=True, index=True)  # slug lisible du createur
 
     # Réinitialisation de mot de passe (page "Mot de passe oublié ?") — on ne
     # stocke jamais le token brut, seulement son hash SHA-256, comme pour un
@@ -182,6 +183,8 @@ class CreatorConversion(Base):
     id = Column(UUIDType, primary_key=True, default=gen_uuid)
     creator_id = Column(UUIDType, ForeignKey("creators.id"), nullable=False, index=True)
     user_id = Column(UUIDType, ForeignKey("users.id"), nullable=False, unique=True)
+    referent = Column(String, nullable=True, index=True)  # slug lisible du createur
+    user_email = Column(String, nullable=True)
     product = Column(String, nullable=False)  # pack5 | starter | pro | lifetime
     amount_cents = Column(Integer, nullable=True)
     commission_cents = Column(Integer, nullable=False)
