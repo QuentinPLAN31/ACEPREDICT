@@ -79,15 +79,12 @@
   .lang-dropdown{ position:relative; }
   .lang-select{
     display:flex; align-items:center; gap:9px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    padding: 9px 16px 9px 18px;
-    font-family: var(--font-b); font-size: 13.5px; font-weight:600; color: var(--text);
-    cursor:pointer; transition: border-color .2s ease, background .2s ease;
+    background: none; border: 0; padding: 6px 2px;
+    font-family: var(--font-h); font-size: 17px; font-weight:700; letter-spacing:.02em; color: var(--accent);
+    cursor:pointer; transition: opacity .2s ease;
   }
-  .lang-select:hover{ background: rgba(255,255,255,0.08); border-color: var(--accent); }
-  .lang-select svg{ width:12px; height:12px; color: var(--text-sec); flex-shrink:0; transition: transform .2s ease; }
+  .lang-select:hover{ opacity:.75; }
+  .lang-select svg{ display:none; }
   .lang-dropdown.open .lang-select svg{ transform: rotate(180deg); }
   .lang-menu{
     position:absolute; top: calc(100% + 8px); right:0; min-width:160px;
@@ -120,7 +117,15 @@
      barres en haut à droite sur téléphone. */
   .nav-login-mobile{ display:none; }
   @media (max-width: 760px){
-    .lang-select, .nav-login{ display:none; }
+    .nav-login{ display:none; }
+    .nav-right{ gap:14px; }
+    header.nav{ padding-left:16px !important; padding-right:16px !important; }
+    header.nav{ gap:12px; }
+    .nav-right{ gap:12px !important; }
+    .nav-login-mobile{ padding:8px 12px !important; font-size:12px !important; }
+    .brand{ gap:8px; } .brand-mark, .brand-mark svg{ width:30px; height:30px; }
+    .brand-name{ font-size:17px; }
+    .lang-select{ font-size:15px; padding:6px 0; }
     .burger{ display:none; }
     .nav-login-mobile{
       display:inline-flex; align-items:center; justify-content:center;
@@ -677,7 +682,7 @@
   <div class="nav-right">
     <div class="lang-dropdown">
       <button class="lang-select" type="button" id="langBtn">
-        <span class="lang-label">Français</span>
+        <span class="lang-label">FR</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
       </button>
       <div class="lang-menu">
@@ -1383,7 +1388,7 @@
     opt.addEventListener('click', ()=>{
       langDropdown.querySelectorAll('.lang-option').forEach(o=> o.classList.remove('active'));
       opt.classList.add('active');
-      langLabel.textContent = LANG_NAMES[opt.dataset.lang] || opt.textContent.trim();
+      langLabel.textContent = opt.dataset.lang.toUpperCase();
       langDropdown.classList.remove('open');
       applyLang(opt.dataset.lang);
     });
@@ -1394,12 +1399,18 @@
   (function(){
     let saved = null;
     try{ saved = localStorage.getItem('tennismind_lang'); }catch(e){}
+    // Première visite : langue du téléphone / navigateur du visiteur.
+    if(!saved){
+      const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'fr'];
+      for(const l of prefs){ const c = String(l).slice(0,2).toLowerCase(); if(TR[c]){ saved = c; break; } }
+      if(!saved) saved = 'en';
+    }
     if(saved && TR[saved]){
       const opt = langDropdown.querySelector('.lang-option[data-lang="'+saved+'"]');
       if(opt){
         langDropdown.querySelectorAll('.lang-option').forEach(o=> o.classList.remove('active'));
         opt.classList.add('active');
-        langLabel.textContent = LANG_NAMES[saved] || opt.textContent.trim();
+        langLabel.textContent = saved.toUpperCase();
       }
       applyLang(saved);
     }
