@@ -2,5 +2,7 @@ User-agent: *
 Allow: /
 Disallow: /app
 Disallow: /api/
+Disallow: /createur
+Disallow: /c/
 
 Sitemap: https://www.app-tennismind.com/sitemap.xml

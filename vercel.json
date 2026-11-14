@@ -6,6 +6,22 @@
   ],
   "rewrites": [
     {
+      "source": "/qui-va-gagner-match-tennis",
+      "destination": "/qui-va-gagner-match-tennis.html"
+    },
+    {
+      "source": "/analyse-match-tennis",
+      "destination": "/analyse-match-tennis.html"
+    },
+    {
+      "source": "/probabilite-victoire-tennis",
+      "destination": "/probabilite-victoire-tennis.html"
+    },
+    {
+      "source": "/face-a-face-tennis",
+      "destination": "/face-a-face-tennis.html"
+    },
+    {
       "source": "/",
       "destination": "/landing.html"
     },

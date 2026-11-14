@@ -727,8 +727,15 @@ def render_tournoi(db: Session, slug: str) -> Optional[str]:
     return seo_render.tournoi_page(name, slug, up, dn, accuracy(db, slug), seo_extra.finals_section(pages))
 
 
+STATIC_GUIDES = ("qui-va-gagner-match-tennis", "analyse-match-tennis",
+                 "probabilite-victoire-tennis", "face-a-face-tennis")
+
+
 def render_sitemap(db: Session) -> str:
-    entries = [("/fr/pronostics", datetime.utcnow().date().isoformat(), "hourly"),
+    today = datetime.utcnow().date().isoformat()
+    # Accueil + pages guides statiques servies par Vercel (cf. vercel.json).
+    entries = [("/", today, "daily")] + [(f"/{s}", today, "weekly") for s in STATIC_GUIDES]
+    entries += [("/fr/pronostics", datetime.utcnow().date().isoformat(), "hourly"),
                ("/fr/bilan", datetime.utcnow().date().isoformat(), "daily")]
     seen = set()
     for slug, mod in (db.query(models.MatchPage.tournament_slug, models.MatchPage.modified_at)
