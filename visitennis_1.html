@@ -2772,6 +2772,10 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     <div class="auth-panel" id="authPanelRegister">
       <div class="auth-title" data-i18n="auth.register_title">Créer un compte</div>
       <div class="auth-sub" data-i18n="auth.register_sub">Rejoins TennisMind et commence à analyser tes premiers matchs.</div>
+      <div class="auth-field" style="margin-bottom:14px">
+        <label for="registerCreatorCode">Code créateur <span style="opacity:.6;font-weight:500">(facultatif)</span></label>
+        <input type="text" id="registerCreatorCode" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" placeholder="Ex : SYLVTENNIS" style="text-transform:uppercase">
+      </div>
       <div class="auth-google-btn" id="googleBtnRegister"></div>
       <div class="auth-divider" data-i18n="auth.or_divider">ou</div>
       <form class="auth-form" id="registerForm">
@@ -4527,7 +4531,23 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       }
     }catch(e){}
   })();
+  // Code créateur tapé à l'inscription (prioritaire sur le lien ?via=).
+  function getTypedCreatorCode(){
+    const el = document.getElementById('registerCreatorCode');
+    const v = el && el.value ? el.value.trim().toLowerCase() : '';
+    return /^[a-z0-9_-]{2,40}$/.test(v) ? v : null;
+  }
+  // Pré-remplit le champ si le visiteur est arrivé par un lien créateur.
+  document.addEventListener('DOMContentLoaded', ()=>{
+    try{
+      const el = document.getElementById('registerCreatorCode');
+      const v = JSON.parse(localStorage.getItem('tennismind_via') || 'null');
+      if(el && !el.value && v && v.code && Date.now() - v.ts < 30*24*3600*1000) el.value = v.code.toUpperCase();
+    }catch(e){}
+  });
   function getPendingViaCode(){
+    const typed = getTypedCreatorCode();
+    if(typed) return typed;
     try{
       const v = JSON.parse(localStorage.getItem('tennismind_via') || 'null');
       if(v && v.code && Date.now() - v.ts < 30*24*3600*1000) return v.code;

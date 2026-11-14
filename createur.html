@@ -48,7 +48,12 @@
   <div id="content" hidden>
     <div class="card">
       <div class="pill">Ton lien</div>
-      <div class="link" style="margin-top:12px"><code id="lnk"></code><button id="copy">Copier</button></div>
+      <div class="link" style="margin-top:12px"><code id="short"></code><button data-copy="short">Copier</button></div>
+      <p class="note">Lien court, facile à taper depuis un commentaire épinglé ou une story.</p>
+      <div class="link" style="margin-top:14px"><code id="lnk"></code><button data-copy="lnk">Copier</button></div>
+      <div class="pill" style="margin-top:22px">Ton code créateur</div>
+      <div class="link" style="margin-top:12px"><code id="code" style="font-family:Unbounded,sans-serif;font-weight:800;font-size:20px;color:var(--lime);letter-spacing:.04em"></code><button data-copy="code">Copier</button></div>
+      <p class="note">Pas de lien cliquable dans ta bio ? Dis simplement « inscris-toi avec le code <b id="code2"></b> » : la personne le tape dans le champ « Code créateur » à l'inscription, et elle t'est attribuée comme avec ton lien.</p>
     </div>
 
     <div class="card">
@@ -89,7 +94,10 @@
     sel.add(new Option(d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}), v));
   }
   sel.onchange = () => load(sel.value);
-  $('copy').onclick = () => { navigator.clipboard.writeText($('lnk').textContent); $('copy').textContent = 'Copié ✓'; setTimeout(()=>$('copy').textContent='Copier',1500); };
+  document.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = () => {
+    navigator.clipboard.writeText($(btn.dataset.copy).textContent);
+    btn.textContent = 'Copié ✓'; setTimeout(() => btn.textContent = 'Copier', 1500);
+  });
 
   async function load(month){
     if(!slug || !key){ $('hello').innerHTML = '<span class="err">Lien incomplet : utilise le lien d\'accès qu\'on t\'a envoyé.</span>'; return; }
@@ -99,6 +107,8 @@
       const d = await r.json();
       $('hello').textContent = 'Salut ' + d.name + ', voici tes résultats.';
       $('lnk').textContent = d.link;
+      $('short').textContent = 'app-tennismind.com/c/' + d.creator;
+      $('code').textContent = d.creator.toUpperCase(); $('code2').textContent = d.creator.toUpperCase();
       $('clicks').textContent = d.clicks_total; $('signups').textContent = d.signups; $('paying').textContent = d.paying_clients;
       $('total').textContent = eur(d.total_eur); $('payable').textContent = eur(d.payable_eur);
       $('waiting').textContent = eur(d.waiting_refund_period_eur); $('paid').textContent = eur(d.paid_eur);

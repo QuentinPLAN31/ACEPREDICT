@@ -1,7 +1,8 @@
 {
   "redirects": [
     { "source": "/tournois", "destination": "/fr/tournois", "permanent": true },
-    { "source": "/joueurs", "destination": "/fr/joueurs", "permanent": true }
+    { "source": "/joueurs", "destination": "/fr/joueurs", "permanent": true },
+    { "source": "/c/:slug", "destination": "/?via=:slug", "permanent": false }
   ],
   "rewrites": [
     {
