@@ -216,7 +216,8 @@ def scores_card(d,state,fav,p1,p2):
         if state=='after' and d['winner']==fav:
             if norm(games)==norm(d['score']):cls=' hit';tag='<em>Score exact trouvé</em>'
             elif sets==act:cls=' near';tag='<em>Bon score en sets</em>'
-        out+=f'<div class="sct{cls}"><div class="sl"><span class="sn">Scénario {i} · {fav} {sets}</span><b class="sg">{games}</b>{tag}</div><div class="sp">{prob}</div></div>'
+        lab = 'Favori' if locked else fav
+        out+=f'<div class="sct{cls}"><div class="sl"><span class="sn">Scénario {i} · {lab} {sets}</span><b class="sg">{games}</b>{tag}</div><div class="sp">{prob}</div></div>'
     if locked:
         return out+'</div></div><div class="lk-over" style="align-items:center"><div class="lk-pan"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><b>Score le plus probable réservé aux inscrits</b><span>Crée ton compte gratuit pour voir le score le plus probable et sa probabilité.</span><a class="btn" href="'+APP+'">Voir le score gratuitement</a></div></div></section>'
     return out+'</div></section>'
@@ -248,8 +249,12 @@ def render(d,state):
     surf={'hard':'Dur','clay':'Terre battue','grass':'Gazon'}[d['surface']];sc=f"var(--{d['surface']})"
     ds=d['date_court'].replace(' 2026','')
     title=(f"{p1} – {p2} : {d['score']}, pronostic {'juste' if d['winner']==fav else 'raté'} | TennisMind" if state=='after' else f"Pronostic {p1} – {p2} ({ds}) : {fr(pf)} % | TennisMind")
-    desc=f"Pronostic {p1} – {p2} au {d['tournoi']} : {fav} favori à {fr(pf)} %. Probabilités, forme, face-à-face et analyse statistique."
     retro=bool(d.get('retro'))
+    # Avant le match : on ne dit jamais QUI est favori (seulement le %), pour
+    # que le visiteur lance l'analyse sur l'app. Révélé après le match.
+    hide = state!='after' and not retro
+    desc=(f"Pronostic {p1} – {p2} au {d['tournoi']} : l'un des deux est donné gagnant à {fr(pf)} %. Lequel ? Probabilités, forme, face-à-face et analyse statistique."
+          if hide else f"Pronostic {p1} – {p2} au {d['tournoi']} : {fav} favori à {fr(pf)} %. Probabilités, forme, face-à-face et analyse statistique.")
     art_attr='' if retro else ' itemscope itemtype="https://schema.org/SportsEvent"'
     if retro:
         title=f"{p1} – {p2} : {d['score']}, {d['round'].lower()} {d['tournoi']} {d['year']} | TennisMind"
@@ -283,7 +288,13 @@ def render(d,state):
 <h1>{'Analyse' if retro else 'Pronostic'} {p1} – {p2} : {d['tournoi']}{(' '+str(d['year'])) if retro else ''}, {d['round']}</h1>
 <div class="chips">{('<span class="chip">Édition '+str(d['year'])+'</span>') if retro else ('<span class="chip"><time datetime="'+d['iso']+'">'+d['date_long']+' · '+d['heure']+'</time></span>')}<span class="chip">{d['tour_lbl']}</span><span class="chip surf" style="--surf:{sc}">{surf}</span><span class="chip">{d['ville']}</span></div>
 <section class="card"><h2>Probabilité de victoire {p1} – {p2}</h2>
-<div class="vs"><div class="pl {'fav' if fav==p1 else ''}"><img class="ph" src="{d['img1']}" alt="{p1}" width="112" height="140" loading="eager" referrerpolicy="no-referrer"><b>{p1}</b><small>{d['rank1']}</small><div class="pct">{fr(d['pct1'])} %</div></div><div class="mid">VS</div>
+"""
+    if hide:
+        h+=f"""<div class="vs"><div class="pl"><img class="ph" src="{d['img1']}" alt="{p1}" width="112" height="140" loading="eager" referrerpolicy="no-referrer"><b>{p1}</b><small>{d['rank1']}</small></div><div class="mid">VS</div>
+<div class="pl"><img class="ph" src="{d['img2']}" alt="{p2}" width="112" height="140" loading="eager" referrerpolicy="no-referrer"><b>{p2}</b><small>{d['rank2']}</small></div></div>
+<div class="hidefav" style="text-align:center;margin:18px 0 6px"><div class="pct" style="font-size:clamp(40px,10vw,64px)">{fr(pf)} %</div><p style="margin:6px 0 14px;color:#dfe7df">de chances de gagner pour l'un des deux. Lequel ?</p><a class="btn" href="{APP}">Voir le favori gratuitement</a></div>"""
+    else:
+        h+=f"""<div class="vs"><div class="pl {'fav' if fav==p1 else ''}"><img class="ph" src="{d['img1']}" alt="{p1}" width="112" height="140" loading="eager" referrerpolicy="no-referrer"><b>{p1}</b><small>{d['rank1']}</small><div class="pct">{fr(d['pct1'])} %</div></div><div class="mid">VS</div>
 <div class="pl {'fav' if fav==p2 else ''}"><img class="ph" src="{d['img2']}" alt="{p2}" width="112" height="140" loading="eager" referrerpolicy="no-referrer"><b>{p2}</b><small>{d['rank2']}</small><div class="pct">{fr(d['pct2'])} %</div></div></div>
 <div class="bar"><i style="width:{d['pct1']}%"></i></div><div class="legend"><span>{p1}</span><span>{p2}</span></div>"""
     if state=='after':
@@ -292,9 +303,15 @@ def render(d,state):
     else:
         h+=f"""<div class="res"><div class="pend">Match prévu le {d['date_long']} à {d['heure']}.</div></div>"""
     h+="</section>"+scores_card(d,state,fav,p1,p2)+CTA_HTML
+    paras=''.join(f'<p>{x}</p>' for x in d['analyse'])
+    if hide:
+        ANALYSIS=(f'<section class="card analysis lockcard"><div class="lk-body paywalled" style="min-height:0"><h2>Analyse du match {p1} – {p2}</h2>{paras}</div>'
+                  f'<div class="lk-over" style="align-items:center"><div class="lk-pan"><b>Analyse réservée aux inscrits</b><span>Le favori, les arguments clés et le scénario du match.</span><a class="btn" href="{APP}">Voir l\'analyse gratuitement</a></div></div></section>')
+    else:
+        ANALYSIS=f'<section class="card analysis"><h2>Analyse du match {p1} – {p2}</h2>{paras}</section>' 
     h+=f"""<section class="card"><h2>Chiffres clés : {p1} contre {p2}</h2>{stats_table(d,p1,p2,surf)}</section>
 {weather_section(d)}
-<section class="card analysis"><h2>Analyse du match {p1} – {p2}</h2>{''.join(f'<p>{x}</p>' for x in d['analyse'])}</section>
+{ANALYSIS}
 <section class="card lockcard"><div class="lk-body paywalled" aria-hidden="true"><h2>Analyse détaillée {p1} – {p2}</h2>
 <div class="proj"><div><b>{tz[0]}</b><small>Jeux gagnés attendus</small></div><div><b>{tz[1]}</b><small>Tie-break probable</small></div><div><b>{tz[2]}</b><small>Aces attendus</small></div></div>
 <div class="fac"><div class="fh">Facteurs clés du match</div><div class="fr"><span>Service</span><i style="width:82%"></i></div><div class="fr"><span>Retour</span><i style="width:64%"></i></div><div class="fr"><span>Forme récente</span><i style="width:71%"></i></div></div>

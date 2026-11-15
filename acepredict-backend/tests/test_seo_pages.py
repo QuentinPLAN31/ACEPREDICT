@@ -253,3 +253,23 @@ def test_stats_json_and_bilan_week(seeded):
     assert r.status_code == 200 and set(r.json()) == {"global", "week"}
     assert "s-maxage" in r.headers["cache-control"]
     assert client.get("/seo/fr/bilan").status_code == 200
+
+
+
+def test_favori_cache_avant_le_match():
+    """Avant le match, la page publique ne dit jamais QUI est favori : seulement le %."""
+    from app.services import seo_render
+    d = dict(img1="", img2="", p1="Sinnerx", p2="Alcarazx", pct1=72.4, pct2=27.6, rank1="", rank2="", tournoi="T",
+             round="Finale", tour_lbl="ATP", surface="hard", ville="X", date_court="1 janv. 2026",
+             date_long="jeudi 1 janvier 2026", heure="10:00", iso="2026-01-01T10:00:00+01:00", slug="a-b",
+             publie="1 janvier 2026", publie_iso="2026-01-01T00:00:00Z", modif_iso="2026-01-01T00:00:00Z", st={},
+             analyse=["Sinnerx aborde cette finale en favori."], related=[], best_of=3,
+             scores=[("2-0", "6-4 6-3", "30 %")], wx=None, traits={}, tournoi_slug="t", winner="Sinnerx",
+             score="6-4 6-3", actual={"sets": "30 %"})
+    before = seo_render.render(d, "before")
+    assert "72,4 %" in before and "Lequel ?" in before
+    assert "Sinnerx favori" not in before and "27,6 %" not in before
+    assert "Scénario 1 · Favori 2-0" in before
+    assert 'class="card analysis lockcard"' in before
+    after = seo_render.render(d, "after")
+    assert "Sinnerx favori" in after and "27,6 %" in after
