@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     # Auth
     jwt_secret: str = "dev-secret-change-me"
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 10080  # 7 jours
     refresh_token_expire_days: int = 30
 
     # "Se connecter / S'inscrire avec Google" (cf. routers/auth.py /auth/google).

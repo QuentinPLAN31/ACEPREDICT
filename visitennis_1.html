@@ -3190,6 +3190,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.missing_reset_token': 'Lien de réinitialisation manquant ou invalide. Redemande un nouveau lien.',
       'auth.invalid_reset_link': 'Lien invalide ou expiré.',
       'auth.reset_success': 'Mot de passe mis à jour ! Tu peux te connecter.',
+      'auth.session_expired': 'Ta session a expiré, reconnecte-toi.',
       'auth.logged_out': 'Déconnecté.',
 
       'unlock.badge': '📈 Basé sur les vrais niveaux ATP/WTA',
@@ -3699,6 +3700,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.missing_reset_token': 'Enlace de restablecimiento ausente o no válido. Solicita un nuevo enlace.',
       'auth.invalid_reset_link': 'Enlace no válido o caducado.',
       'auth.reset_success': '¡Contraseña actualizada! Ya puedes iniciar sesión.',
+      'auth.session_expired': 'Tu sesión ha caducado, vuelve a iniciar sesión.',
       'auth.logged_out': 'Sesión cerrada.',
 
       'unlock.badge': '📈 Basado en los niveles reales ATP/WTA',
@@ -4208,6 +4210,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
       'auth.missing_reset_token': 'Reset link missing or invalid. Request a new link.',
       'auth.invalid_reset_link': 'Invalid or expired link.',
       'auth.reset_success': 'Password updated! You can now log in.',
+      'auth.session_expired': 'Your session expired, please log in again.',
       'auth.logged_out': 'Logged out.',
 
       'unlock.badge': '📈 Based on real ATP/WTA levels',
@@ -4658,6 +4661,8 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     localStorage.setItem('tennismind_token', token);
     setAuthMsg(msgEl, 'success', successText);
     updateAuthUI();
+    sessionExpiredShown = false;
+    refreshCurrentPage();
     const after = pendingAction;
     pendingAction = null;
     setTimeout(()=>{
@@ -4834,6 +4839,30 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     go('matchs');
     showToast(t('auth.logged_out'));
   }
+  // Recharge le contenu de la page affichée (après connexion / expiration de
+  // session) : sinon il fallait changer de rubrique puis revenir pour voir
+  // l'historique, les gains, etc.
+  function refreshCurrentPage(){
+    const cur = document.querySelector('.page.active');
+    const name = cur ? cur.id.replace('page-','') : '';
+    if(name === 'historique') refreshHistorique();
+    if(name === 'compte' && isLoggedIn()) loadAccount();
+    if(name === 'remuneration' && isLoggedIn()){ creatorReferralLink = null; loadReferrals(); loadCreatorLink(); }
+  }
+  // Session expirée (401 sur un appel API) : on ne change pas de page, on
+  // propose de se reconnecter et on recharge la page en cours une fois connecté.
+  let sessionExpiredShown = false;
+  function sessionExpired(){
+    if(sessionExpiredShown) return;
+    sessionExpiredShown = true;
+    localStorage.removeItem('tennismind_token');
+    authToken = null;
+    currentUser = null;
+    updateAuthUI();
+    refreshCurrentPage();
+    showToast(t('auth.session_expired'));
+    openAuth('login', ()=>{ sessionExpiredShown = false; refreshCurrentPage(); });
+  }
   document.querySelectorAll('.foot-link.logout, .btn-danger').forEach(btn=>{
     btn.addEventListener('click', logout);
   });
@@ -4935,7 +4964,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   async function loadAccount(){
     try {
       const meRes = await fetch(API_BASE + '/auth/me', { headers: { 'Authorization': 'Bearer ' + authToken } });
-      if(meRes.status === 401){ logout(); return; }
+      if(meRes.status === 401){ sessionExpired(); return; }
       if(!meRes.ok) return;
       const me = await meRes.json();
       currentUser = me;
@@ -5020,7 +5049,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
   async function loadReferrals(){
     try {
       const res = await fetch(API_BASE + '/referrals/me', { headers: { 'Authorization': 'Bearer ' + authToken } });
-      if(res.status === 401){ logout(); return; }
+      if(res.status === 401){ sessionExpired(); return; }
       if(!res.ok) return;
       const data = await res.json();
 
@@ -5108,7 +5137,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     if(creatorReferralLink) return;
     try {
       const res = await fetch(API_BASE + '/referrals/me', { headers: { 'Authorization': 'Bearer ' + authToken } });
-      if(res.status === 401){ logout(); return; }
+      if(res.status === 401){ sessionExpired(); return; }
       if(!res.ok) return;
       const data = await res.json();
       creatorReferralLink = data.referral_link;
@@ -6365,7 +6394,7 @@ ennis-loader .tb-ball::before, .tennis-loader .tb-ball::after{
     const list = document.getElementById('historiqueList');
     try {
       const res = await fetch(API_BASE + '/analyses/history', { headers: { 'Authorization': 'Bearer ' + authToken } });
-      if(res.status === 401){ logout(); return; }
+      if(res.status === 401){ sessionExpired(); return; }
       if(!res.ok) return;
       const items = await res.json();
       if(items.length === 0){

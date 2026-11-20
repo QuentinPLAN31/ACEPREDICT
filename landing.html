@@ -678,15 +678,17 @@
   .auth-divider::before, .auth-divider::after{ content:''; flex:1; height:1px; background: var(--line); }
 /* Maquettes de téléphone de part et d'autre du titre */
 .hero-phones{position:absolute;inset:0;pointer-events:none;z-index:0 !important;overflow:hidden;overflow-x:clip;overflow-y:visible}
-.hp{position:absolute;top:170px;height:480px;width:auto;filter:drop-shadow(0 40px 60px rgba(0,0,0,.55));animation:hpfloat 7s ease-in-out infinite}
-.hp-l{right:calc(50% + 430px);rotate:-9deg}
-.hp-r{left:calc(50% + 430px);rotate:9deg;animation-delay:-3.5s}
+.hp{position:absolute;top:170px;height:410px;width:auto;filter:drop-shadow(0 40px 60px rgba(0,0,0,.55));animation:hpfloat 7s ease-in-out infinite}
+.hp-l{right:calc(50% + 430px);rotate:-9deg;top:150px}
+.hp-r{left:calc(50% + 430px);rotate:9deg;animation-delay:-3.5s;top:300px}
 @keyframes hpfloat{0%,100%{translate:0 0}50%{translate:0 -12px}}
-@media (max-width:1300px){ .hp{height:380px;top:205px} .hp-l{right:calc(50% + 365px)} .hp-r{left:calc(50% + 365px)} }
-@media (max-width:1100px){ .hp{height:300px;top:250px} .hp-l{right:calc(50% + 320px)} .hp-r{left:calc(50% + 320px)} }
+@media (max-width:1300px){ .hp{height:330px} .hp-l{right:calc(50% + 365px);top:140px} .hp-r{left:calc(50% + 365px);top:300px} }
+@media (max-width:1100px){ .hp{height:260px} .hp-l{right:calc(50% + 320px);top:170px} .hp-r{left:calc(50% + 355px);top:330px} }
 @media (max-width:900px){
-  .hero{--ph:clamp(205px,38vw,300px); padding-bottom:calc(var(--ph) + 40px)}
-  .hp{top:auto;bottom:10px;height:var(--ph)}
+  .hero{--ph:clamp(180px,33vw,260px); padding-bottom:calc(var(--ph) + 110px)}
+  .hp{height:var(--ph)}
+  .hp-l{top:auto !important;bottom:80px}
+  .hp-r{top:auto !important;bottom:0}
   .hp-l{right:auto;left:max(-38px, calc(50% - 300px));rotate:-12deg}
   .hp-r{left:auto;right:max(-38px, calc(50% - 300px));rotate:12deg}
 }

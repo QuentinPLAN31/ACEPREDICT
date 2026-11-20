@@ -42,6 +42,18 @@ def stats(db: Session = Depends(get_db)):
                         headers={"Cache-Control": "public, s-maxage=21600, stale-while-revalidate=86400"})
 
 
+@router.get("/activity.json")
+def activity(db: Session = Depends(get_db)):
+    """Nombre reel d'analyses lancees depuis minuit (heure de Paris), pour le badge de la landing."""
+    from datetime import datetime, timezone
+    from zoneinfo import ZoneInfo
+    paris = ZoneInfo("Europe/Paris")
+    start = datetime.now(paris).replace(hour=0, minute=0, second=0, microsecond=0)
+    start_utc = start.astimezone(timezone.utc).replace(tzinfo=None)
+    n = db.query(models.Analysis).filter(models.Analysis.created_at >= start_utc).count()
+    return JSONResponse({"today": n}, headers={"Cache-Control": "public, s-maxage=300, stale-while-revalidate=600"})
+
+
 @router.get("/fr/bilan")
 def bilan(db: Session = Depends(get_db)):
     return HTMLResponse(seo_pages.render_bilan(db), headers=CACHE)
