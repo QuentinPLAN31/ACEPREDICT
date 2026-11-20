@@ -3,8 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AcePredict</title>
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<title>TennisMind : prédis le gagnant de n'importe quel match</title>
+<meta name="description" content="Connais le gagnant du match avant qu'il ne commence. Des millions de données tennis analysées pour prédire chaque match ATP et WTA.">
+<link rel="canonical" href="https://www.app-tennismind.com/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="TennisMind"><meta property="og:url" content="https://www.app-tennismind.com/">
+<meta property="og:title" content="TennisMind : prédis le gagnant de n'importe quel match"><meta property="og:description" content="Connais le gagnant du match avant qu'il ne commence. Des millions de données tennis analysées pour prédire chaque match.">
+<meta property="og:image" content="https://www.app-tennismind.com/assets/thumb-home.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="1200"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://www.app-tennismind.com/assets/thumb-home.png"><link rel="image_src" href="https://www.app-tennismind.com/assets/thumb-home.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"https://www.app-tennismind.com/#site","url":"https://www.app-tennismind.com/","name":"TennisMind","alternateName":["Tennis Minde","Tenis-Mind","Tennismin","Tennis Mnd","Tennis Mid","TennisMind.com","tennismind app","TennisMind application","Tennis Mind application","Tennis Mind prédictions","TennisMind prédictions","TennisMind avis","Tennis Mind avis","app tennismind","www.app-tennismind.com","Tennis Mind","Tennismind","Tennis-Mind","Tennis Mind app","TennisMind app","App TennisMind","App Tennis Mind","Tennis Mind pronostics","TennisMind pronostics","TennisMind.com","app-tennismind","Tenis Mind","Tenismind","TennisMind IA","Tennis Mind IA"],"inLanguage":"fr"},{"@type":"WebPage","@id":"https://www.app-tennismind.com/#webpage","url":"https://www.app-tennismind.com/","isPartOf":{"@id":"https://www.app-tennismind.com/#site"},"primaryImageOfPage":{"@type":"ImageObject","url":"https://www.app-tennismind.com/assets/thumb-home.png","width":1200,"height":1200},"thumbnailUrl":"https://www.app-tennismind.com/assets/thumb-home.png"},{"@type":"Organization","@id":"https://www.app-tennismind.com/#org","name":"TennisMind","url":"https://www.app-tennismind.com/","logo":"https://www.app-tennismind.com/assets/favicon-512.png","description":"TennisMind est une application française d'analyse de matchs de tennis ATP et WTA : probabilité de victoire, score le plus probable, scénarios du match et fiches joueurs.","areaServed":"FR","sameAs":["https://www.tiktok.com/@tennis_mind"]},{"@type":"WebApplication","@id":"https://www.app-tennismind.com/#app","name":"TennisMind","url":"https://www.app-tennismind.com/app","applicationCategory":"SportsApplication","operatingSystem":"Web","inLanguage":"fr","publisher":{"@id":"https://www.app-tennismind.com/#org"},"description":"Analyse n'importe quel match de tennis ATP ou WTA : probabilité de victoire, score le plus probable, scénarios du match et fiches joueurs.","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}]}</script>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg"><link rel="icon" type="image/png" sizes="256x256" href="/assets/favicon.png"><link rel="shortcut icon" href="/assets/favicon.ico"><link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -25,13 +31,15 @@
     --font-b: 'Inter', -apple-system, sans-serif;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
-  html{ scroll-behavior:smooth; }
+  html{ scroll-behavior:smooth; overflow-x:hidden; overscroll-behavior-x:none; max-width:100%; }
   body{
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-b);
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
+    overflow-x: clip;
+    max-width:100vw; position:relative;
   }
   img{ max-width:100%; }
   a{ color:inherit; text-decoration:none; }
@@ -53,10 +61,13 @@
     display:flex; align-items:center; justify-content:space-between;
     padding: 22px 32px;
     transition: background .3s ease, border-color .3s ease, backdrop-filter .3s ease;
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid var(--line);
+    background: rgba(19,26,22,0.70);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
   header.nav.scrolled{
-    background: rgba(19,26,22,0.82);
+    background: rgba(19,26,22,0.70);
     backdrop-filter: blur(10px);
     border-color: var(--line);
   }
@@ -71,15 +82,12 @@
   .lang-dropdown{ position:relative; }
   .lang-select{
     display:flex; align-items:center; gap:9px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--line-strong);
-    border-radius: 999px;
-    padding: 9px 16px 9px 18px;
-    font-family: var(--font-b); font-size: 13.5px; font-weight:600; color: var(--text);
-    cursor:pointer; transition: border-color .2s ease, background .2s ease;
+    background: none; border: 0; padding: 6px 2px;
+    font-family: var(--font-h); font-size: 17px; font-weight:700; letter-spacing:.02em; color: var(--accent);
+    cursor:pointer; transition: opacity .2s ease;
   }
-  .lang-select:hover{ background: rgba(255,255,255,0.08); border-color: var(--accent); }
-  .lang-select svg{ width:12px; height:12px; color: var(--text-sec); flex-shrink:0; transition: transform .2s ease; }
+  .lang-select:hover{ opacity:.75; }
+  .lang-select svg{ display:none; }
   .lang-dropdown.open .lang-select svg{ transform: rotate(180deg); }
   .lang-menu{
     position:absolute; top: calc(100% + 8px); right:0; min-width:160px;
@@ -108,22 +116,39 @@
   .nav-login .chev svg{ width:15px; height:15px; }
   .burger{ display:flex; flex-direction:column; gap:5px; cursor:pointer; padding:6px; }
   .burger span{ width:26px; height:2px; background: var(--text); display:block; border-radius:2px; }
+  /* Bouton "Se connecter" (mobile uniquement) : remplace le bouton à deux
+     barres en haut à droite sur téléphone. */
+  .nav-login-mobile{ display:none; }
   @media (max-width: 760px){
-    .lang-select, .nav-login{ display:none; }
+    .nav-login{ display:none; }
+    .nav-right{ gap:14px; }
+    header.nav{ padding-left:16px !important; padding-right:16px !important; }
+    header.nav{ gap:12px; }
+    .nav-right{ gap:12px !important; }
+    .nav-login-mobile{ padding:8px 12px !important; font-size:12px !important; }
+    .brand{ gap:8px; } .brand-mark, .brand-mark svg{ width:30px; height:30px; }
+    .brand-name{ font-size:17px; }
+    .lang-select{ font-size:15px; padding:6px 0; }
+    .burger{ display:none; }
+    .nav-login-mobile{
+      display:inline-flex; align-items:center; justify-content:center;
+      background: var(--accent); color: var(--bg); border-radius:999px;
+      padding:9px 16px; font-family: var(--font-h); font-weight:800; font-size:13px;
+      letter-spacing:.02em; white-space:nowrap; cursor:pointer;
+    }
   }
 
   /* ---------- HERO ---------- */
   .hero{
     position:relative;
-    padding: 84px 32px 0;
+    margin-top:-79px; /* le fond du hero passe sous la barre du haut (barre transparente en haut de page) */
+    padding: 163px 32px 0;
     text-align:center;
-    overflow:hidden;
-    background:
-      radial-gradient(ellipse 900px 480px at 50% 210px, rgba(215,242,44,0.10), transparent 70%),
-      linear-gradient(180deg, var(--bg) 0%, var(--bg) 60%, var(--bg-2) 100%);
+    overflow:visible;
+    background: radial-gradient(ellipse 900px 480px at 50% 289px, rgba(215,242,44,0.10), transparent 70%);
   }
   .court-bg{
-    position:absolute; inset:0; z-index:0; opacity:.5;
+    position:absolute; inset:0 0 -420px 0; z-index:0; opacity:.5; pointer-events:none;
     background:
       radial-gradient(ellipse 1200px 620px at 50% 780px, rgba(215,242,44,0.05), transparent 65%);
   }
@@ -147,6 +172,12 @@
   }
   @keyframes glow{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
   .badge .star{ color:#FFD34D; font-size:14px; letter-spacing:2px; }
+  .badge b{ font-family: var(--font-h); font-weight:800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .live-dot{ width:8px; height:8px; border-radius:50%; background:#3BE37A; box-shadow:0 0 0 0 rgba(59,227,122,.6); animation: livepulse 1.8s ease-out infinite; }
+  @keyframes livepulse{ 0%{ box-shadow:0 0 0 0 rgba(59,227,122,.55);} 100%{ box-shadow:0 0 0 10px rgba(59,227,122,0);} }
+
+  /* Habillage du hero : court en fond (lignes lumineuses + balle) */
+  .hero-deco{ position:absolute; inset:0; pointer-events:none; z-index:0 !important; overflow:hidden; }
 
   .hero h1{
     font-size: clamp(30px, 4.6vw, 54px);
@@ -180,19 +211,46 @@
     cursor:pointer; font-family:inherit; white-space:nowrap;
   }
 
-  .stat-line{ margin: 30px auto 0; color: var(--text-sec); font-size: 14.5px; }
-  .stat-line b{ color: var(--accent); font-variant-numeric: tabular-nums; }
-  .stat-line b.n2{ color: var(--text); }
+  .stat-line{
+    margin: 26px auto 0; max-width: 720px; padding: 0 20px; text-align:center;
+    color: var(--text-sec); font-size: 16px; line-height:1.5;
+  }
+  .stat-top{ display:flex; justify-content:center; align-items:baseline; gap:6px 12px; flex-wrap:wrap; }
+  .stat-pct, .stat-lbl{
+    font-family: 'Unbounded', Inter, sans-serif; font-weight: 800; font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, #2FEAF0 0%, #6FA3FF 50%, #B07CFF 100%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent;
+    filter: drop-shadow(0 0 14px rgba(111,163,255,.35));
+  }
+  .stat-pct{ font-size: clamp(48px, 8.4vw, 73px); line-height:1.1; letter-spacing:-1px; }
+  .stat-lbl{ font-size: clamp(17px, 3vw, 26px); line-height:1.1; }
+  .stat-sub{ margin-top:6px; }
+  .stat-sub b{ font-variant-numeric: tabular-nums; }
+  .stat-sub b.n2{ color:#fff; font-size:1.15em; font-weight:800; }
+  @media(max-width:520px){ .stat-line{ margin: 20px 16px 0; font-size: 14px; } }
 
   /* ---------- PHONE MOCK ---------- */
   .phone-stage{
     position:relative;
-    max-width: 420px; margin: 56px auto 0;
+    max-width: 322px; margin: 56px auto 0;
     padding-bottom: 40px;
   }
+  /* Mockup iPhone genere (shots.so) : remplace l'ancien faux telephone
+     HTML/CSS -- une seule image deja cadree, pas besoin de refaire le
+     bezel/notch en CSS. Agrandie par rapport a l'ancien .phone (420px ->
+     520px sur .phone-stage) pour rester lisible avec le rendu shots.so. */
+  .phone-mockup{
+    position:relative; z-index:2;
+    width:100%; display:block;
+    filter: drop-shadow(0 40px 70px rgba(0,0,0,0.6));
+  }
+  /* Eventail de 3 telephones (hero) : image plus large que haute,
+     contrairement au mockup phone unique -- stage dedie plus large. */
+  .phone-fan-stage{ max-width: 708px; }
+  .phone-fan{ filter: drop-shadow(0 50px 80px rgba(0,0,0,0.55)); }
   .float-badge{
     position:absolute; z-index:3;
-    width: 86px; height:86px; border-radius:999px;
+    width: 108px; height:108px; border-radius:999px;
     background: radial-gradient(circle at 35% 30%, #1c2b1e, #0c110e);
     border: 2px solid var(--line-strong);
     display:flex; align-items:center; justify-content:center;
@@ -203,7 +261,6 @@
   .float-badge img{ width:100%; height:100%; object-fit:cover; display:block; }
   .float-badge.b1{ top: 4%; left: -11%; animation-delay: 0s; }
   .float-badge.b2{ top: 0%; right: -13%; animation-delay: .6s; }
-  .float-badge.b3{ bottom: 28%; left: -15%; animation-delay: 1.2s; width:72px; height:72px; }
   .float-badge.b4{ bottom: 24%; right: -12%; animation-delay: 1.8s; }
   @keyframes bob{ 0%,100%{ transform: translateY(0px); } 50%{ transform: translateY(-14px); } }
 
@@ -253,7 +310,7 @@
   .p-comp-chev{ margin-left:auto; color: var(--text-dim); font-size:12px; }
 
   /* ---------- LOGOS STRIP ---------- */
-  .logos-section{ padding: 90px 32px; text-align:center; }
+  .logos-section{ padding: 50px 32px 90px; text-align:center; }
   .logos-section h2{ font-size: clamp(24px,3.4vw,38px); font-weight:800; text-transform:uppercase; margin-bottom:40px; }
   .logos-row{
     display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap: 52px;
@@ -263,29 +320,77 @@
   .wordmark{ transition: transform .35s cubic-bezier(.2,.8,.2,1), color .35s ease, opacity .35s ease; will-change: transform; display:inline-block; }
   .wordmark.col-active{ transform: translateY(-8px); color: #ff8fb0 !important; opacity:1 !important; }
 
+  /* ---------- FACTEURS PRIS EN COMPTE (section 220 sources) ---------- */
+  /* Grille sur 4 bandes (3 colonnes x 4 lignes pour 12 facteurs), pleine
+     largeur ; le texte peut etre tronque plutot que de retourner a la
+     ligne (chips a hauteur fixe). */
+  .factors-row{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px 12px;
+    width: 100%; margin: 46px auto 0;
+  }
+  .factor-chip{
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 9px 14px;
+    font-size: 13px; font-weight:600; color: var(--text-sec);
+    white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
+  }
+
+
+  /* Nuage d'icônes : sans cadre, couleurs variées, repoussées par la souris */
+  .factors-field{ display:flex; flex-wrap:wrap; justify-content:center; gap:26px 30px; position:relative; margin-top:46px; }
+  .factors-field .factor-chip{ flex-direction:column; background:none; border:0; border-radius:0; padding:0; width:120px; white-space:normal; overflow:visible; text-overflow:clip; text-align:center; font-size:12px; line-height:1.3; font-weight:600; color: color-mix(in srgb, var(--c) calc(var(--g,0)*55%), var(--text-sec)); user-select:none; will-change:transform; }
+  .factors-field .factor-chip svg{ width:34px; height:34px; margin:0 0 9px; flex:none; fill:none; stroke:var(--c); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transform:scale(calc(1 + var(--g,0)*.4)); filter:drop-shadow(0 0 calc(6px + var(--g,0)*10px) color-mix(in srgb, var(--c) 55%, transparent)); transition:filter .2s; }
+  .factors-field.cloud{ display:block; height:380px; margin-top:34px; }
+  .factors-field.cloud .factor-chip{ position:absolute; left:0; top:0; display:flex; align-items:center; }
+  @media (max-width:640px){ .factors-field.cloud{ height:560px; } .factors-field .factor-chip{ width:92px; font-size:10.5px; } .factors-field .factor-chip svg{ width:30px; height:30px; } }
+  @media (prefers-reduced-motion: reduce){ .factor-chip{ transform:none !important; } }
+
   /* ---------- SCORE / COURT SECTION ---------- */
   .court-section{
-    position:relative; padding: 70px 32px 90px; text-align:center; overflow:hidden;
+    position:relative; padding: 150px 32px 40px; text-align:center; overflow:visible;
   }
+  /* Les halos dépassent volontairement de leur section (inset négatif, sections en
+     overflow visible) pour que chaque tache se complète au lieu d'être coupée net. */
   .court-visual{
-    position:absolute; inset:0; z-index:0;
+    position:absolute; inset:-300px 0; z-index:0; pointer-events:none;
+    background: radial-gradient(ellipse 900px 500px at 50% 50%, rgba(96,180,90,0.16), transparent 70%);
+  }
+  .court-section > *:not(.court-visual){ position:relative; z-index:1; }
+  /* La section "sources" suivait la section "court" avec le même halo vert centré :
+     le motif se répétait deux fois d'affilée. Ici : halo orange discret, décalé à
+     droite, avec un léger filet en haut -- visuellement distinct du halo vert. */
+  .sources-section .court-visual{
     background:
-      linear-gradient(180deg, transparent 0%, rgba(19,26,22,0.2) 55%, var(--bg) 100%),
-      radial-gradient(ellipse 900px 500px at 50% 40%, rgba(96,180,90,0.16), transparent 70%);
+      radial-gradient(ellipse 620px 360px at 88% 38%, rgba(255,122,69,0.09), transparent 70%),
+      radial-gradient(ellipse 520px 300px at 8% 66%, rgba(215,242,44,0.05), transparent 70%);
+  }
+  .sources-section > *:not(.court-visual){ position:relative; z-index:1; }
+  .court-h2{ font-size: clamp(28px,4.2vw,46px); font-weight:800; text-transform:uppercase; }
+  .court-h2 .lime{ background: linear-gradient(90deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+  .court-p{ max-width:560px; margin: 20px auto 0; color: var(--text-sec); font-size:15px; line-height:1.6; }
+  /* Conteneur dedie au terrain : seul le SVG et les pourcentages vivent
+     ici, pour que rien d'autre ne chevauche les lignes du terrain. */
+  .court-visual-wrap{
+    position:relative; width:100%; max-width:640px; margin: 44px auto 0;
+    aspect-ratio: 640 / 380;
   }
   .court-lines{
-    position:absolute; left:50%; top: 30%; transform: translateX(-50%);
-    width: 640px; height: 380px; z-index:0; opacity:.55;
+    position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.55;
   }
-  .court-section > *:not(.court-visual):not(.court-lines){ position:relative; z-index:1; }
-  .court-h2{ font-size: clamp(28px,4.2vw,46px); font-weight:800; text-transform:uppercase; }
-  .court-p{ max-width:560px; margin: 20px auto 0; color: var(--text-sec); font-size:15px; line-height:1.6; }
-  .score-stats{ display:flex; justify-content:center; gap: 70px; margin-top: 50px; flex-wrap:wrap; }
+  .score-stats{
+    position:relative; z-index:1; height:100%;
+    display:grid; grid-template-columns: 1fr 1fr; align-items:center; justify-items:center;
+  }
   .score-stat{ min-width:140px; }
   .score-num{ font-family: var(--font-h); font-weight:800; font-size: clamp(40px,6vw,64px); font-variant-numeric: tabular-nums; }
   .score-cap{ color: var(--text-sec); font-size: 14px; margin-top:4px; }
   .ready-pill{
-    display:inline-flex; align-items:center; gap:12px; margin-top: 46px;
+    display:inline-flex; align-items:center; gap:12px; margin-top: 10px;
     background: rgba(255,255,255,0.03); border:1px solid var(--line-strong);
     border-radius: 999px; padding: 8px; padding-right:26px;
   }
@@ -295,34 +400,59 @@
   .ready-text{ font-family: var(--font-h); font-weight:700; font-size:14px; background: linear-gradient(90deg,#3a5c3d,var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .dl-line{ margin-top: 18px; color: var(--accent); opacity:.75; font-size:13.5px; line-height:1.6; }
 
+
+  /* ---------- SHOWCASE : terrain au premier plan, telephone en travers derriere ---------- */
+  .showcase{ position:relative; max-width: 980px; margin: 56px auto 0; padding: 60px 0 130px; }
+  .showcase .court-visual-wrap{ z-index:1; max-width: 900px; margin: 0 auto; }
+  .showcase .court-lines{ opacity:1; stroke: rgba(255,255,255,0.8); stroke-width: 4; }
+  .showcase .score-stats{ padding: 0 2%; }
+  .showcase .score-stat:first-child .score-num{ filter: drop-shadow(0 2px 10px rgba(10,15,11,0.9)); }
+  .showcase .score-stat:first-child .score-num .counter{ background: linear-gradient(135deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+  .showcase .score-stat:first-child{ justify-self:start; margin-left:0; }
+  .showcase .score-stat:last-child{ justify-self:end; margin-right:2%; }
+  .showcase .score-num{ font-size: clamp(34px,4.6vw,52px); }
+  .showcase-phone{
+    position:absolute; z-index:3; top:10px; left:calc(50% - 140px); width: 280px;
+  }
+  .phone-rot{ position:relative; transform: rotate(-9deg); filter: drop-shadow(0 30px 60px rgba(0,0,0,0.65)); }
+  /* fond plein derriere le mockup : l'image a des zones transparentes (ilot, coins) */
+  .phone-rot::before{ content:""; position:absolute; inset:1.2% 3%; border-radius:15%; background:#0c110d; z-index:0; }
+  .showcase-phone .phone-mockup{ cursor:pointer; filter:none; z-index:1; }
+  .showcase .float-badge{ width: 92px; height: 92px; z-index:4; }
+  .showcase .float-badge.b1{ top: 4%; left: 6%; right:auto; bottom:auto; }
+  .showcase .float-badge.b2{ top: 2%; right: 6%; left:auto; bottom:auto; }
+  .showcase .float-badge.b4{ bottom: 12%; right: 10%; left:auto; top:auto; }
+
   /* ---------- TESTIMONIALS ---------- */
-  .testi-section{ padding: 90px 32px; text-align:center; background: var(--bg-2); }
+  .testi-section{ padding: 90px 32px; text-align:center; background: linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 24%, var(--bg-2) 76%, var(--bg) 100%); }
   .avatar-row{ display:flex; justify-content:center; margin-bottom: 34px; }
   .avatar{
     width:46px; height:46px; border-radius:999px; border: 2px solid var(--bg-2);
     margin-left:-12px; display:flex; align-items:center; justify-content:center;
     font-family: var(--font-h); font-weight:700; font-size:14px; color:#14180a;
+    overflow:hidden;
   }
+  .avatar img, .testi-avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
   .avatar:first-child{ margin-left:0; }
   .testi-section h2{ font-size: clamp(24px,3.6vw,38px); font-weight:800; text-transform:uppercase; }
   .testi-section > .wrap > p{ max-width:520px; margin:16px auto 0; color: var(--text-sec); font-size:15px; }
 
   .video-strip{ display:flex; justify-content:center; gap:14px; margin: 46px auto 0; max-width: 620px; flex-wrap:wrap; }
   .video-card{
-    width: 160px; height: 220px; border-radius: 16px; overflow:hidden; position:relative;
+    width: 184px; height: 327px; border-radius: 16px; overflow:hidden; position:relative;
     background: linear-gradient(155deg, #1b2a1d, #0b100d);
-    border: 1px solid var(--line);
+    background-size: cover; background-position: center;
+    cursor: pointer;
   }
-  .video-card .vtag{
-    position:absolute; top:8px; left:8px; right:8px;
-    background:#fff; color:#0c110e; font-size:8.5px; font-weight:800;
-    padding:4px 6px; border-radius:5px; text-transform:uppercase; text-align:center;
+  .video-card::after{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%);
   }
   .video-card .vbars{ position:absolute; bottom:14px; left:10px; right:10px; display:flex; flex-direction:column; gap:6px; }
   .video-card .vbar{ height:5px; border-radius:3px; background: rgba(255,255,255,0.12); overflow:hidden; }
   .video-card .vbar span{ display:block; height:100%; background: var(--accent); }
   .video-card .vplay{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    position:absolute; inset:0; z-index:1; display:flex; align-items:center; justify-content:center;
     font-size: 30px; color: rgba(255,255,255,0.5);
   }
 
@@ -334,11 +464,24 @@
   .testi-card.hidden-extra{ display:none; }
   .testi-card p{ font-size: 15.5px; line-height:1.55; font-weight:600; margin-bottom:20px; }
   .testi-who{ display:flex; align-items:center; gap:12px; }
-  .testi-avatar{ width:42px; height:42px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-family:var(--font-h); font-weight:700; font-size:13px; color:#14180a; flex-shrink:0; }
+  .testi-avatar{ width:42px; height:42px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-family:var(--font-h); font-weight:700; font-size:13px; color:#14180a; flex-shrink:0; overflow:hidden; }
   .testi-name{ font-weight:700; font-size:13.5px; }
   .testi-role{ color: var(--accent); font-size:12.5px; opacity:.85; }
   .testi-x{ margin-left:auto; width:34px; height:34px; border-radius:999px; background:#fff; color:#0c110e; display:flex; align-items:center; justify-content:center; font-weight:700; cursor:pointer; flex-shrink:0; }
 
+  .seo-section{ padding: 70px 32px 40px; }
+  .seo-section::before{ display:none; }
+  .seo-k{ display:inline-block; font-size:12px; font-weight:800; letter-spacing:1.6px; text-transform:uppercase; color:var(--accent); margin-bottom:14px; }
+  .seo-links{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:18px; }
+  .seo-links a{ padding:8px 16px; border-radius:999px; border:1px solid rgba(255,176,32,.45); color:#ffcf6b; font-size:13.5px; font-weight:700; text-decoration:none; transition:background .15s,color .15s,transform .15s; }
+  .seo-links a:hover{ background:linear-gradient(135deg,#ff7a45,#ffb020,#ff5f6d); color:#0b110c; border-color:transparent; transform:translateY(-2px); }
+  .seo-note{ margin:14px 0 0 !important; font-size:12.5px !important; color:var(--text-sec); }
+  .lp-cta-wrap{ text-align:center; margin:34px 0 0; position:relative; z-index:2; }
+  .lp-cta{ display:inline-flex; align-items:center; gap:10px; padding:17px 34px; border-radius:999px; background:var(--accent); color:#0b110c; font-family:var(--font-h); font-weight:800; font-size:16px; text-decoration:none; box-shadow:0 0 34px rgba(215,242,44,.35); transition:transform .15s ease, box-shadow .15s ease; }
+  .lp-cta:hover{ transform:translateY(-2px); box-shadow:0 0 46px rgba(215,242,44,.5); }
+  .lp-cta::after{ content:'→'; font-family:var(--font-b); }
+  .seo-btn{ display:inline-block; margin-top:28px; padding:15px 26px; border-radius:12px; background:var(--accent); color:#0b110c; font-weight:800; font-size:15px; text-decoration:none; }
+  @media(max-width:760px){ .seo-section{ padding:50px 18px 24px; } }
   .voir-tous{
     display:inline-block; margin: 30px auto 0; background:#fff; color:#0c110e;
     border:none; border-radius:999px; padding: 14px 34px; font-weight:700; font-size:14px;
@@ -346,12 +489,26 @@
   }
 
   /* ---------- FEATURE + PHONE (compétitions) ---------- */
-  .feature-section{ padding: 100px 32px; text-align:center; }
+  .feature-section{ padding: 100px 32px 10px; text-align:center; }
+  /* Halos décoratifs supplémentaires, répartis à gauche / à droite (jamais au centre).
+     Ils débordent de leur section pour ne pas être coupés. */
+  .feature-section, .testi-section, .faq-section{ position:relative; overflow-x:clip; }
+  .hero, .court-section, .sources-section{ overflow-x:clip; }
+  body{ overscroll-behavior-x:none; touch-action:pan-y pinch-zoom; }
+  .feature-section::before, .testi-section::before, .faq-section::before{
+    content:''; position:absolute; z-index:0; pointer-events:none; width:820px; height:680px;
+  }
+  .feature-section > *, .testi-section > *, .faq-section > *{ position:relative; z-index:1; }
+  .feature-section::before{ left:-300px; top:0; height:560px; background: radial-gradient(ellipse 330px 280px at 50% 50%, rgba(255,122,69,0.10), transparent 70%); }
+  .testi-section::before{ right:-300px; top:12%; background: radial-gradient(ellipse 330px 280px at 50% 50%, rgba(240,225,50,0.085), transparent 70%); }
+  .faq-section::before{ left:-300px; top:6%; background: radial-gradient(ellipse 330px 280px at 50% 50%, rgba(255,150,60,0.095), transparent 70%); }
+
   .feature-section h2{ font-size: clamp(28px,4.4vw,48px); font-weight:800; text-transform:uppercase; max-width:720px; margin:0 auto; }
+  .feature-section h2 .lime{ background: linear-gradient(90deg, #ff7a45, #ffb020, #ff5f6d); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
   .feature-section > .wrap > p{ max-width:480px; margin: 20px auto 0; color: var(--text-sec); font-size:15px; line-height:1.6; }
 
   /* ---------- SOURCES SECTION ---------- */
-  .sources-section{ position:relative; padding: 90px 32px; text-align:center; overflow:hidden; }
+  .sources-section{ position:relative; padding: 90px 32px; text-align:center; overflow:visible; }
   .sources-pill{
     display:inline-flex; align-items:center; background: rgba(255,255,255,0.05);
     border:1px solid var(--line-strong); border-radius:999px; padding:8px 20px; font-size:13px; font-weight:600;
@@ -385,14 +542,69 @@
   .faq-a p{ padding: 16px 0 0 50px; color: var(--text-sec); font-size:14.5px; line-height:1.6; max-width:600px; }
 
   /* ---------- FOOTER ---------- */
-  footer{ border-top:1px solid var(--line); padding: 44px 32px; }
+  footer{ background: linear-gradient(180deg, transparent 0%, rgba(12,17,14,0.55) 100%); padding: 56px 32px 44px; }
   .foot-wrap{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
-  .foot-links{ display:flex; gap:26px; color: var(--text-sec); font-size:13.5px; }
+  .foot-links{ display:flex; flex-wrap:wrap; gap:12px 26px; color: var(--text-sec); font-size:13.5px; }
   .foot-copy{ color: var(--text-dim); font-size:12.5px; }
 
   @media (max-width: 640px){
-    .float-badge{ display:none; }
+    .float-badge{ width: 83px; height: 83px; }
     .score-stats{ gap: 40px; }
+
+    /* Mobile : reduit les marges laterales fixes (32px) pour que le
+       contenu utilise davantage la largeur de l'ecran, sans coller aux
+       bords non plus. */
+    .wrap{ padding: 0 18px; }
+    .hero{ margin-top:-76px; padding: 140px 18px 0; }
+    .logos-section{ padding: 36px 18px 64px; }
+    .court-section{ padding: 110px 18px 30px; }
+    .testi-section{ padding: 64px 18px; }
+    .feature-section{ padding: 70px 18px 36px; }
+    .sources-section{ padding: 64px 18px; }
+    .faq-section{ padding: 64px 18px 90px; }
+    footer{ padding: 34px 18px; }
+
+    .showcase{ padding: 16px 0 0; display:flex; flex-direction:column; }
+    .showcase .court-visual-wrap{ order:1; width:100%; }
+    .showcase-phone{ order:2; }
+    .showcase-phone{ position:relative; left:auto; top:auto; width: 230px; margin: -36px auto 0; }
+    .showcase .court-visual-wrap{ max-width: none; width:120%; margin-left:-10%; aspect-ratio: 640 / 380; }
+    .showcase .court-lines{ stroke-width: 5; opacity:.55; }
+    .showcase .court-lines *{ vector-effect: non-scaling-stroke; }
+    .showcase .court-lines{ stroke-width: 3; }
+    .showcase .score-stat:first-child{ margin-left:0; } .showcase .score-stat:last-child{ margin-right:0; }
+    .showcase .score-stat:last-child .score-num{ text-shadow: 0 0 6px #0c110d, 0 0 14px #0c110d, 0 2px 18px #0c110d; }
+    .showcase .score-cap{ color:#e6ece6; text-shadow: 0 0 5px #0c110d, 0 0 12px #0c110d; font-weight:600; }
+    .showcase .float-badge.b4{ bottom: 22%; }
+    .court-section .ready-pill{ margin-top: 36px; }
+    .court-h2{ margin-bottom: -6px; }
+    .court-p{ margin-top: 12px; }
+    .showcase{ margin-top: 6px; }
+    .showcase .court-visual-wrap{ margin-top: 0; }
+    .showcase .float-badge.b1{ top: 3%; } .showcase .float-badge.b2{ top: 1%; }
+    .showcase .float-badge{ width: 83px; height: 83px; }
+    /* Hero : le mockup de telephone est trop grand sur mobile, on le reduit. */
+    .hero .phone-stage{ max-width: 70%; }
+
+    /* Eventail (feature-section) : on l'agrandit au-dela de son conteneur
+       pour mieux voir les 3 telephones sur mobile. */
+    .feature-section .phone-fan-stage{
+      max-width: none;
+      width: 130%;
+      margin-left: -15%;
+      margin-right: -15%;
+    }
+
+    /* Facteurs pris en compte : sur mobile on utilise toute la largeur
+       dispo (pas seulement 75%) pour que les puces se repartissent sur
+       plusieurs colonnes au lieu de s'empiler une par ligne. */
+    .factors-row{ gap: 8px; }
+    .factor-chip{ font-size: 11px; padding: 7px 10px; }
+
+    /* Videos : on force les 3 cartes sur une seule ligne (au lieu de les
+       laisser passer a la ligne et s'empiler) en les retrecissant. */
+    .video-strip{ flex-wrap: nowrap; gap: 8px; }
+    .video-card{ width: auto; flex: 1 1 0; min-width: 0; height: 260px; }
   }
 
   /* ---------- Auth modal ---------- */
@@ -464,9 +676,25 @@
     font-size:12px; font-weight:600; color: var(--text-sec); text-transform:uppercase; letter-spacing:.05em;
   }
   .auth-divider::before, .auth-divider::after{ content:''; flex:1; height:1px; background: var(--line); }
+/* Maquettes de téléphone de part et d'autre du titre */
+.hero-phones{position:absolute;inset:0;pointer-events:none;z-index:0 !important;overflow:hidden;overflow-x:clip;overflow-y:visible}
+.hp{position:absolute;top:170px;height:480px;width:auto;filter:drop-shadow(0 40px 60px rgba(0,0,0,.55));animation:hpfloat 7s ease-in-out infinite}
+.hp-l{right:calc(50% + 430px);rotate:-9deg}
+.hp-r{left:calc(50% + 430px);rotate:9deg;animation-delay:-3.5s}
+@keyframes hpfloat{0%,100%{translate:0 0}50%{translate:0 -12px}}
+@media (max-width:1300px){ .hp{height:380px;top:205px} .hp-l{right:calc(50% + 365px)} .hp-r{left:calc(50% + 365px)} }
+@media (max-width:1100px){ .hp{height:300px;top:250px} .hp-l{right:calc(50% + 320px)} .hp-r{left:calc(50% + 320px)} }
+@media (max-width:900px){
+  .hero{--ph:clamp(205px,38vw,300px); padding-bottom:calc(var(--ph) + 40px)}
+  .hp{top:auto;bottom:10px;height:var(--ph)}
+  .hp-l{right:auto;left:max(-38px, calc(50% - 300px));rotate:-12deg}
+  .hp-r{left:auto;right:max(-38px, calc(50% - 300px));rotate:12deg}
+}
 </style>
 <!-- "Se connecter / S'inscrire avec Google" -- cf. JS plus bas -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 
@@ -477,12 +705,12 @@
     <span class="brand-mark">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M 11.07,1.11 L 11.14,1.32 L 11.25,1.54 L 11.50,1.75 L 11.78,1.97 L 12.04,2.19 L 12.29,2.40 L 12.47,2.62 L 12.65,2.83 L 12.83,3.05 L 12.97,3.26 L 13.11,3.48 L 13.22,3.70 L 13.29,3.91 L 13.37,4.13 L 13.44,4.34 L 13.47,4.56 L 13.51,4.77 L 13.55,4.99 L 13.55,5.21 L 13.55,5.42 L 13.55,5.64 L 13.51,5.85 L 13.47,6.07 L 13.44,6.28 L 13.40,6.50 L 13.37,6.72 L 13.29,6.93 L 13.22,7.15 L 13.15,7.36 L 13.08,7.58 L 13.01,7.79 L 12.93,8.01 L 12.83,8.23 L 12.75,8.44 L 12.65,8.66 L 12.54,8.87 L 12.43,9.09 L 12.32,9.30 L 12.22,9.52 L 12.11,9.74 L 12.00,9.95 L 11.89,10.17 L 11.78,10.38 L 11.68,10.60 L 11.53,10.81 L 11.42,11.03 L 11.32,11.25 L 11.17,11.46 L 11.07,11.68 L 10.96,11.89 L 10.85,12.11 L 10.71,12.32 L 10.60,12.54 L 10.49,12.75 L 10.38,12.97 L 10.24,13.19 L 10.13,13.40 L 10.02,13.62 L 9.92,13.83 L 9.81,14.05 L 9.74,14.26 L 9.63,14.48 L 9.52,14.70 L 9.41,14.91 L 9.34,15.13 L 9.23,15.34 L 9.16,15.56 L 9.09,15.77 L 9.02,15.99 L 8.94,16.21 L 8.87,16.42 L 8.80,16.64 L 8.76,16.85 L 8.69,17.07 L 8.66,17.28 L 8.62,17.50 L 8.58,17.72 L 8.55,17.93 L 8.55,18.15 L 8.51,18.36 L 8.51,18.58 L 8.51,18.79 L 8.51,19.01 L 8.55,19.23 L 8.55,19.44 L 8.58,19.66 L 8.62,19.87 L 8.69,20.09 L 8.73,20.30 L 8.80,20.52 L 8.87,20.74 L 8.98,20.95 L 9.09,21.17 L 9.20,21.38 L 9.30,21.60 L 9.45,21.81 L 9.59,22.03 L 9.77,22.25 L 9.95,22.46 L 10.13,22.68 L 10.31,22.86 L 12.90,22.86 L 12.86,22.68 L 12.72,22.46 L 12.50,22.25 L 12.22,22.03 L 11.96,21.81 L 11.71,21.60 L 11.53,21.38 L 11.32,21.17 L 11.17,20.95 L 10.99,20.74 L 10.89,20.52 L 10.78,20.30 L 10.67,20.09 L 10.60,19.87 L 10.53,19.66 L 10.49,19.44 L 10.45,19.23 L 10.42,19.01 L 10.42,18.79 L 10.42,18.58 L 10.42,18.36 L 10.45,18.15 L 10.45,17.93 L 10.53,17.72 L 10.56,17.50 L 10.60,17.28 L 10.67,17.07 L 10.71,16.85 L 10.78,16.64 L 10.85,16.42 L 10.96,16.21 L 11.03,15.99 L 11.10,15.77 L 11.21,15.56 L 11.32,15.34 L 11.39,15.13 L 11.50,14.91 L 11.60,14.70 L 11.71,14.48 L 11.82,14.26 L 11.93,14.05 L 12.04,13.83 L 12.18,13.62 L 12.29,13.40 L 12.40,13.19 L 12.50,12.97 L 12.65,12.75 L 12.75,12.54 L 12.86,12.32 L 13.01,12.11 L 13.11,11.89 L 13.22,11.68 L 13.33,11.46 L 13.47,11.25 L 13.58,11.03 L 13.69,10.81 L 13.80,10.60 L 13.91,10.38 L 14.01,10.17 L 14.12,9.95 L 14.23,9.74 L 14.34,9.52 L 14.44,9.30 L 14.52,9.09 L 14.62,8.87 L 14.70,8.66 L 14.80,8.44 L 14.88,8.23 L 14.95,8.01 L 15.02,7.79 L 15.09,7.58 L 15.16,7.36 L 15.20,7.15 L 15.27,6.93 L 15.31,6.72 L 15.34,6.50 L 15.38,6.28 L 15.42,6.07 L 15.42,5.85 L 15.45,5.64 L 15.45,5.42 L 15.45,5.21 L 15.45,4.99 L 15.45,4.77 L 15.42,4.56 L 15.38,4.34 L 15.34,4.13 L 15.31,3.91 L 15.24,3.70 L 15.16,3.48 L 15.09,3.26 L 15.02,3.05 L 14.91,2.83 L 14.80,2.62 L 14.66,2.40 L 14.55,2.19 L 14.41,1.97 L 14.23,1.75 L 14.05,1.54 L 13.87,1.32 L 13.65,1.11 Z" fill="var(--bg)"/></svg>
     </span>
-    <span class="brand-name">AcePredict</span>
+    <span class="brand-name">TennisMind</span>
   </div>
   <div class="nav-right">
     <div class="lang-dropdown">
       <button class="lang-select" type="button" id="langBtn">
-        <span class="lang-label">Français</span>
+        <span class="lang-label">FR</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
       </button>
       <div class="lang-menu">
@@ -497,130 +725,139 @@
       <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l6 8-6 8"/><path d="M13 4l6 8-6 8"/></svg></span>
       <span data-i18n="nav_login">Connexion</span>
     </a>
+    <a href="#" class="nav-login-mobile" id="navLoginMobileBtn" data-i18n="nav_login_cta">Se connecter</a>
     <div class="burger"><span></span><span></span></div>
   </div>
 </header>
 
 <section class="hero">
   <div class="court-bg"></div>
-  <div class="badge"><span class="star">★★★★★</span> +100K utilisateurs satisfaits</div>
+  <div class="hero-phones" aria-hidden="true">
+    <img class="hp hp-l" src="assets/mockups/phone-shelton.webp" alt="" loading="eager" decoding="async">
+    <img class="hp hp-r" src="assets/mockups/phone-zverev.webp" alt="" loading="eager" decoding="async">
+  </div>
+  <div class="badge" id="liveBadge"><span class="live-dot"></span><b id="todayCount">–</b> <span data-i18n="badge_today">analyses lancées aujourd'hui</span></div>
   <h1 class="reveal" data-i18n-html="hero_title">Prédit chaque match avant qu'il ne<br><span class="lime">commence.</span></h1>
   <p class="sub reveal" data-i18n="hero_sub">Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.</p>
 
   <div class="search-hero reveal">
     <input type="text" placeholder="Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)" data-i18n-placeholder="hero_search_ph">
-    <button data-i18n="btn_analyser">Analyser</button>
+    <button data-i18n="btn_analyser" onclick="window.location.href='/app?auth=register'">Analyser</button>
   </div>
 
-  <div class="stat-line reveal"><b class="counter" data-target="91.8" data-suffix="%">0%</b><span data-i18n="stat_mid1"> de précision sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs analysés la semaine dernière</span></div>
-
-  <div class="phone-stage reveal">
-    <div class="float-badge b1"><img src="assets/players/alcaraz.jpg" alt="Carlos Alcaraz" loading="lazy"></div>
-    <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
-    <div class="float-badge b3"><img src="assets/players/player-w.jpg" alt="Joueuse WTA" loading="lazy"></div>
-    <div class="float-badge b4"><img src="assets/players/djokovic.jpg" alt="Novak Djokovic" loading="lazy"></div>
-    <div class="phone">
-      <div class="phone-notch"></div>
-      <div class="phone-screen">
-        <div class="p-brand">
-          <span class="brand-name" style="font-size:14px;">AcePredict</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA69A" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-        </div>
-        <div class="p-h1" data-i18n="p_h1_analyse">Analyse de match</div>
-        <div class="p-sub" data-i18n="p_sub1">Entre les joueurs que tu veux analyser</div>
-        <div class="p-sub accent" data-i18n="p_sub_accent1">Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.</div>
-        <div class="p-card">
-          <div class="p-label" data-i18n="p_label_match">MATCH À ANALYSER</div>
-          <div class="p-vs-badge">🇪🇸</div>
-          <input class="p-input ok" value="Carlos Alcaraz" readonly>
-          <div class="p-vs">VS</div>
-          <input class="p-input" placeholder="Cherche un joueur (ex: Sinner, Zverev...)" data-i18n-placeholder="p_search_ph">
-          <button class="p-btn" onclick="window.location.href='visitennis_1.html'" data-i18n="p_analyse_btn">Analyser le match avec l'IA</button>
-        </div>
-        <div class="p-card p-next">
-          <div class="p-next-title" data-i18n="p_next_title">Prochains matchs</div>
-          <div class="p-match"><span class="p-date">03/04<br>20:45</span><b>Alcaraz</b> 🇪🇸 <span class="vs-mini">vs</span> 🇮🇹 Sinner</div>
-          <div class="p-match"><span class="p-date">08/04<br>21:00</span><b>Alcaraz</b> 🇪🇸 <span class="vs-mini">vs</span> 🇬🇷 Tsitsipas</div>
-          <div class="p-match"><span class="p-date">11/04<br>17:00</span>Zverev 🇩🇪 <span class="vs-mini">vs</span> 🇪🇸 <b>Alcaraz</b></div>
-          <div class="p-match"><span class="p-date">14/04<br>21:00</span>Djokovic 🇷🇸 <span class="vs-mini">vs</span> 🇪🇸 <b>Alcaraz</b></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="logos-section">
-  <div class="wrap">
-    <h2 class="reveal" data-i18n-html="logos_h2">Plus de 60 tournois <span class="lime">couverts</span></h2>
-    <div class="logos-row reveal">
-      <span class="wordmark">ATP TOUR</span>
-      <span class="wordmark dim">WTA TOUR</span>
-      <span class="wordmark">ROLAND-GARROS</span>
-      <span class="wordmark dim">WIMBLEDON</span>
-      <span class="wordmark">GRAND CHELEM</span>
-    </div>
-  </div>
+  <!-- CHIFFRE À METTRE À JOUR À LA MAIN CHAQUE SEMAINE : data-target="89.7" (taux) et data-target="612" (nombre de matchs) -->
+  <div class="stat-line reveal"><div class="stat-top"><b class="stat-pct counter" data-target="89.7" data-suffix="%">0%</b><span class="stat-lbl" data-i18n="stat_mid1">de précision</span></div><div class="stat-sub"><span data-i18n="stat_sub1">sur les </span><b class="n2 counter" data-target="612">0</b><span data-i18n="stat_mid2"> matchs vérifiés depuis le début</span></div></div>
 </section>
 
 <section class="court-section">
   <div class="court-visual"></div>
-  <svg class="court-lines" viewBox="0 0 640 380" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
-    <rect x="40" y="20" width="560" height="340" rx="4"/>
-    <line x1="40" y1="70" x2="600" y2="70"/>
-    <line x1="40" y1="310" x2="600" y2="310"/>
-    <line x1="320" y1="20" x2="320" y2="360" stroke-dasharray="6 6" stroke-width="1.5"/>
-    <line x1="150" y1="70" x2="150" y2="310"/>
-    <line x1="490" y1="70" x2="490" y2="310"/>
-    <line x1="150" y1="190" x2="490" y2="190"/>
-  </svg>
   <div class="wrap">
     <h2 class="court-h2 reveal"><span class="lime">Alcaraz</span> 3 - 1 Sinner</h2>
     <p class="court-p reveal" data-i18n="court_p">Des millions de données tennis analysées à partir de plus de 220 sources pour prédire chaque match.</p>
-    <div class="score-stats">
-      <div class="score-stat reveal">
-        <div class="score-num"><span class="counter" data-target="68" data-suffix="%">0%</span></div>
-        <div class="score-cap" data-i18n="score_cap1">Victoire Alcaraz</div>
+    <div class="showcase">
+      <div class="showcase-phone reveal">
+        <div class="phone-rot"><img class="phone-mockup" src="assets/mockups/hero-alcaraz.png" alt="TennisMind - Analyse de match Alcaraz" onclick="window.location.href='/app'" style="cursor:pointer;"></div>
       </div>
-      <div class="score-stat reveal">
-        <div class="score-num"><span class="counter" data-target="32" data-suffix="%">0%</span></div>
-        <div class="score-cap" data-i18n="score_cap2">Victoire Sinner</div>
+      <div class="float-badge b1"><img src="assets/players/alcaraz.jpg" alt="Carlos Alcaraz" loading="lazy"></div>
+      <div class="float-badge b2"><img src="assets/players/sinner.jpg" alt="Jannik Sinner" loading="lazy"></div>
+      <div class="float-badge b4"><img src="assets/players/djokovic.jpg" alt="Novak Djokovic" loading="lazy"></div>
+      <div class="court-visual-wrap reveal">
+      <svg class="court-lines" viewBox="0 0 640 380" preserveAspectRatio="none" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2">
+        <rect x="40" y="20" width="560" height="340" rx="4"/>
+        <line x1="40" y1="70" x2="600" y2="70"/>
+        <line x1="40" y1="310" x2="600" y2="310"/>
+        <line x1="320" y1="20" x2="320" y2="360" stroke-dasharray="6 6" stroke-width="1.5"/>
+        <line x1="150" y1="70" x2="150" y2="310"/>
+        <line x1="490" y1="70" x2="490" y2="310"/>
+        <line x1="150" y1="190" x2="490" y2="190"/>
+      </svg>
+      <div class="score-stats">
+        <div class="score-stat reveal">
+          <div class="score-num"><span class="counter" data-target="91.4" data-suffix="%">0%</span></div>
+          <div class="score-cap" data-i18n="score_cap1">Victoire Alcaraz</div>
+        </div>
+        <div class="score-stat reveal">
+          <div class="score-num"><span class="counter" data-target="8.6" data-suffix="%">0%</span></div>
+          <div class="score-cap" data-i18n="score_cap2">Victoire Sinner</div>
+        </div>
       </div>
+    </div>
     </div>
     <div class="ready-pill reveal" style="padding-left:20px;">
       <span class="ready-text" data-i18n="live_update">Données mises à jour toutes les 15 minutes</span>
       <span class="live-dot"></span>
     </div>
-    <div class="dl-line reveal" data-i18n-html="dl_line">Télécharger l'app pour obtenir toutes les<br>analyses du match</div>
+    <div class="lp-cta-wrap reveal"><a class="lp-cta" href="/app" data-i18n="cta_tool">Analyser un match</a></div>
+  </div>
+</section>
+
+<section class="sources-section">
+  <div class="court-visual"></div>
+  <div class="wrap">
+    <span class="sources-pill reveal" data-i18n="sources_pill">+1M de sources de données</span>
+    <h2 class="reveal" data-i18n-html="sources_h2">Nous analysons +220 <span class="lime">sources</span></h2>
+    <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
+    <div class="factors-row factors-field reveal" id="factorsField">
+      <span class="factor-chip" style="--c:#D7F22C"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h11M14 3l4 4-4 4M17 17H6M10 13l-4 4 4 4"/></svg>Historique face-a-face</span>
+      <span class="factor-chip" style="--c:#FF8A3D"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14M3 12h18"/></svg>Surface de jeu</span>
+      <span class="factor-chip" style="--c:#2FEAF0"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Forme des 10 derniers matchs</span>
+      <span class="factor-chip" style="--c:#B07CFF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 01-10 0zM17 5h3v2a3 3 0 01-3 3M7 5H4v2a3 3 0 003 3"/></svg>Classement ATP/WTA en direct</span>
+      <span class="factor-chip" style="--c:#FF6F91"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 1116 0M12 16l4-5"/><circle cx="12" cy="16" r="1.2"/></svg>Vitesse moyenne de service</span>
+      <span class="factor-chip" style="--c:#FFC53D"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>Conversion des balles de break</span>
+      <span class="factor-chip" style="--c:#6FA3FF"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="16" height="9" rx="2"/><path d="M21 11v3M7 11v3M11 11v3"/></svg>Indice de fatigue physique</span>
+      <span class="factor-chip" style="--c:#3ED66B"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5L5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>Ratio de victoires par surface</span>
+      <span class="factor-chip" style="--c:#FF7A45"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4 4 0 01-.5-7.97A5.5 5.5 0 0117 9.5a4 4 0 01-.5 8.5z"/></svg>Conditions meteo du match</span>
+      <span class="factor-chip" style="--c:#5EE6B8"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-7 4 14 3-7h4"/></svg>Analyse biomecanique du service</span>
+      <span class="factor-chip" style="--c:#E879F9"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="18" rx="2" transform="rotate(45 12 12)"/><path d="M12 12h.01M10 10h.01M14 14h.01"/></svg>Historique des blessures</span>
+      <span class="factor-chip" style="--c:#7DD3FC"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z"/></svg>Indice de confiance psychologique</span>
+    </div>
+  </div>
+</section>
+
+<section class="feature-section">
+  <div class="wrap">
+    <h2 class="reveal" data-i18n-html="feature_h2">Des analyses IA pour anticiper <span class="lime">chaque match.</span></h2>
+    <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
+
+    <div class="phone-stage phone-fan-stage reveal" style="margin-top:34px;">
+      <img class="phone-mockup phone-fan" src="assets/mockups/hero-fan.png" alt="TennisMind - Liste des joueurs, fiche joueur et compétitions" onclick="window.location.href='/app'" style="cursor:pointer;">
+    </div>
+    <div class="lp-cta-wrap reveal"><a class="lp-cta" href="/app" data-i18n="cta_tool">Analyser un match</a></div>
+  </div>
+</section>
+
+<section class="feature-section seo-section">
+  <div class="wrap">
+    <span class="seo-k reveal" data-i18n="seo_k">Pronostics du jour</span>
+    <h2 class="reveal" data-i18n-html="seo_h2">Les matchs <span class="lime">en un coup d'œil.</span></h2>
+    <p class="reveal" data-i18n="seo_p">Probabilité de victoire, score probable et résultat réel de chaque match ATP et WTA, publiés avant le premier service.</p>
+    <a class="seo-btn reveal" href="/fr/pronostics/aujourdhui" data-i18n="seo_btn">Voir les matchs du jour</a>
+    <div class="seo-links reveal"><a href="/fr/pronostics/demain" data-i18n="seo_l1">Demain</a><a href="/fr/tournois" data-i18n="seo_l2">Tournois</a><a href="/fr/joueurs" data-i18n="seo_l3">Joueurs</a></div>
+    <p class="seo-note reveal" data-i18n="seo_note">Gratuit, sans inscription</p>
   </div>
 </section>
 
 <section class="testi-section">
   <div class="wrap">
     <div class="avatar-row reveal">
-      <span class="avatar" style="background:#F7B267;">MZ</span>
-      <span class="avatar" style="background:#E8604C;">EM</span>
-      <span class="avatar" style="background:#8CC0DE;">HL</span>
-      <span class="avatar" style="background:#A78BFA;">DP</span>
-      <span class="avatar" style="background:#D7F22C;">LK</span>
+      <span class="avatar" style="background:#F7B267;"><img src="assets/avatars/maya.jpg" alt="Maya Zong" loading="lazy"></span>
+      <span class="avatar" style="background:#E8604C;"><img src="assets/avatars/ethan.jpg" alt="Ethan Miller" loading="lazy"></span>
+      <span class="avatar" style="background:#8CC0DE;"><img src="assets/avatars/hannah.jpg" alt="Hannah Lee" loading="lazy"></span>
+      <span class="avatar" style="background:#A78BFA;"><img src="assets/avatars/daniel.jpg" alt="Daniel Perez" loading="lazy"></span>
+      <span class="avatar" style="background:#D7F22C; color:#14180a;">LK</span>
     </div>
-    <h2 class="reveal" data-i18n-html="testi_h2">Ce que pensent les utilisateurs de <span class="lime">AcePredict</span></h2>
-    <p class="reveal" data-i18n="testi_p">Des milliers de passionnés utilisent AcePredict pour analyser les matchs avec précision.</p>
+    <h2 class="reveal" data-i18n-html="testi_h2">Ce que pensent les utilisateurs de <span class="lime">TennisMind</span></h2>
+    <p class="reveal" data-i18n="testi_p">Des milliers de passionnés utilisent TennisMind pour analyser les matchs avec précision.</p>
 
     <div class="video-strip reveal">
-      <div class="video-card">
-        <div class="vtag" data-i18n="vtag1">Analyse IA prête</div>
+      <div class="video-card" style="background-image:url('assets/social/social1.jpg');" onclick="window.open('https://www.tiktok.com/','_blank')">
         <div class="vplay">▶</div>
-        <div class="vbars"><div class="vbar"><span style="width:70%"></span></div><div class="vbar"><span style="width:45%"></span></div></div>
       </div>
-      <div class="video-card">
-        <div class="vtag" data-i18n="vtag2">L'IA avait prédit tout ✅</div>
+      <div class="video-card" style="background-image:url('assets/social/social2.jpg');" onclick="window.open('https://www.tiktok.com/','_blank')">
         <div class="vplay">▶</div>
-        <div class="vbars"><div class="vbar"><span style="width:90%"></span></div><div class="vbar"><span style="width:30%"></span></div></div>
       </div>
-      <div class="video-card">
-        <div class="vtag" data-i18n="vtag3">Confiance de l'IA</div>
+      <div class="video-card" style="background-image:url('assets/social/social3.jpg');" onclick="window.open('https://www.tiktok.com/','_blank')">
         <div class="vplay">▶</div>
-        <div class="vbars"><div class="vbar"><span style="width:60%"></span></div><div class="vbar"><span style="width:80%"></span></div></div>
       </div>
     </div>
 
@@ -628,7 +865,7 @@
       <div class="testi-card">
         <p>"Franchement bluffant. Les analyses sont claires et ça m'aide à vraiment comprendre les matchs, pas juste regarder le score."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#F7B267;">MZ</span>
+          <span class="testi-avatar" style="background:#F7B267;"><img src="assets/avatars/maya.jpg" alt="Maya Zong" loading="lazy"></span>
           <div><div class="testi-name">Maya Zong</div><div class="testi-role">Passionnée de tennis</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
@@ -636,7 +873,7 @@
       <div class="testi-card hidden-extra">
         <p>"Les scénarios IA sont super intéressants. On voit direct les points forts et faiblesses des joueurs."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#E8604C;">EM</span>
+          <span class="testi-avatar" style="background:#E8604C;"><img src="assets/avatars/ethan.jpg" alt="Ethan Miller" loading="lazy"></span>
           <div><div class="testi-name">Ethan Miller</div><div class="testi-role">Analyste amateur</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
@@ -644,7 +881,7 @@
       <div class="testi-card hidden-extra">
         <p>"Enfin une app simple avec des vraies stats utiles. Tout est bien expliqué, c'est rapide à comprendre."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#8CC0DE;">HL</span>
+          <span class="testi-avatar" style="background:#8CC0DE;"><img src="assets/avatars/hannah.jpg" alt="Hannah Lee" loading="lazy"></span>
           <div><div class="testi-name">Hannah Lee</div><div class="testi-role">Utilisatrice régulière</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
@@ -652,7 +889,7 @@
       <div class="testi-card hidden-extra">
         <p>"Je gagne un temps énorme. Plus besoin de chercher les infos partout, tout est déjà analysé."</p>
         <div class="testi-who">
-          <span class="testi-avatar" style="background:#A78BFA;">DP</span>
+          <span class="testi-avatar" style="background:#A78BFA;"><img src="assets/avatars/daniel.jpg" alt="Daniel Perez" loading="lazy"></span>
           <div><div class="testi-name">Daniel Perez</div><div class="testi-role">Fan de tennis</div></div>
           <span class="testi-x"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span>
         </div>
@@ -670,46 +907,15 @@
   </div>
 </section>
 
-<section class="feature-section">
+<section class="logos-section">
   <div class="wrap">
-    <h2 class="reveal" data-i18n-html="feature_h2">Des analyses IA pour anticiper <span class="lime">chaque match.</span></h2>
-    <p class="reveal" data-i18n="feature_p">Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.</p>
-
-    <div class="phone-stage reveal" style="margin-top:50px;">
-      <div class="phone">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div class="p-brand">
-            <span class="brand-name" style="font-size:14px;">AcePredict</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9AA69A" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-          </div>
-          <div class="p-h1" data-i18n="p_h1_comp">Compétitions</div>
-          <div class="p-sub" data-i18n="p_sub2">Découvre les compétitions en cours</div>
-          <div class="p-sub accent" data-i18n="p_sub_accent2">Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.</div>
-          <div class="p-search"><span data-i18n="p_search_comp">🔍&nbsp; Rechercher une compétition...</span></div>
-          <div class="p-comp-label" data-i18n="p_label_slam">GRAND CHELEM</div>
-          <div class="p-comp-row"><span class="p-comp-icon">🇦🇺</span><div><div class="p-comp-name">Australian Open</div><div class="p-comp-meta">Melbourne • 2026</div></div><span class="p-comp-chev">›</span></div>
-          <div class="p-comp-row"><span class="p-comp-icon">🇫🇷</span><div><div class="p-comp-name">Roland-Garros</div><div class="p-comp-meta">Paris • 2026</div></div><span class="p-comp-chev">›</span></div>
-          <div class="p-comp-label" data-i18n="p_label_circuits">CIRCUITS</div>
-          <div class="p-comp-row"><span class="p-comp-icon">🎾</span><div><div class="p-comp-name">ATP Tour</div><div class="p-comp-meta">Monde • 2026</div></div><span class="p-comp-chev">›</span></div>
-          <div class="p-comp-row"><span class="p-comp-icon">🏆</span><div><div class="p-comp-name">Masters 1000</div><div class="p-comp-meta">Monde • 2026</div></div><span class="p-comp-chev">›</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="sources-section">
-  <div class="court-visual"></div>
-  <div class="wrap">
-    <span class="sources-pill reveal" data-i18n="sources_pill">+1M de sources de données</span>
-    <h2 class="reveal" data-i18n-html="sources_h2">Nous analysons +220 <span class="lime">sources</span></h2>
-    <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
-    <div class="logos-row reveal" style="margin-top:46px;">
+    <h2 class="reveal" data-i18n-html="logos_h2">Plus de 60 tournois <span class="lime">couverts</span></h2>
+    <div class="logos-row reveal">
       <span class="wordmark">ATP TOUR</span>
-      <span class="wordmark dim">ROLAND-GARROS</span>
-      <span class="wordmark">WIMBLEDON</span>
       <span class="wordmark dim">WTA TOUR</span>
+      <span class="wordmark">ROLAND-GARROS</span>
+      <span class="wordmark dim">WIMBLEDON</span>
+      <span class="wordmark">GRAND CHELEM</span>
     </div>
   </div>
 </section>
@@ -717,21 +923,21 @@
 <section class="faq-section">
   <div class="wrap">
     <div class="faq-head">
-      <h2 class="reveal" data-i18n="faq_h2">Question fréquente</h2>
+      <h2 class="reveal" data-i18n="faq_h2">Questions fréquentes</h2>
       <p class="reveal" data-i18n="process_line">Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.</p>
     </div>
     <div class="faq-list reveal">
       <div class="faq-item">
-        <div class="faq-q"><span class="num" style="background:#D7F22C;">1</span><span class="q-text" data-i18n="faq_q1">AcePredict est-il gratuit ?</span><span class="plus">+</span></div>
-        <div class="faq-a"><p data-i18n="faq_a1">AcePredict propose une version gratuite avec un accès limité à certaines analyses. L'abonnement à 19€/mois permet de débloquer l'ensemble des fonctionnalités.</p></div>
+        <div class="faq-q"><span class="num" style="background:#D7F22C;">1</span><span class="q-text" data-i18n="faq_q1">TennisMind est-il gratuit ?</span><span class="plus">+</span></div>
+        <div class="faq-a"><p data-i18n="faq_a1">TennisMind propose une version gratuite avec un accès limité à certaines analyses. L'abonnement à 19€/mois permet de débloquer l'ensemble des fonctionnalités.</p></div>
       </div>
       <div class="faq-item">
         <div class="faq-q"><span class="num" style="background:#7DD3FC;">2</span><span class="q-text" data-i18n="faq_q2">Comment fonctionnent les analyses IA ?</span><span class="plus">+</span></div>
         <div class="faq-a"><p data-i18n="faq_a2">Nos modèles analysent des milliers de données (statistiques, forme des joueurs, historiques...) pour générer des probabilités et des scénarios de match clairs et compréhensibles.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><span class="num" style="background:#FDA4AF;">3</span><span class="q-text" data-i18n="faq_q3">Est-ce que AcePredict permet de parier ?</span><span class="plus">+</span></div>
-        <div class="faq-a"><p data-i18n="faq_a3">Non. AcePredict est un outil d'analyse et d'aide à la compréhension du jeu. Nous ne proposons aucun service de pari.</p></div>
+        <div class="faq-q"><span class="num" style="background:#FDA4AF;">3</span><span class="q-text" data-i18n="faq_q3">Est-ce que TennisMind permet de parier ?</span><span class="plus">+</span></div>
+        <div class="faq-a"><p data-i18n="faq_a3">TennisMind n'est pas un bookmaker : on ne prend aucun pari et on ne donne aucun conseil de pari. C'est un outil d'analyse, et ce que tu en fais t'appartient : tu peux t'en servir comme tu le souhaites, y compris pour tes propres paris là où c'est légal. Aucun résultat n'est garanti, joue de façon responsable.</p></div>
       </div>
       <div class="faq-item">
         <div class="faq-q"><span class="num" style="background:#C4B5FD;">4</span><span class="q-text" data-i18n="faq_q4">Les données sont-elles fiables ?</span><span class="plus">+</span></div>
@@ -743,9 +949,10 @@
 
 <footer>
   <div class="wrap foot-wrap">
-    <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M 11.07,1.11 L 11.14,1.32 L 11.25,1.54 L 11.50,1.75 L 11.78,1.97 L 12.04,2.19 L 12.29,2.40 L 12.47,2.62 L 12.65,2.83 L 12.83,3.05 L 12.97,3.26 L 13.11,3.48 L 13.22,3.70 L 13.29,3.91 L 13.37,4.13 L 13.44,4.34 L 13.47,4.56 L 13.51,4.77 L 13.55,4.99 L 13.55,5.21 L 13.55,5.42 L 13.55,5.64 L 13.51,5.85 L 13.47,6.07 L 13.44,6.28 L 13.40,6.50 L 13.37,6.72 L 13.29,6.93 L 13.22,7.15 L 13.15,7.36 L 13.08,7.58 L 13.01,7.79 L 12.93,8.01 L 12.83,8.23 L 12.75,8.44 L 12.65,8.66 L 12.54,8.87 L 12.43,9.09 L 12.32,9.30 L 12.22,9.52 L 12.11,9.74 L 12.00,9.95 L 11.89,10.17 L 11.78,10.38 L 11.68,10.60 L 11.53,10.81 L 11.42,11.03 L 11.32,11.25 L 11.17,11.46 L 11.07,11.68 L 10.96,11.89 L 10.85,12.11 L 10.71,12.32 L 10.60,12.54 L 10.49,12.75 L 10.38,12.97 L 10.24,13.19 L 10.13,13.40 L 10.02,13.62 L 9.92,13.83 L 9.81,14.05 L 9.74,14.26 L 9.63,14.48 L 9.52,14.70 L 9.41,14.91 L 9.34,15.13 L 9.23,15.34 L 9.16,15.56 L 9.09,15.77 L 9.02,15.99 L 8.94,16.21 L 8.87,16.42 L 8.80,16.64 L 8.76,16.85 L 8.69,17.07 L 8.66,17.28 L 8.62,17.50 L 8.58,17.72 L 8.55,17.93 L 8.55,18.15 L 8.51,18.36 L 8.51,18.58 L 8.51,18.79 L 8.51,19.01 L 8.55,19.23 L 8.55,19.44 L 8.58,19.66 L 8.62,19.87 L 8.69,20.09 L 8.73,20.30 L 8.80,20.52 L 8.87,20.74 L 8.98,20.95 L 9.09,21.17 L 9.20,21.38 L 9.30,21.60 L 9.45,21.81 L 9.59,22.03 L 9.77,22.25 L 9.95,22.46 L 10.13,22.68 L 10.31,22.86 L 12.90,22.86 L 12.86,22.68 L 12.72,22.46 L 12.50,22.25 L 12.22,22.03 L 11.96,21.81 L 11.71,21.60 L 11.53,21.38 L 11.32,21.17 L 11.17,20.95 L 10.99,20.74 L 10.89,20.52 L 10.78,20.30 L 10.67,20.09 L 10.60,19.87 L 10.53,19.66 L 10.49,19.44 L 10.45,19.23 L 10.42,19.01 L 10.42,18.79 L 10.42,18.58 L 10.42,18.36 L 10.45,18.15 L 10.45,17.93 L 10.53,17.72 L 10.56,17.50 L 10.60,17.28 L 10.67,17.07 L 10.71,16.85 L 10.78,16.64 L 10.85,16.42 L 10.96,16.21 L 11.03,15.99 L 11.10,15.77 L 11.21,15.56 L 11.32,15.34 L 11.39,15.13 L 11.50,14.91 L 11.60,14.70 L 11.71,14.48 L 11.82,14.26 L 11.93,14.05 L 12.04,13.83 L 12.18,13.62 L 12.29,13.40 L 12.40,13.19 L 12.50,12.97 L 12.65,12.75 L 12.75,12.54 L 12.86,12.32 L 13.01,12.11 L 13.11,11.89 L 13.22,11.68 L 13.33,11.46 L 13.47,11.25 L 13.58,11.03 L 13.69,10.81 L 13.80,10.60 L 13.91,10.38 L 14.01,10.17 L 14.12,9.95 L 14.23,9.74 L 14.34,9.52 L 14.44,9.30 L 14.52,9.09 L 14.62,8.87 L 14.70,8.66 L 14.80,8.44 L 14.88,8.23 L 14.95,8.01 L 15.02,7.79 L 15.09,7.58 L 15.16,7.36 L 15.20,7.15 L 15.27,6.93 L 15.31,6.72 L 15.34,6.50 L 15.38,6.28 L 15.42,6.07 L 15.42,5.85 L 15.45,5.64 L 15.45,5.42 L 15.45,5.21 L 15.45,4.99 L 15.45,4.77 L 15.42,4.56 L 15.38,4.34 L 15.34,4.13 L 15.31,3.91 L 15.24,3.70 L 15.16,3.48 L 15.09,3.26 L 15.02,3.05 L 14.91,2.83 L 14.80,2.62 L 14.66,2.40 L 14.55,2.19 L 14.41,1.97 L 14.23,1.75 L 14.05,1.54 L 13.87,1.32 L 13.65,1.11 Z" fill="var(--bg)"/></svg></span><span class="brand-name">AcePredict</span></div>
-    <div class="foot-links"><a href="#" data-i18n="foot_pricing">Pricing</a><a href="#" data-i18n="foot_support">Support</a><a href="#" data-i18n="foot_privacy">Confidentialité</a></div>
-    <div class="foot-copy" data-i18n="foot_copy">© 2026 AcePredict. Toutes les analyses sont fournies à titre informatif uniquement.</div>
+    <div class="brand"><span class="brand-mark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M 11.07,1.11 L 11.14,1.32 L 11.25,1.54 L 11.50,1.75 L 11.78,1.97 L 12.04,2.19 L 12.29,2.40 L 12.47,2.62 L 12.65,2.83 L 12.83,3.05 L 12.97,3.26 L 13.11,3.48 L 13.22,3.70 L 13.29,3.91 L 13.37,4.13 L 13.44,4.34 L 13.47,4.56 L 13.51,4.77 L 13.55,4.99 L 13.55,5.21 L 13.55,5.42 L 13.55,5.64 L 13.51,5.85 L 13.47,6.07 L 13.44,6.28 L 13.40,6.50 L 13.37,6.72 L 13.29,6.93 L 13.22,7.15 L 13.15,7.36 L 13.08,7.58 L 13.01,7.79 L 12.93,8.01 L 12.83,8.23 L 12.75,8.44 L 12.65,8.66 L 12.54,8.87 L 12.43,9.09 L 12.32,9.30 L 12.22,9.52 L 12.11,9.74 L 12.00,9.95 L 11.89,10.17 L 11.78,10.38 L 11.68,10.60 L 11.53,10.81 L 11.42,11.03 L 11.32,11.25 L 11.17,11.46 L 11.07,11.68 L 10.96,11.89 L 10.85,12.11 L 10.71,12.32 L 10.60,12.54 L 10.49,12.75 L 10.38,12.97 L 10.24,13.19 L 10.13,13.40 L 10.02,13.62 L 9.92,13.83 L 9.81,14.05 L 9.74,14.26 L 9.63,14.48 L 9.52,14.70 L 9.41,14.91 L 9.34,15.13 L 9.23,15.34 L 9.16,15.56 L 9.09,15.77 L 9.02,15.99 L 8.94,16.21 L 8.87,16.42 L 8.80,16.64 L 8.76,16.85 L 8.69,17.07 L 8.66,17.28 L 8.62,17.50 L 8.58,17.72 L 8.55,17.93 L 8.55,18.15 L 8.51,18.36 L 8.51,18.58 L 8.51,18.79 L 8.51,19.01 L 8.55,19.23 L 8.55,19.44 L 8.58,19.66 L 8.62,19.87 L 8.69,20.09 L 8.73,20.30 L 8.80,20.52 L 8.87,20.74 L 8.98,20.95 L 9.09,21.17 L 9.20,21.38 L 9.30,21.60 L 9.45,21.81 L 9.59,22.03 L 9.77,22.25 L 9.95,22.46 L 10.13,22.68 L 10.31,22.86 L 12.90,22.86 L 12.86,22.68 L 12.72,22.46 L 12.50,22.25 L 12.22,22.03 L 11.96,21.81 L 11.71,21.60 L 11.53,21.38 L 11.32,21.17 L 11.17,20.95 L 10.99,20.74 L 10.89,20.52 L 10.78,20.30 L 10.67,20.09 L 10.60,19.87 L 10.53,19.66 L 10.49,19.44 L 10.45,19.23 L 10.42,19.01 L 10.42,18.79 L 10.42,18.58 L 10.42,18.36 L 10.45,18.15 L 10.45,17.93 L 10.53,17.72 L 10.56,17.50 L 10.60,17.28 L 10.67,17.07 L 10.71,16.85 L 10.78,16.64 L 10.85,16.42 L 10.96,16.21 L 11.03,15.99 L 11.10,15.77 L 11.21,15.56 L 11.32,15.34 L 11.39,15.13 L 11.50,14.91 L 11.60,14.70 L 11.71,14.48 L 11.82,14.26 L 11.93,14.05 L 12.04,13.83 L 12.18,13.62 L 12.29,13.40 L 12.40,13.19 L 12.50,12.97 L 12.65,12.75 L 12.75,12.54 L 12.86,12.32 L 13.01,12.11 L 13.11,11.89 L 13.22,11.68 L 13.33,11.46 L 13.47,11.25 L 13.58,11.03 L 13.69,10.81 L 13.80,10.60 L 13.91,10.38 L 14.01,10.17 L 14.12,9.95 L 14.23,9.74 L 14.34,9.52 L 14.44,9.30 L 14.52,9.09 L 14.62,8.87 L 14.70,8.66 L 14.80,8.44 L 14.88,8.23 L 14.95,8.01 L 15.02,7.79 L 15.09,7.58 L 15.16,7.36 L 15.20,7.15 L 15.27,6.93 L 15.31,6.72 L 15.34,6.50 L 15.38,6.28 L 15.42,6.07 L 15.42,5.85 L 15.45,5.64 L 15.45,5.42 L 15.45,5.21 L 15.45,4.99 L 15.45,4.77 L 15.42,4.56 L 15.38,4.34 L 15.34,4.13 L 15.31,3.91 L 15.24,3.70 L 15.16,3.48 L 15.09,3.26 L 15.02,3.05 L 14.91,2.83 L 14.80,2.62 L 14.66,2.40 L 14.55,2.19 L 14.41,1.97 L 14.23,1.75 L 14.05,1.54 L 13.87,1.32 L 13.65,1.11 Z" fill="var(--bg)"/></svg></span><span class="brand-name">TennisMind</span></div>
+    <div class="foot-links"><a href="/fr/pronostics">Pronostics</a><a href="#" data-i18n="foot_pricing">Pricing</a><a href="mailto:tennismindsupport@gmail.com" data-i18n="foot_support">Support</a><a href="legal/mentions-legales.html">Mentions légales</a><a href="legal/cgu-cgv.html">CGU / CGV</a><a href="legal/politique-confidentialite.html" data-i18n="foot_privacy">Confidentialité</a></div>
+    <div class="foot-copy" data-i18n="foot_copy">© 2026 TennisMind. Toutes les analyses sont fournies à titre informatif uniquement.</div>
+    <div class="foot-copy" style="margin-top:10px;opacity:.55;font-size:12px">TennisMind, aussi écrit Tennis Mind, Tenismind, Tennis-Mind, Tenis Mind ou app TennisMind : l'application de prédictions de matchs de tennis ATP et WTA. <a href="/qui-va-gagner-match-tennis" style="color:inherit">Qui va gagner</a> · <a href="/analyse-match-tennis" style="color:inherit">analyse de match</a> · <a href="/probabilite-victoire-tennis" style="color:inherit">probabilité de victoire</a> · <a href="/face-a-face-tennis" style="color:inherit">face-à-face</a> · <a href="https://www.tiktok.com/@tennis_mind" rel="me" style="color:inherit">TikTok</a></div>
   </div>
 </footer>
 
@@ -781,7 +988,11 @@
 
     <div class="auth-panel" id="authPanelRegister">
       <div class="auth-title" data-i18n="auth_title_register">Créer un compte</div>
-      <div class="auth-sub" data-i18n="auth_sub_register">Rejoins AcePredict et commence à analyser tes premiers matchs.</div>
+      <div class="auth-sub" data-i18n="auth_sub_register">Rejoins TennisMind et commence à analyser tes premiers matchs.</div>
+      <div class="auth-field" style="margin-bottom:14px">
+        <label for="registerCreatorCode">Code créateur <span style="opacity:.6;font-weight:500">(facultatif)</span></label>
+        <input type="text" id="registerCreatorCode" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" placeholder="Ex : SYLVTENNIS" style="text-transform:uppercase">
+      </div>
       <div class="auth-google-btn" id="googleBtnRegister"></div>
       <div class="auth-divider" data-i18n="auth_or_divider">ou</div>
       <form class="auth-form" id="registerForm">
@@ -810,6 +1021,7 @@
   const TR = {
   "fr": {
     "nav_login": "Connexion",
+    "nav_login_cta": "Se connecter",
     "auth_or_divider": "ou",
     "auth_google_error": "Connexion Google impossible — réessaie.",
     "auth_google_connecting": "Connexion avec Google…",
@@ -817,8 +1029,8 @@
     "hero_sub": "Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.",
     "hero_search_ph": "Recherchez l'un des joueurs (par ex: Alcaraz, Sinner...)",
     "btn_analyser": "Analyser",
-    "stat_mid1": " de précision sur les ",
-    "stat_mid2": " matchs analysés la semaine dernière",
+    "stat_mid1": "de précision", "stat_sub1": "sur les ",
+    "stat_mid2": " matchs vérifiés depuis le début",
     "p_h1_analyse": "Analyse de match",
     "p_sub1": "Entre les joueurs que tu veux analyser",
     "p_sub_accent1": "Notre IA est connectée à l'actualité tennis et croise des millions de données pour chaque pronostic.",
@@ -832,14 +1044,18 @@
     "score_cap2": "Victoire Sinner",
     "live_update": "Données mises à jour toutes les 15 minutes",
     "dl_line": "Télécharger l'app pour obtenir toutes les<br>analyses du match",
-    "testi_h2": "Ce que pensent les utilisateurs de <span class=\"lime\">AcePredict</span>",
-    "testi_p": "Des milliers de passionnés utilisent AcePredict pour analyser les matchs avec précision.",
+    "testi_h2": "Ce que pensent les utilisateurs de <span class=\"lime\">TennisMind</span>",
+    "testi_p": "Des milliers de passionnés utilisent TennisMind pour analyser les matchs avec précision.",
     "vtag1": "Analyse IA prête",
     "vtag2": "L'IA avait prédit tout ✅",
     "vtag3": "Confiance de l'IA",
     "voir_tous": "Voir tous",
     "feature_h2": "Des analyses IA pour anticiper <span class=\"lime\">chaque match.</span>",
     "feature_p": "Probabilités, scénarios et données clés pour comprendre le déroulement d'un match avant même le premier point.",
+    "seo_k": "Pronostics du jour",
+    "seo_h2": "Les matchs <span class=\"lime\">en un coup d'œil.</span>",
+    "seo_p": "Probabilité de victoire, score probable et résultat réel de chaque match ATP et WTA, publiés avant le premier service.",
+    "badge_today": "analyses lancées aujourd'hui", "hd_win": "Gagnant probable", "hd_score": "Score le plus probable", "hd_result": "Résultat", "cta_tool": "Analyser un match", "seo_btn": "Voir les matchs du jour", "seo_l1": "Demain", "seo_l2": "Tournois", "seo_l3": "Joueurs", "seo_note": "Gratuit, sans inscription",
     "p_h1_comp": "Compétitions",
     "p_sub2": "Découvre les compétitions en cours",
     "p_sub_accent2": "Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.",
@@ -849,19 +1065,19 @@
     "sources_pill": "+1M de sources de données",
     "sources_h2": "Nous analysons +220 <span class=\"lime\">sources</span>",
     "process_line": "Une seule équipe, un seul process, pour lancer une app pensée conversion et rentabilité.",
-    "faq_h2": "Question fréquente",
-    "faq_q1": "AcePredict est-il gratuit ?",
-    "faq_a1": "AcePredict propose une version gratuite avec un accès limité à certaines analyses. L'abonnement à 19€/mois permet de débloquer l'ensemble des fonctionnalités.",
+    "faq_h2": "Questions fréquentes",
+    "faq_q1": "TennisMind est-il gratuit ?",
+    "faq_a1": "TennisMind propose une version gratuite avec un accès limité à certaines analyses. L'abonnement à 19€/mois permet de débloquer l'ensemble des fonctionnalités.",
     "faq_q2": "Comment fonctionnent les analyses IA ?",
     "faq_a2": "Nos modèles analysent des milliers de données (statistiques, forme des joueurs, historiques...) pour générer des probabilités et des scénarios de match clairs et compréhensibles.",
-    "faq_q3": "Est-ce que AcePredict permet de parier ?",
-    "faq_a3": "Non. AcePredict est un outil d'analyse et d'aide à la compréhension du jeu. Nous ne proposons aucun service de pari.",
+    "faq_q3": "Est-ce que TennisMind permet de parier ?",
+    "faq_a3": "TennisMind n'est pas un bookmaker : on ne prend aucun pari et on ne donne aucun conseil de pari. C'est un outil d'analyse, et ce que tu en fais t'appartient : tu peux t'en servir comme tu le souhaites, y compris pour tes propres paris là où c'est légal. Aucun résultat n'est garanti, joue de façon responsable.",
     "faq_q4": "Les données sont-elles fiables ?",
     "faq_a4": "Oui. Les analyses s'appuient sur des données réelles et mises à jour en continu pour garantir la meilleure précision possible.",
     "foot_pricing": "Pricing",
     "foot_support": "Support",
     "foot_privacy": "Confidentialité",
-    "foot_copy": "© 2026 AcePredict. Toutes les analyses sont fournies à titre informatif uniquement.",
+    "foot_copy": "© 2026 TennisMind. Toutes les analyses sont fournies à titre informatif uniquement.",
     "auth_tab_register": "Inscription",
     "auth_title_login": "Content de te revoir",
     "auth_sub_login": "Connecte-toi pour accéder à tes analyses et à ton historique.",
@@ -871,7 +1087,7 @@
     "auth_switch_to_register": "Pas encore de compte ?",
     "link_signup": "Inscris-toi",
     "auth_title_register": "Créer un compte",
-    "auth_sub_register": "Rejoins AcePredict et commence à analyser tes premiers matchs.",
+    "auth_sub_register": "Rejoins TennisMind et commence à analyser tes premiers matchs.",
     "auth_label_name": "Nom complet",
     "auth_btn_register": "Créer mon compte",
     "auth_switch_to_login": "Déjà inscrit ?",
@@ -879,6 +1095,7 @@
   },
   "en": {
     "nav_login": "Log in",
+    "nav_login_cta": "Log in",
     "auth_or_divider": "or",
     "auth_google_error": "Google sign-in failed — please try again.",
     "auth_google_connecting": "Signing in with Google…",
@@ -886,8 +1103,8 @@
     "hero_sub": "AI analysis, advanced stats and match scenarios to anticipate results and better understand the game.",
     "hero_search_ph": "Search for a player (e.g. Alcaraz, Sinner...)",
     "btn_analyser": "Analyze",
-    "stat_mid1": " accuracy on the ",
-    "stat_mid2": " matches analyzed last week",
+    "stat_mid1": "accuracy", "stat_sub1": "on the ",
+    "stat_mid2": " matches verified so far",
     "p_h1_analyse": "Match analysis",
     "p_sub1": "Enter the players you want to analyze",
     "p_sub_accent1": "Our AI is connected to tennis news and crosses millions of data points for every prediction.",
@@ -901,14 +1118,18 @@
     "score_cap2": "Sinner win",
     "live_update": "Data updated every 15 minutes",
     "dl_line": "Download the app to get all the<br>match analyses",
-    "testi_h2": "What <span class=\"lime\">AcePredict</span> users think",
-    "testi_p": "Thousands of fans use AcePredict to analyze matches with precision.",
+    "testi_h2": "What <span class=\"lime\">TennisMind</span> users think",
+    "testi_p": "Thousands of fans use TennisMind to analyze matches with precision.",
     "vtag1": "AI analysis ready",
     "vtag2": "The AI predicted it all ✅",
     "vtag3": "AI confidence",
     "voir_tous": "See all",
     "feature_h2": "AI analysis to anticipate <span class=\"lime\">every match.</span>",
     "feature_p": "Probabilities, scenarios and key data to understand how a match will unfold before the first point.",
+    "seo_k": "Today's predictions",
+    "seo_h2": "Every match <span class=\"lime\">at a glance.</span>",
+    "seo_p": "Win probability, likely score and real result for every ATP and WTA match, published before the first point.",
+    "badge_today": "analyses run today", "hd_win": "Likely winner", "hd_score": "Most likely score", "hd_result": "Result", "cta_tool": "Analyze a match", "seo_btn": "See today's matches", "seo_l1": "Tomorrow", "seo_l2": "Tournaments", "seo_l3": "Players", "seo_note": "Free, no sign-up",
     "p_h1_comp": "Competitions",
     "p_sub2": "Discover ongoing competitions",
     "p_sub_accent2": "Our AI analyzes tournaments and gives you insights on players, rankings and upcoming matches.",
@@ -919,18 +1140,18 @@
     "sources_h2": "We analyze +220 <span class=\"lime\">sources</span>",
     "process_line": "One team, one process, to launch an app built for conversion and profitability.",
     "faq_h2": "Frequently asked questions",
-    "faq_q1": "Is AcePredict free?",
-    "faq_a1": "AcePredict offers a free version with limited access to some analyses. The €19/month subscription unlocks all features.",
+    "faq_q1": "Is TennisMind free?",
+    "faq_a1": "TennisMind offers a free version with limited access to some analyses. The €19/month subscription unlocks all features.",
     "faq_q2": "How do the AI analyses work?",
     "faq_a2": "Our models analyze thousands of data points (stats, player form, history...) to generate clear, understandable probabilities and match scenarios.",
-    "faq_q3": "Does AcePredict let you bet?",
-    "faq_a3": "No. AcePredict is an analysis and understanding tool. We offer no betting service whatsoever.",
+    "faq_q3": "Does TennisMind let you bet?",
+    "faq_a3": "TennisMind isn't a bookmaker: we take no bets and give no betting advice. It's an analysis tool, and what you do with it is up to you, including for your own bets where legal. No result is guaranteed, so play responsibly.",
     "faq_q4": "Is the data reliable?",
     "faq_a4": "Yes. Analyses rely on real data updated continuously to guarantee the best possible accuracy.",
     "foot_pricing": "Pricing",
     "foot_support": "Support",
     "foot_privacy": "Privacy",
-    "foot_copy": "© 2026 AcePredict. All analyses are provided for informational purposes only.",
+    "foot_copy": "© 2026 TennisMind. All analyses are provided for informational purposes only.",
     "auth_tab_register": "Sign up",
     "auth_title_login": "Welcome back",
     "auth_sub_login": "Log in to access your analyses and history.",
@@ -940,7 +1161,7 @@
     "auth_switch_to_register": "Don't have an account yet?",
     "link_signup": "Sign up",
     "auth_title_register": "Create an account",
-    "auth_sub_register": "Join AcePredict and start analyzing your first matches.",
+    "auth_sub_register": "Join TennisMind and start analyzing your first matches.",
     "auth_label_name": "Full name",
     "auth_btn_register": "Create my account",
     "auth_switch_to_login": "Already registered?",
@@ -948,6 +1169,7 @@
   },
   "es": {
     "nav_login": "Iniciar sesión",
+    "nav_login_cta": "Iniciar sesión",
     "auth_or_divider": "o",
     "auth_google_error": "No se pudo iniciar sesión con Google — inténtalo de nuevo.",
     "auth_google_connecting": "Conectando con Google…",
@@ -955,8 +1177,8 @@
     "hero_sub": "Análisis con IA, estadísticas avanzadas y escenarios de partido para anticipar resultados y entender mejor el juego.",
     "hero_search_ph": "Busca un jugador (ej: Alcaraz, Sinner...)",
     "btn_analyser": "Analizar",
-    "stat_mid1": " de precisión en los ",
-    "stat_mid2": " partidos analizados la semana pasada",
+    "stat_mid1": "de precisión", "stat_sub1": "en los ",
+    "stat_mid2": " partidos verificados desde el inicio",
     "p_h1_analyse": "Análisis de partido",
     "p_sub1": "Introduce los jugadores que quieres analizar",
     "p_sub_accent1": "Nuestra IA está conectada a la actualidad del tenis y cruza millones de datos para cada pronóstico.",
@@ -970,14 +1192,18 @@
     "score_cap2": "Victoria de Sinner",
     "live_update": "Datos actualizados cada 15 minutos",
     "dl_line": "Descarga la app para obtener todos los<br>análisis del partido",
-    "testi_h2": "Lo que opinan los usuarios de <span class=\"lime\">AcePredict</span>",
-    "testi_p": "Miles de aficionados usan AcePredict para analizar partidos con precisión.",
+    "testi_h2": "Lo que opinan los usuarios de <span class=\"lime\">TennisMind</span>",
+    "testi_p": "Miles de aficionados usan TennisMind para analizar partidos con precisión.",
     "vtag1": "Análisis de IA listo",
     "vtag2": "La IA lo predijo todo ✅",
     "vtag3": "Confianza de la IA",
     "voir_tous": "Ver todos",
     "feature_h2": "Análisis de IA para anticipar <span class=\"lime\">cada partido.</span>",
     "feature_p": "Probabilidades, escenarios y datos clave para entender el desarrollo de un partido antes del primer punto.",
+    "seo_k": "Pronósticos del día",
+    "seo_h2": "Los partidos <span class=\"lime\">de un vistazo.</span>",
+    "seo_p": "Probabilidad de victoria, marcador probable y resultado real de cada partido ATP y WTA, publicados antes de empezar.",
+    "badge_today": "análisis realizados hoy", "hd_win": "Ganador probable", "hd_score": "Marcador más probable", "hd_result": "Resultado", "cta_tool": "Analizar un partido", "seo_btn": "Ver los partidos de hoy", "seo_l1": "Mañana", "seo_l2": "Torneos", "seo_l3": "Jugadores", "seo_note": "Gratis, sin registro",
     "p_h1_comp": "Competiciones",
     "p_sub2": "Descubre las competiciones en curso",
     "p_sub_accent2": "Nuestra IA analiza los torneos y te da información sobre jugadores, clasificaciones y próximos partidos.",
@@ -988,18 +1214,18 @@
     "sources_h2": "Analizamos +220 <span class=\"lime\">fuentes</span>",
     "process_line": "Un solo equipo, un solo proceso, para lanzar una app pensada para la conversión y la rentabilidad.",
     "faq_h2": "Preguntas frecuentes",
-    "faq_q1": "¿AcePredict es gratis?",
-    "faq_a1": "AcePredict ofrece una versión gratuita con acceso limitado a algunos análisis. La suscripción de 19€/mes desbloquea todas las funciones.",
+    "faq_q1": "¿TennisMind es gratis?",
+    "faq_a1": "TennisMind ofrece una versión gratuita con acceso limitado a algunos análisis. La suscripción de 19€/mes desbloquea todas las funciones.",
     "faq_q2": "¿Cómo funcionan los análisis de IA?",
     "faq_a2": "Nuestros modelos analizan miles de datos (estadísticas, forma de los jugadores, historial...) para generar probabilidades y escenarios de partido claros y comprensibles.",
-    "faq_q3": "¿AcePredict permite apostar?",
-    "faq_a3": "No. AcePredict es una herramienta de análisis y comprensión del juego. No ofrecemos ningún servicio de apuestas.",
+    "faq_q3": "¿TennisMind permite apostar?",
+    "faq_a3": "TennisMind no es una casa de apuestas: no aceptamos apuestas ni damos consejos de apuestas. Es una herramienta de análisis y lo que hagas con ella depende de ti, incluso para tus propias apuestas donde sea legal. Ningún resultado está garantizado, juega con responsabilidad.",
     "faq_q4": "¿Son fiables los datos?",
     "faq_a4": "Sí. Los análisis se basan en datos reales actualizados continuamente para garantizar la mejor precisión posible.",
     "foot_pricing": "Precios",
     "foot_support": "Soporte",
     "foot_privacy": "Privacidad",
-    "foot_copy": "© 2026 AcePredict. Todos los análisis se ofrecen únicamente con fines informativos.",
+    "foot_copy": "© 2026 TennisMind. Todos los análisis se ofrecen únicamente con fines informativos.",
     "auth_tab_register": "Registrarse",
     "auth_title_login": "Bienvenido de nuevo",
     "auth_sub_login": "Inicia sesión para acceder a tus análisis y a tu historial.",
@@ -1009,7 +1235,7 @@
     "auth_switch_to_register": "¿Aún no tienes cuenta?",
     "link_signup": "Regístrate",
     "auth_title_register": "Crear una cuenta",
-    "auth_sub_register": "Únete a AcePredict y empieza a analizar tus primeros partidos.",
+    "auth_sub_register": "Únete a TennisMind y empieza a analizar tus primeros partidos.",
     "auth_label_name": "Nombre completo",
     "auth_btn_register": "Crear mi cuenta",
     "auth_switch_to_login": "¿Ya tienes cuenta?",
@@ -1017,6 +1243,7 @@
   },
   "de": {
     "nav_login": "Anmelden",
+    "nav_login_cta": "Anmelden",
     "auth_or_divider": "oder",
     "auth_google_error": "Google-Anmeldung fehlgeschlagen — bitte erneut versuchen.",
     "auth_google_connecting": "Anmeldung mit Google…",
@@ -1024,8 +1251,8 @@
     "hero_sub": "KI-Analysen, fortschrittliche Statistiken und Spielszenarien, um Ergebnisse vorherzusehen und das Spiel besser zu verstehen.",
     "hero_search_ph": "Spieler suchen (z. B. Alcaraz, Sinner...)",
     "btn_analyser": "Analysieren",
-    "stat_mid1": " Genauigkeit bei den ",
-    "stat_mid2": " Matches, die letzte Woche analysiert wurden",
+    "stat_mid1": "Genauigkeit", "stat_sub1": "bei den ",
+    "stat_mid2": " geprüften Matches seit Beginn",
     "p_h1_analyse": "Match-Analyse",
     "p_sub1": "Gib die Spieler ein, die du analysieren möchtest",
     "p_sub_accent1": "Unsere KI ist mit aktuellen Tennisnachrichten verbunden und wertet Millionen von Daten für jede Prognose aus.",
@@ -1039,14 +1266,18 @@
     "score_cap2": "Sieg Sinner",
     "live_update": "Daten alle 15 Minuten aktualisiert",
     "dl_line": "Lade die App herunter, um alle<br>Match-Analysen zu erhalten",
-    "testi_h2": "Was Nutzer von <span class=\"lime\">AcePredict</span> sagen",
-    "testi_p": "Tausende von Fans nutzen AcePredict, um Matches präzise zu analysieren.",
+    "testi_h2": "Was Nutzer von <span class=\"lime\">TennisMind</span> sagen",
+    "testi_p": "Tausende von Fans nutzen TennisMind, um Matches präzise zu analysieren.",
     "vtag1": "KI-Analyse bereit",
     "vtag2": "Die KI hatte alles vorhergesagt ✅",
     "vtag3": "Vertrauen der KI",
     "voir_tous": "Alle anzeigen",
     "feature_h2": "KI-Analysen, um <span class=\"lime\">jedes Match</span> vorherzusehen.",
     "feature_p": "Wahrscheinlichkeiten, Szenarien und Schlüsseldaten, um den Verlauf eines Matches schon vor dem ersten Punkt zu verstehen.",
+    "seo_k": "Tipps des Tages",
+    "seo_h2": "Alle Matches <span class=\"lime\">auf einen Blick.</span>",
+    "seo_p": "Siegwahrscheinlichkeit, wahrscheinliches Ergebnis und echtes Resultat jedes ATP- und WTA-Matches, vor dem ersten Ballwechsel veröffentlicht.",
+    "badge_today": "Analysen heute", "hd_win": "Wahrscheinlicher Sieger", "hd_score": "Wahrscheinlichstes Ergebnis", "hd_result": "Ergebnis", "cta_tool": "Ein Match analysieren", "seo_btn": "Heutige Matches ansehen", "seo_l1": "Morgen", "seo_l2": "Turniere", "seo_l3": "Spieler", "seo_note": "Kostenlos, ohne Anmeldung",
     "p_h1_comp": "Wettbewerbe",
     "p_sub2": "Entdecke laufende Wettbewerbe",
     "p_sub_accent2": "Unsere KI analysiert Turniere und liefert dir Einblicke zu Spielern, Ranglisten und kommenden Matches.",
@@ -1057,18 +1288,18 @@
     "sources_h2": "Wir analysieren +220 <span class=\"lime\">Quellen</span>",
     "process_line": "Ein Team, ein Prozess, um eine App zu starten, die auf Conversion und Rentabilität ausgelegt ist.",
     "faq_h2": "Häufige Fragen",
-    "faq_q1": "Ist AcePredict kostenlos?",
-    "faq_a1": "AcePredict bietet eine kostenlose Version mit begrenztem Zugriff auf bestimmte Analysen. Das Abo für 19€/Monat schaltet alle Funktionen frei.",
+    "faq_q1": "Ist TennisMind kostenlos?",
+    "faq_a1": "TennisMind bietet eine kostenlose Version mit begrenztem Zugriff auf bestimmte Analysen. Das Abo für 19€/Monat schaltet alle Funktionen frei.",
     "faq_q2": "Wie funktionieren die KI-Analysen?",
     "faq_a2": "Unsere Modelle analysieren Tausende von Daten (Statistiken, Spielerform, Historie...), um klare und verständliche Wahrscheinlichkeiten und Matchszenarien zu erstellen.",
-    "faq_q3": "Kann man mit AcePredict wetten?",
-    "faq_a3": "Nein. AcePredict ist ein Analyse- und Verständnistool. Wir bieten keinerlei Wettservice an.",
+    "faq_q3": "Kann man mit TennisMind wetten?",
+    "faq_a3": "TennisMind ist kein Buchmacher: Wir nehmen keine Wetten an und geben keine Wettempfehlungen. Es ist ein Analysetool, und was du damit machst, entscheidest du selbst, auch für eigene Wetten, wo es legal ist. Kein Ergebnis ist garantiert, spiel verantwortungsvoll.",
     "faq_q4": "Sind die Daten zuverlässig?",
     "faq_a4": "Ja. Die Analysen basieren auf realen, kontinuierlich aktualisierten Daten, um bestmögliche Genauigkeit zu gewährleisten.",
     "foot_pricing": "Preise",
     "foot_support": "Support",
     "foot_privacy": "Datenschutz",
-    "foot_copy": "© 2026 AcePredict. Alle Analysen dienen ausschließlich zu Informationszwecken.",
+    "foot_copy": "© 2026 TennisMind. Alle Analysen dienen ausschließlich zu Informationszwecken.",
     "auth_tab_register": "Registrieren",
     "auth_title_login": "Schön, dich wiederzusehen",
     "auth_sub_login": "Melde dich an, um auf deine Analysen und deinen Verlauf zuzugreifen.",
@@ -1078,7 +1309,7 @@
     "auth_switch_to_register": "Noch kein Konto?",
     "link_signup": "Registrieren",
     "auth_title_register": "Konto erstellen",
-    "auth_sub_register": "Tritt AcePredict bei und beginne, deine ersten Matches zu analysieren.",
+    "auth_sub_register": "Tritt TennisMind bei und beginne, deine ersten Matches zu analysieren.",
     "auth_label_name": "Vollständiger Name",
     "auth_btn_register": "Konto erstellen",
     "auth_switch_to_login": "Schon registriert?",
@@ -1086,6 +1317,7 @@
   },
   "it": {
     "nav_login": "Accedi",
+    "nav_login_cta": "Accedi",
     "auth_or_divider": "o",
     "auth_google_error": "Accesso con Google non riuscito — riprova.",
     "auth_google_connecting": "Accesso con Google…",
@@ -1093,8 +1325,8 @@
     "hero_sub": "Analisi IA, statistiche avanzate e scenari di partita per anticipare i risultati e capire meglio il gioco.",
     "hero_search_ph": "Cerca un giocatore (es: Alcaraz, Sinner...)",
     "btn_analyser": "Analizza",
-    "stat_mid1": " di precisione sulle ",
-    "stat_mid2": " partite analizzate la settimana scorsa",
+    "stat_mid1": "di precisione", "stat_sub1": "sulle ",
+    "stat_mid2": " partite verificate dall'inizio",
     "p_h1_analyse": "Analisi della partita",
     "p_sub1": "Inserisci i giocatori che vuoi analizzare",
     "p_sub_accent1": "La nostra IA è connessa alle notizie sul tennis e incrocia milioni di dati per ogni pronostico.",
@@ -1108,13 +1340,17 @@
     "score_cap2": "Vittoria Sinner",
     "live_update": "Dati aggiornati ogni 15 minuti",
     "dl_line": "Scarica l'app per ottenere tutte le<br>analisi della partita",
-    "testi_p": "Migliaia di appassionati usano AcePredict per analizzare le partite con precisione.",
+    "testi_p": "Migliaia di appassionati usano TennisMind per analizzare le partite con precisione.",
     "vtag1": "Analisi IA pronta",
     "vtag2": "L'IA aveva previsto tutto ✅",
     "vtag3": "Fiducia dell'IA",
     "voir_tous": "Vedi tutti",
     "feature_h2": "Analisi IA per anticipare <span class=\"lime\">ogni partita.</span>",
     "feature_p": "Probabilità, scenari e dati chiave per capire lo svolgimento di una partita ancora prima del primo punto.",
+    "seo_k": "Pronostici del giorno",
+    "seo_h2": "Tutte le partite <span class=\"lime\">in un colpo d'occhio.</span>",
+    "seo_p": "Probabilità di vittoria, punteggio probabile e risultato reale di ogni partita ATP e WTA, pubblicati prima dell'inizio.",
+    "badge_today": "analisi effettuate oggi", "hd_win": "Vincitore probabile", "hd_score": "Punteggio più probabile", "hd_result": "Risultato", "cta_tool": "Analizza una partita", "seo_btn": "Vedi le partite di oggi", "seo_l1": "Domani", "seo_l2": "Tornei", "seo_l3": "Giocatori", "seo_note": "Gratis, senza registrazione",
     "p_h1_comp": "Competizioni",
     "p_sub2": "Scopri le competizioni in corso",
     "p_sub_accent2": "La nostra IA analizza i tornei e ti offre approfondimenti su giocatori, classifiche e prossime partite.",
@@ -1125,18 +1361,18 @@
     "sources_h2": "Analizziamo +220 <span class=\"lime\">fonti</span>",
     "process_line": "Un solo team, un solo processo, per lanciare un'app pensata per conversione e redditività.",
     "faq_h2": "Domande frequenti",
-    "faq_q1": "AcePredict è gratuito?",
-    "faq_a1": "AcePredict offre una versione gratuita con accesso limitato ad alcune analisi. L'abbonamento a 19€/mese sblocca tutte le funzionalità.",
+    "faq_q1": "TennisMind è gratuito?",
+    "faq_a1": "TennisMind offre una versione gratuita con accesso limitato ad alcune analisi. L'abbonamento a 19€/mese sblocca tutte le funzionalità.",
     "faq_q2": "Come funzionano le analisi IA?",
     "faq_a2": "I nostri modelli analizzano migliaia di dati (statistiche, forma dei giocatori, storico...) per generare probabilità e scenari di partita chiari e comprensibili.",
-    "faq_q3": "AcePredict permette di scommettere?",
-    "faq_a3": "No. AcePredict è uno strumento di analisi e comprensione del gioco. Non offriamo alcun servizio di scommesse.",
+    "faq_q3": "TennisMind permette di scommettere?",
+    "faq_a3": "TennisMind non è un bookmaker: non accettiamo scommesse né diamo consigli di scommessa. È uno strumento di analisi e quello che ne fai dipende da te, anche per le tue scommesse dove è legale. Nessun risultato è garantito, gioca in modo responsabile.",
     "faq_q4": "I dati sono affidabili?",
     "faq_a4": "Sì. Le analisi si basano su dati reali aggiornati continuamente per garantire la migliore precisione possibile.",
     "foot_pricing": "Prezzi",
     "foot_support": "Supporto",
     "foot_privacy": "Privacy",
-    "foot_copy": "© 2026 AcePredict. Tutte le analisi sono fornite esclusivamente a scopo informativo.",
+    "foot_copy": "© 2026 TennisMind. Tutte le analisi sono fornite esclusivamente a scopo informativo.",
     "auth_tab_register": "Registrati",
     "auth_title_login": "Bentornato",
     "auth_sub_login": "Accedi per consultare le tue analisi e la cronologia.",
@@ -1146,12 +1382,12 @@
     "auth_switch_to_register": "Non hai ancora un account?",
     "link_signup": "Registrati",
     "auth_title_register": "Crea un account",
-    "auth_sub_register": "Unisciti ad AcePredict e inizia ad analizzare le tue prime partite.",
+    "auth_sub_register": "Unisciti ad TennisMind e inizia ad analizzare le tue prime partite.",
     "auth_label_name": "Nome completo",
     "auth_btn_register": "Crea il mio account",
     "auth_switch_to_login": "Hai già un account?",
     "link_login": "Accedi",
-    "testi_h2": "Cosa pensano gli utenti di <span class=\"lime\">AcePredict</span>"
+    "testi_h2": "Cosa pensano gli utenti di <span class=\"lime\">TennisMind</span>"
   }
 };
   const LANG_NAMES = { fr:'Français', en:'English', es:'Español', de:'Deutsch', it:'Italiano' };
@@ -1171,7 +1407,7 @@
       if(dict[key] !== undefined) el.placeholder = dict[key];
     });
     document.documentElement.lang = lang;
-    try{ localStorage.setItem('acepredict_lang', lang); }catch(e){}
+    try{ localStorage.setItem('tennismind_lang', lang); }catch(e){}
   }
 
   // language dropdown
@@ -1186,7 +1422,7 @@
     opt.addEventListener('click', ()=>{
       langDropdown.querySelectorAll('.lang-option').forEach(o=> o.classList.remove('active'));
       opt.classList.add('active');
-      langLabel.textContent = LANG_NAMES[opt.dataset.lang] || opt.textContent.trim();
+      langLabel.textContent = opt.dataset.lang.toUpperCase();
       langDropdown.classList.remove('open');
       applyLang(opt.dataset.lang);
     });
@@ -1196,13 +1432,19 @@
   // restore saved language on load
   (function(){
     let saved = null;
-    try{ saved = localStorage.getItem('acepredict_lang'); }catch(e){}
+    try{ saved = localStorage.getItem('tennismind_lang'); }catch(e){}
+    // Première visite : langue du téléphone / navigateur du visiteur.
+    if(!saved){
+      const prefs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navigator.language || 'fr'];
+      for(const l of prefs){ const c = String(l).slice(0,2).toLowerCase(); if(TR[c]){ saved = c; break; } }
+      if(!saved) saved = 'en';
+    }
     if(saved && TR[saved]){
       const opt = langDropdown.querySelector('.lang-option[data-lang="'+saved+'"]');
       if(opt){
         langDropdown.querySelectorAll('.lang-option').forEach(o=> o.classList.remove('active'));
         opt.classList.add('active');
-        langLabel.textContent = LANG_NAMES[saved] || opt.textContent.trim();
+        langLabel.textContent = saved.toUpperCase();
       }
       applyLang(saved);
     }
@@ -1210,6 +1452,58 @@
 
   // ---------- Auth modal ----------
   const API_BASE = 'https://acepredict-production.up.railway.app';
+  (function liveCount(){
+    const el = document.getElementById('todayCount'); if(!el) return;
+    let cur = 0;
+    function show(n){
+      const from = cur, t0 = performance.now();
+      (function step(t){ const p = Math.min(1,(t-t0)/900); const v = Math.round(from+(n-from)*(1-Math.pow(1-p,3)));
+        el.textContent = v.toLocaleString(document.documentElement.lang || 'fr'); if(p<1) requestAnimationFrame(step); })(t0);
+      cur = n;
+    }
+    async function load(){
+      try{ const r = await fetch(API_BASE + '/seo/activity.json'); if(!r.ok) throw 0; const d = await r.json(); if(typeof d.today==='number') show(d.today); }
+      catch(e){ if(!cur) document.getElementById('liveBadge').style.display='none'; }
+    }
+    load(); setInterval(load, 5*60*1000);
+  })();
+  // ---------- Programme createurs : capture du ?via=NOM (valable 30 jours) ----------
+  (function captureCreatorCode(){
+    try{
+      const v = new URLSearchParams(window.location.search).get('via');
+      if(v && /^[a-zA-Z0-9_-]{2,40}$/.test(v.trim())){
+        const code = v.trim().toLowerCase();
+        const prev = JSON.parse(localStorage.getItem('tennismind_via') || 'null');
+        if(!prev || prev.code !== code){
+          localStorage.setItem('tennismind_via', JSON.stringify({ code, ts: Date.now() }));
+          fetch(API_BASE + '/creators/click', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ code }) }).catch(()=>{});
+        }
+      }
+    }catch(e){}
+  })();
+  // Code créateur tapé à l'inscription (prioritaire sur le lien ?via=).
+  function getTypedCreatorCode(){
+    const el = document.getElementById('registerCreatorCode');
+    const v = el && el.value ? el.value.trim().toLowerCase() : '';
+    return /^[a-z0-9_-]{2,40}$/.test(v) ? v : null;
+  }
+  // Pré-remplit le champ si le visiteur est arrivé par un lien créateur.
+  document.addEventListener('DOMContentLoaded', ()=>{
+    try{
+      const el = document.getElementById('registerCreatorCode');
+      const v = JSON.parse(localStorage.getItem('tennismind_via') || 'null');
+      if(el && !el.value && v && v.code && Date.now() - v.ts < 30*24*3600*1000) el.value = v.code.toUpperCase();
+    }catch(e){}
+  });
+  function getPendingViaCode(){
+    const typed = getTypedCreatorCode();
+    if(typed) return typed;
+    try{
+      const v = JSON.parse(localStorage.getItem('tennismind_via') || 'null');
+      if(v && v.code && Date.now() - v.ts < 30*24*3600*1000) return v.code;
+    }catch(e){}
+    return null;
+  }
   const authOverlay = document.getElementById('authOverlay');
   const navLoginBtn = document.getElementById('navLoginBtn');
 
@@ -1227,6 +1521,7 @@
   }
 
   navLoginBtn.addEventListener('click', (e)=>{ e.preventDefault(); openAuth('login'); });
+  document.getElementById('navLoginMobileBtn').addEventListener('click', (e)=>{ e.preventDefault(); openAuth('login'); });
   document.getElementById('authClose').addEventListener('click', closeAuth);
   authOverlay.addEventListener('click', (e)=>{ if(e.target === authOverlay) closeAuth(); });
   document.querySelectorAll('[data-auth-tab]').forEach(el=>{
@@ -1238,7 +1533,7 @@
     el.className = 'auth-msg ' + (type || '');
   }
 
-  const NETWORK_ERR = "Impossible de contacter le serveur AcePredict. Vérifie que le backend tourne (voir README du projet, ex: docker compose up) et qu'il écoute bien sur " + API_BASE + ".";
+  const NETWORK_ERR = "Impossible de contacter le serveur TennisMind. Vérifie que le backend tourne (voir README du projet, ex: docker compose up) et qu'il écoute bien sur " + API_BASE + ".";
 
   async function apiLogin(email, password){
     const body = new URLSearchParams();
@@ -1269,13 +1564,13 @@
       const res = await fetch(API_BASE + '/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_token: response.credential }),
+        body: JSON.stringify({ id_token: response.credential, via_code: getPendingViaCode() }),
       });
       const data = await res.json().catch(()=> ({}));
       if(!res.ok) throw new Error(data.detail || 'Connexion Google impossible — réessaie.');
-      localStorage.setItem('acepredict_token', data.access_token);
+      localStorage.setItem('tennismind_token', data.access_token);
       setAuthMsg(msg, 'success', 'Connecté, redirection...');
-      window.location.href = 'visitennis_1.html';
+      window.location.href = '/app';
     } catch(err){
       setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
     }
@@ -1308,9 +1603,9 @@
     btn.disabled = true; btn.textContent = 'Connexion...';
     try {
       const data = await apiLogin(email, password);
-      localStorage.setItem('acepredict_token', data.access_token);
+      localStorage.setItem('tennismind_token', data.access_token);
       setAuthMsg(msg, 'success', 'Connecté, redirection...');
-      window.location.href = 'visitennis_1.html';
+      window.location.href = '/app';
     } catch(err){
       setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
     } finally {
@@ -1331,16 +1626,16 @@
       const res = await fetch(API_BASE + '/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, full_name: full_name || null }),
+        body: JSON.stringify({ email, password, full_name: full_name || null, via_code: getPendingViaCode() }),
       });
       if(!res.ok){
         const errBody = await res.json().catch(()=> ({}));
         throw new Error(errBody.detail || 'Inscription refusée (code ' + res.status + ').');
       }
       const data = await apiLogin(email, password);
-      localStorage.setItem('acepredict_token', data.access_token);
+      localStorage.setItem('tennismind_token', data.access_token);
       setAuthMsg(msg, 'success', 'Compte créé, redirection...');
-      window.location.href = 'visitennis_1.html';
+      window.location.href = '/app';
     } catch(err){
       setAuthMsg(msg, 'error', err instanceof TypeError ? NETWORK_ERR : err.message);
     } finally {
@@ -1433,6 +1728,73 @@
     });
     document.addEventListener('mouseleave', ()=> marks.forEach(m=> m.classList.remove('col-active')));
   })();
+
+/* Nuage d'icônes de la section sources : dérive libre, repoussées par la souris/le doigt, sans chevauchement, sans position d'ancrage */
+(function(){
+  var f=document.getElementById('factorsField'); if(!f) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var seed=7; function rnd(){ seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }
+  var items=[].slice.call(f.querySelectorAll('.factor-chip')).map(function(el){
+    return {el:el,x:0,y:0,vx:(rnd()-.5)*.5,vy:(rnd()-.5)*.5,g:0};
+  });
+  var W=0,H=0,mx=-9999,my=-9999,active=false,R=170,raf=null,vis=false,box=null,PAD=(window.innerWidth<640?50:64),placed=false;
+  function cw(){ return W<640?98:128; } function ch(){ return 88; }
+  function scatter(){
+    /* placement aléatoire sans chevauchement (rejet) : un vrai nuage, pas une grille */
+    var pts=[];
+    items.forEach(function(c){
+      var best=null,bd=-1;
+      for(var k=0;k<400;k++){
+        var x=PAD+rnd()*(W-2*PAD), y=PAD*.8+rnd()*(H-1.6*PAD), m=1e9;
+        pts.forEach(function(q){ var d=Math.max(Math.abs(q.x-x)/cw(),Math.abs(q.y-y)/ch()); if(d<m) m=d; });
+        if(m>bd){ bd=m; best={x:x,y:y}; if(m>=1.15) break; }
+      }
+      c.x=best.x; c.y=best.y; pts.push(c);
+    });
+  }
+  function size(){
+    var r=f.getBoundingClientRect(), w=r.width, h=r.height;
+    if(!placed){ f.classList.add('cloud'); r=f.getBoundingClientRect(); w=r.width; h=r.height; }
+    if(placed){ items.forEach(function(c){ c.x*=w/(W||w); c.y*=h/(H||h); }); }
+    W=w; H=h;
+    if(!placed){ scatter(); placed=true; }
+  }
+  function tick(){
+    box=f.getBoundingClientRect(); var CW=cw(),CH=ch();
+    items.forEach(function(c){
+      /* léger vagabondage + répulsion du curseur */
+      c.vx+=(rnd()-.5)*.05; c.vy+=(rnd()-.5)*.05; c.g=0;
+      if(active){
+        var dx=c.x+box.left-mx, dy=c.y+box.top-my, d=Math.hypot(dx,dy)||1;
+        if(d<R){ var k=1-d/R; c.vx+=dx/d*k*2.2; c.vy+=dy/d*k*2.2; c.g=k; }
+      }
+    });
+    for(var i=0;i<items.length;i++) for(var j=i+1;j<items.length;j++){
+      var a=items[i],b=items[j],dx=a.x-b.x,dy=a.y-b.y,px=CW-Math.abs(dx),py=CH-Math.abs(dy);
+      if(px>0&&py>0){ /* chevauchement de boîtes : on pousse sur l'axe le moins pénétré */
+        if(px/CW<py/CH){ var s=Math.sign(dx||1)*(px*.06+.15); a.vx+=s; b.vx-=s; a.x+=s*2; b.x-=s*2; }
+        else { var s2=Math.sign(dy||1)*(py*.06+.15); a.vy+=s2; b.vy-=s2; a.y+=s2*2; b.y-=s2*2; } }
+    }
+    items.forEach(function(c){
+      c.vx*=.955; c.vy*=.955;
+      var sp=Math.hypot(c.vx,c.vy); if(sp>14){ c.vx*=14/sp; c.vy*=14/sp; }
+      if(sp<.25){ c.vx+=(rnd()-.5)*.12; c.vy+=(rnd()-.5)*.12; }
+      c.x+=c.vx; c.y+=c.vy;
+      /* bords doux : rebond amorti, pas de rappel vers un point fixe */
+      if(c.x<PAD*.6){ c.x=PAD*.6; c.vx=Math.abs(c.vx)*.6; } if(c.x>W-PAD*.6){ c.x=W-PAD*.6; c.vx=-Math.abs(c.vx)*.6; }
+      if(c.y<PAD*.6){ c.y=PAD*.6; c.vy=Math.abs(c.vy)*.6; } if(c.y>H-PAD*.6){ c.y=H-PAD*.6; c.vy=-Math.abs(c.vy)*.6; }
+      c.el.style.transform='translate('+c.x.toFixed(1)+'px,'+c.y.toFixed(1)+'px) translate(-50%,-50%)';
+      c.el.style.setProperty('--g',c.g.toFixed(2));
+    });
+    raf=vis?requestAnimationFrame(tick):null;
+  }
+  size(); window.addEventListener('resize',size);
+  new IntersectionObserver(function(e){ vis=e[0].isIntersecting; if(vis&&!raf) raf=requestAnimationFrame(tick); }).observe(f);
+  var sec=f.closest('section')||f;
+  sec.addEventListener('pointermove',function(e){ mx=e.clientX; my=e.clientY; active=true; });
+  sec.addEventListener('pointerleave',function(){ active=false; });
+  sec.addEventListener('pointerup',function(e){ if(e.pointerType!=='mouse') active=false; });
+})();
 </script>
 </body>
 </html>
