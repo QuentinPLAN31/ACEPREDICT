@@ -155,7 +155,7 @@
   .hero > *{ position:relative; z-index:1; }
 
   .badge{
-    display:inline-flex; align-items:center; gap:9px;
+    display:inline-flex; align-items:center; gap:9px; white-space:nowrap;
     background: rgba(255,255,255,0.05);
     border: 1px solid var(--line-strong);
     padding: 9px 20px; border-radius: 999px;
@@ -690,6 +690,12 @@
   .hp-l{top:auto !important;bottom:70px;right:auto;left:calc(50% - var(--ph)*0.49 - 14px);rotate:-8deg}
   .hp-r{top:auto !important;bottom:15px;left:calc(50% + 14px);right:auto;rotate:8deg}
 }
+@media (max-width:560px){
+  .stat-line .stat-sub{max-width:180px;margin-left:auto;margin-right:auto}
+  .hero{--ph:200px; padding-bottom:130px}
+  .hp-r{top:calc(100% - 222px) !important;bottom:auto;left:calc(50% + 112px);right:auto;rotate:9deg}
+  .hp-l{top:calc(100% - 122px) !important;bottom:auto;right:auto;left:calc(50% - 112px - var(--ph)*0.49);rotate:-9deg}
+}
 </style>
 <!-- "Se connecter / S'inscrire avec Google" -- cf. JS plus bas -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -736,7 +742,7 @@
     <img class="hp hp-l" src="assets/mockups/phone-shelton.webp" alt="" loading="eager" decoding="async">
     <img class="hp hp-r" src="assets/mockups/phone-zverev.webp" alt="" loading="eager" decoding="async">
   </div>
-  <div class="badge" id="liveBadge"><span class="live-dot"></span><b id="todayCount">–</b> <span data-i18n="badge_today">analyses réalisées avec TennisMind</span></div>
+  <div class="badge" id="liveBadge"><span class="live-dot"></span><b id="todayCount">–</b> <span data-i18n="badge_today">analyses depuis le lancement</span></div>
   <h1 class="reveal" data-i18n-html="hero_title">Prédit chaque match avant qu'il ne<br><span class="lime">commence.</span></h1>
   <p class="sub reveal" data-i18n="hero_sub">Analyses IA, statistiques avancées et scénarios de match pour anticiper les résultats et mieux comprendre le jeu.</p>
 
@@ -1055,7 +1061,7 @@
     "seo_k": "Pronostics du jour",
     "seo_h2": "Les matchs <span class=\"lime\">en un coup d'œil.</span>",
     "seo_p": "Probabilité de victoire, score probable et résultat réel de chaque match ATP et WTA, publiés avant le premier service.",
-    "badge_today": "analyses réalisées avec TennisMind", "hd_win": "Gagnant probable", "hd_score": "Score le plus probable", "hd_result": "Résultat", "cta_tool": "Analyser un match", "seo_btn": "Voir les matchs du jour", "seo_l1": "Demain", "seo_l2": "Tournois", "seo_l3": "Joueurs", "seo_note": "Gratuit, sans inscription",
+    "badge_today": "analyses depuis le lancement", "hd_win": "Gagnant probable", "hd_score": "Score le plus probable", "hd_result": "Résultat", "cta_tool": "Analyser un match", "seo_btn": "Voir les matchs du jour", "seo_l1": "Demain", "seo_l2": "Tournois", "seo_l3": "Joueurs", "seo_note": "Gratuit, sans inscription",
     "p_h1_comp": "Compétitions",
     "p_sub2": "Découvre les compétitions en cours",
     "p_sub_accent2": "Notre IA analyse les tournois et te donne des insights sur les joueurs, les classements et les matchs à venir.",
@@ -1129,7 +1135,7 @@
     "seo_k": "Today's predictions",
     "seo_h2": "Every match <span class=\"lime\">at a glance.</span>",
     "seo_p": "Win probability, likely score and real result for every ATP and WTA match, published before the first point.",
-    "badge_today": "analyses run with TennisMind", "hd_win": "Likely winner", "hd_score": "Most likely score", "hd_result": "Result", "cta_tool": "Analyze a match", "seo_btn": "See today's matches", "seo_l1": "Tomorrow", "seo_l2": "Tournaments", "seo_l3": "Players", "seo_note": "Free, no sign-up",
+    "badge_today": "analyses since launch", "hd_win": "Likely winner", "hd_score": "Most likely score", "hd_result": "Result", "cta_tool": "Analyze a match", "seo_btn": "See today's matches", "seo_l1": "Tomorrow", "seo_l2": "Tournaments", "seo_l3": "Players", "seo_note": "Free, no sign-up",
     "p_h1_comp": "Competitions",
     "p_sub2": "Discover ongoing competitions",
     "p_sub_accent2": "Our AI analyzes tournaments and gives you insights on players, rankings and upcoming matches.",
@@ -1203,7 +1209,7 @@
     "seo_k": "Pronósticos del día",
     "seo_h2": "Los partidos <span class=\"lime\">de un vistazo.</span>",
     "seo_p": "Probabilidad de victoria, marcador probable y resultado real de cada partido ATP y WTA, publicados antes de empezar.",
-    "badge_today": "análisis realizados con TennisMind", "hd_win": "Ganador probable", "hd_score": "Marcador más probable", "hd_result": "Resultado", "cta_tool": "Analizar un partido", "seo_btn": "Ver los partidos de hoy", "seo_l1": "Mañana", "seo_l2": "Torneos", "seo_l3": "Jugadores", "seo_note": "Gratis, sin registro",
+    "badge_today": "análisis desde el lanzamiento", "hd_win": "Ganador probable", "hd_score": "Marcador más probable", "hd_result": "Resultado", "cta_tool": "Analizar un partido", "seo_btn": "Ver los partidos de hoy", "seo_l1": "Mañana", "seo_l2": "Torneos", "seo_l3": "Jugadores", "seo_note": "Gratis, sin registro",
     "p_h1_comp": "Competiciones",
     "p_sub2": "Descubre las competiciones en curso",
     "p_sub_accent2": "Nuestra IA analiza los torneos y te da información sobre jugadores, clasificaciones y próximos partidos.",
@@ -1277,7 +1283,7 @@
     "seo_k": "Tipps des Tages",
     "seo_h2": "Alle Matches <span class=\"lime\">auf einen Blick.</span>",
     "seo_p": "Siegwahrscheinlichkeit, wahrscheinliches Ergebnis und echtes Resultat jedes ATP- und WTA-Matches, vor dem ersten Ballwechsel veröffentlicht.",
-    "badge_today": "Analysen mit TennisMind", "hd_win": "Wahrscheinlicher Sieger", "hd_score": "Wahrscheinlichstes Ergebnis", "hd_result": "Ergebnis", "cta_tool": "Ein Match analysieren", "seo_btn": "Heutige Matches ansehen", "seo_l1": "Morgen", "seo_l2": "Turniere", "seo_l3": "Spieler", "seo_note": "Kostenlos, ohne Anmeldung",
+    "badge_today": "Analysen seit dem Start", "hd_win": "Wahrscheinlicher Sieger", "hd_score": "Wahrscheinlichstes Ergebnis", "hd_result": "Ergebnis", "cta_tool": "Ein Match analysieren", "seo_btn": "Heutige Matches ansehen", "seo_l1": "Morgen", "seo_l2": "Turniere", "seo_l3": "Spieler", "seo_note": "Kostenlos, ohne Anmeldung",
     "p_h1_comp": "Wettbewerbe",
     "p_sub2": "Entdecke laufende Wettbewerbe",
     "p_sub_accent2": "Unsere KI analysiert Turniere und liefert dir Einblicke zu Spielern, Ranglisten und kommenden Matches.",
@@ -1350,7 +1356,7 @@
     "seo_k": "Pronostici del giorno",
     "seo_h2": "Tutte le partite <span class=\"lime\">in un colpo d'occhio.</span>",
     "seo_p": "Probabilità di vittoria, punteggio probabile e risultato reale di ogni partita ATP e WTA, pubblicati prima dell'inizio.",
-    "badge_today": "analisi effettuate con TennisMind", "hd_win": "Vincitore probabile", "hd_score": "Punteggio più probabile", "hd_result": "Risultato", "cta_tool": "Analizza una partita", "seo_btn": "Vedi le partite di oggi", "seo_l1": "Domani", "seo_l2": "Tornei", "seo_l3": "Giocatori", "seo_note": "Gratis, senza registrazione",
+    "badge_today": "analisi dal lancio", "hd_win": "Vincitore probabile", "hd_score": "Punteggio più probabile", "hd_result": "Risultato", "cta_tool": "Analizza una partita", "seo_btn": "Vedi le partite di oggi", "seo_l1": "Domani", "seo_l2": "Tornei", "seo_l3": "Giocatori", "seo_note": "Gratis, senza registrazione",
     "p_h1_comp": "Competizioni",
     "p_sub2": "Scopri le competizioni in corso",
     "p_sub_accent2": "La nostra IA analizza i tornei e ti offre approfondimenti su giocatori, classifiche e prossime partite.",
